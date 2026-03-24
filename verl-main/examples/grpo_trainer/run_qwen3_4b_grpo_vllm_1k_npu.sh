@@ -12,7 +12,7 @@ export CPU_AFFINITY_CONF=1
 # 使用jemalloc优化内存访问（依赖安装jemalloc）
 #export LD_PRELOAD="/usr/lib/aarch64-linux-gnu/libjemalloc.so.2${LD_PRELOAD:+:$LD_PRELOAD}"
 
-trainer_n_gpus_per_node=4
+trainer_n_gpus_per_node=1
 trainer_nnodes=1
 trainer_project_name='RL_Dynamics'
 trainer_experiment_name="Llama3.2-1B-Instruct_grpo_4gpu"
@@ -28,7 +28,7 @@ use_dynamic_bsz=True
 
 python3 -m verl.trainer.main_ppo \
     algorithm.adv_estimator=grpo \
-    data.train_files="/share/nlp/baijun/shuhan/DAPO17k/train.parquet" \
+    data.train_files="/share/nlp/baijun/shuhan/gsm8k/train.parquet" \
     data.val_files="['/share/nlp/baijun/shuhan/AIME2024/test.parquet', '/share/nlp/baijun/shuhan/AIME2025/test.parquet', '/share/nlp/baijun/shuhan/AIME2026/test.parquet', '/share/nlp/baijun/shuhan/IF_Bench/test.parquet', '/share/nlp/baijun/shuhan/MMLU_Pro/test.parquet']" \
     data.train_batch_size=512 \
     data.max_prompt_length=1024 \
@@ -53,9 +53,9 @@ python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.rollout.log_prob_use_dynamic_bsz=${use_dynamic_bsz} \
     actor_rollout_ref.rollout.log_prob_max_token_len_per_gpu=9300\
     actor_rollout_ref.rollout.enable_chunked_prefill=False \
-    actor_rollout_ref.rollout.tensor_model_parallel_size=4 \
+    actor_rollout_ref.rollout.tensor_model_parallel_size=1 \
     actor_rollout_ref.rollout.name=vllm \
-    actor_rollout_ref.rollout.gpu_memory_utilization=0.6 \
+    actor_rollout_ref.rollout.gpu_memory_utilization=0.9 \
     actor_rollout_ref.rollout.n=5 \
     actor_rollout_ref.ref.log_prob_use_dynamic_bsz=${use_dynamic_bsz} \
     actor_rollout_ref.ref.log_prob_max_token_len_per_gpu=9300 \
