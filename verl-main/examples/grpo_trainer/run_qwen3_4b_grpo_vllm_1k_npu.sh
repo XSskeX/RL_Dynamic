@@ -28,8 +28,8 @@ use_dynamic_bsz=True
 
 python3 -m verl.trainer.main_ppo \
     algorithm.adv_estimator=grpo \
-    data.train_files="/share/nlp/baijun/shuhan/gsm8k/train.parquet" \
-    data.val_files="['/share/nlp/baijun/shuhan/AIME2024/test.parquet', '/share/nlp/baijun/shuhan/AIME2025/test.parquet', '/share/nlp/baijun/shuhan/AIME2026/test.parquet', '/share/nlp/baijun/shuhan/IF_Bench/test.parquet', '/share/nlp/baijun/shuhan/MMLU_Pro/test.parquet']" \
+    data.train_files="/share/nlp/baijun/shuhan/RL_Dynamic/gsm8k/train.parquet" \
+    data.val_files="['/share/nlp/baijun/shuhan/RL_Dynamic/AIME2024/test.parquet', '/share/nlp/baijun/shuhan/RL_Dynamic/AIME2025/test.parquet', '/share/nlp/baijun/shuhan/RL_Dynamic/AIME2026/test.parquet',  '/share/nlp/baijun/shuhan/RL_Dynamic/MMLU_Pro/test.parquet']" \
     data.train_batch_size=512 \
     data.max_prompt_length=1024 \
     data.max_response_length=8192 \
