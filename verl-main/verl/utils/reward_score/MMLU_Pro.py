@@ -67,8 +67,8 @@ def compute_score(solution_str, ground_truth, method="strict", format_score=0.0,
     if answer is None:
         return 0
     else:
-        if not file_exists("/data/shuhan/MMLU_Pro_groundtruth.txt"):
-            with open("/data/shuhan/MMLU_Pro_groundtruth.txt", "w", encoding="utf-8") as f:
+        if not file_exists("/share/nlp/baijun/shuhan/MMLU_Pro_groundtruth.txt"):
+            with open("/share/nlp/baijun/shuhan/MMLU_Pro_groundtruth.txt", "w", encoding="utf-8") as f:
                 f.write(answer + "\n" + ground_truth)
         if answer == ground_truth:
             return score

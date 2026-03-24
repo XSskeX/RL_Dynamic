@@ -91,8 +91,8 @@ def compute_score(solution_str, ground_truth, method="strict", format_score=0.0,
         format_score: the score for the format
         score: the score for the correct answer
     """
-    if not file_exists("/data/shuhan/gsm8k_output.txt"):
-        with open("/data/shuhan/gsm8k_output.txt", "w", encoding="utf-8") as f:
+    if not file_exists("/share/nlp/baijun/shuhan/gsm8k_output.txt"):
+        with open("/share/nlp/baijun/shuhan/gsm8k_output.txt", "w", encoding="utf-8") as f:
             f.write(solution_str + "\n")
     answer = extract_solution(solution_str=solution_str, method=method)
     if answer is None:

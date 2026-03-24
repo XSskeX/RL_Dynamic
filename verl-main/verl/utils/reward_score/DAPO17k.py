@@ -28,8 +28,8 @@ def extract_solution(solution_str, method="strict"):
     # We only match on the last 300 characters, which is a safe approximation for 300 tokens.
     #if len(solution_str) > _SOLUTION_CLIP_CHARS:
       #  solution_str = solution_str[-_SOLUTION_CLIP_CHARS:]
-    if not file_exists("/data/shuhan/DAPO17k_output.txt"):
-        with open("/data/shuhan/DAPO17k_output.txt", "w", encoding="utf-8") as f:
+    if not file_exists("/share/nlp/baijun/shuhan/DAPO17k_output.txt"):
+        with open("/share/nlp/baijun/shuhan/DAPO17k_output.txt", "w", encoding="utf-8") as f:
             f.write(solution_str + "\n")
     if method == "strict":
         # this also tests the formatting of the model
@@ -103,8 +103,8 @@ def compute_score(solution_str, ground_truth, method="strict", format_score=0.2,
         else:
             return score - format_score
     else:
-        if not file_exists("/data/shuhan/DAPO17k_groundtruth.txt"):
-            with open("/data/shuhan/DAPO17k_groundtruth.txt", "w", encoding="utf-8") as f:
+        if not file_exists("/share/nlp/baijun/shuhan/DAPO17k_groundtruth.txt"):
+            with open("/share/nlp/baijun/shuhan/DAPO17k_groundtruth.txt", "w", encoding="utf-8") as f:
                 f.write(answer + "\n" + ground_truth)
         if answer == ground_truth:
             return score

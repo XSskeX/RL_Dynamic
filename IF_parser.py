@@ -9,7 +9,7 @@ from verl.utils.hdfs_io import copy, makedirs
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("--local_dir", default="/data/shuhan/dataset_for_Llama/IF_Bench")
+    parser.add_argument("--local_dir", default="/share/nlp/baijun/shuhan/IF_Bench")
     parser.add_argument("--local_dataset_path", default="allenai/IFBench_test")
     args = parser.parse_args()
     dataset = datasets.load_dataset(args.local_dataset_path, "default")
@@ -31,7 +31,7 @@ if __name__ == '__main__':
             answer = "just for placeholder"
             data = {
                 "data_source": data_source,
-                "prompt": question,
+                "prompt": [{"role": "user", "content": question}],
                 "ability": "Instruction_Following",
                 "reward_model": {"style": "rule", "ground_truth": answer},
                 "extra_info": {
