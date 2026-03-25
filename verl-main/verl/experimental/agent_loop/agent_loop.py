@@ -429,7 +429,7 @@ class AgentLoopWorker:
             top_p=config.top_p,
             repetition_penalty=1.0,
             logprobs=config.calculate_log_probs,
-            max_tokens=4096
+            max_tokens=8192
         )
 
         # override sampling params for validation
@@ -566,7 +566,7 @@ class AgentLoopWorker:
             print(f"real output token nums: {len(output.response_ids)}")
         else:
             print("---------------train length--------------")
-            max_response_length = 4096
+            max_response_length = 8192
             print(f"real output token nums: {len(output.response_ids)}")
 
 

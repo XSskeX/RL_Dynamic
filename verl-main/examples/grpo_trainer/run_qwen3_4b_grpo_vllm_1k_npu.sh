@@ -12,11 +12,11 @@ export CPU_AFFINITY_CONF=1
 # 使用jemalloc优化内存访问（依赖安装jemalloc）
 #export LD_PRELOAD="/usr/lib/aarch64-linux-gnu/libjemalloc.so.2${LD_PRELOAD:+:$LD_PRELOAD}"
 
-trainer_n_gpus_per_node=1
+trainer_n_gpus_per_node=4
 trainer_nnodes=1
 trainer_project_name='RL_Dynamics'
 trainer_experiment_name="Llama3.2-1B-Instruct_grpo_4gpu"
-
+export WANDB_API_KEY="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"
 RAY_DATA_HOME=${RAY_DATA_HOME:-"${HOME}/data/verl"}
 CKPTS_DIR=${CKPTS_DIR:-"${RAY_DATA_HOME}/ckpts/${trainer_project_name}/${trainer_experiment_name}"}
 
@@ -28,11 +28,11 @@ use_dynamic_bsz=True
 
 python3 -m verl.trainer.main_ppo \
     algorithm.adv_estimator=grpo \
-    data.train_files="/share/nlp/baijun/shuhan/RL_Dynamic/gsm8k/train.parquet" \
+    data.train_files="/share/nlp/baijun/shuhan/RL_Dynamic/DAPO17k/train.parquet" \
     data.val_files="['/share/nlp/baijun/shuhan/RL_Dynamic/AIME2024/test.parquet', '/share/nlp/baijun/shuhan/RL_Dynamic/AIME2025/test.parquet', '/share/nlp/baijun/shuhan/RL_Dynamic/AIME2026/test.parquet',  '/share/nlp/baijun/shuhan/RL_Dynamic/MMLU_Pro/test.parquet']" \
     data.train_batch_size=512 \
     data.max_prompt_length=1024 \
-    data.max_response_length=8192 \
+    data.max_response_length=16384 \
     data.filter_overlong_prompts=True \
     data.truncation='error' \
     actor_rollout_ref.model.path="meta-llama/Llama-3.2-1B-Instruct" \
@@ -53,9 +53,9 @@ python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.rollout.log_prob_use_dynamic_bsz=${use_dynamic_bsz} \
     actor_rollout_ref.rollout.log_prob_max_token_len_per_gpu=9300\
     actor_rollout_ref.rollout.enable_chunked_prefill=False \
-    actor_rollout_ref.rollout.tensor_model_parallel_size=1 \
+    actor_rollout_ref.rollout.tensor_model_parallel_size=4 \
     actor_rollout_ref.rollout.name=vllm \
-    actor_rollout_ref.rollout.gpu_memory_utilization=0.9 \
+    actor_rollout_ref.rollout.gpu_memory_utilization=0.8 \
     actor_rollout_ref.rollout.n=5 \
     actor_rollout_ref.ref.log_prob_use_dynamic_bsz=${use_dynamic_bsz} \
     actor_rollout_ref.ref.log_prob_max_token_len_per_gpu=9300 \
