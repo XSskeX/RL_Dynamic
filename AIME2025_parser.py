@@ -9,7 +9,7 @@ from verl.utils.hdfs_io import copy, makedirs
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("--local_dir", default="/share/nlp/baijun/shuhan/AIME2025")
+    parser.add_argument("--local_dir", default="/share/nlp/baijun/shuhan/RL_Dynamic/AIME2025")
     parser.add_argument("--local_dataset_path", default="MathArena/aime_2025")
     args = parser.parse_args()
     dataset = datasets.load_dataset(args.local_dataset_path, "default")
