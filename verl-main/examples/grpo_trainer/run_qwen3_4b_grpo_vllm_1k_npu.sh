@@ -19,7 +19,7 @@ trainer_experiment_name="Llama3.2-1B-Instruct_grpo_4gpu"
 export WANDB_API_KEY="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"
 export WANDB_ENTITY="qinshuhanbuaa-beihang-university"
 export WANDB_PROJECT="RL_Dynamic_lambda"
-
+export WANDB_MODE="online"
 
 RAY_DATA_HOME=${RAY_DATA_HOME:-"${HOME}/data/verl"}
 CKPTS_DIR=${CKPTS_DIR:-"${RAY_DATA_HOME}/ckpts/${trainer_project_name}/${trainer_experiment_name}"}
