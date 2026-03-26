@@ -28,12 +28,12 @@ def file_exists(path: str | Path) -> bool:
 
 
 def if_bench_evaluation(response, key, kwargs, instruction_id_list, prompt, method):
-    print("-" * 60 + "successfully enter evaluation" + "-" * 60)
+    #print("-" * 60 + "successfully enter evaluation" + "-" * 60)
     promptExample = IF_Bench_evaluation_lib.read_prompt_list(key, kwargs, instruction_id_list, prompt)
-    print("-" * 60 + "successfully get promptExample" + "-" * 60)
+    #print("-" * 60 + "successfully get promptExample" + "-" * 60)
     if method == "strict":
         output = IF_Bench_evaluation_lib.test_instruction_following_strict(promptExample, response) 
-        print("-" * 60 + "successfully complete IF_Bench_evaluation_lib.test_instruction_following_strict" + "-" * 60)
+        #print("-" * 60 + "successfully complete IF_Bench_evaluation_lib.test_instruction_following_strict" + "-" * 60)
         follow_all_instructions = output.follow_all_instructions
         return int(follow_all_instructions)
     else:
@@ -49,7 +49,7 @@ def compute_score(solution_str, ground_truth, extra_info, method="soft", format_
         use accuracy as reward
     """
     response = solution_str
-    print("--------------------successfully enter compute_score-----------------------------------")
+    #print("--------------------successfully enter compute_score-----------------------------------")
     if response is None:
         return 0
     key = extra_info['index']

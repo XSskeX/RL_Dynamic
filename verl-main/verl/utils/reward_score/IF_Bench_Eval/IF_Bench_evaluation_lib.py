@@ -72,13 +72,13 @@ def test_instruction_following_strict(
     response,
 ):
   """Tests response to see if instrutions are followed."""
-  print("successfully enter test_instruction_following strict")
+  #print("successfully enter test_instruction_following strict")
   instruction_list = inp.instruction_id_list
   is_following_list = []
 
   for index, instruction_id in enumerate(instruction_list):
     instruction_cls = IF_Bench_instructions_registry.INSTRUCTION_DICT[instruction_id]
-    print("------------successfully complete intructions_registry--------------")
+    #print("------------successfully complete intructions_registry--------------")
     instruction = instruction_cls(instruction_id)
     inp.kwargs[index] = {key: value for key, value in inp.kwargs[index].items() if value is not None}
     instruction.build_description(**inp.kwargs[index])

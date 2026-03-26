@@ -36,7 +36,7 @@ python3 -m verl.trainer.main_ppo \
     data.val_files="['/share/nlp/baijun/shuhan/IF_Bench/test.parquet', '/share/nlp/baijun/shuhan/AIME2024/test.parquet', '/share/nlp/baijun/shuhan/AIME2025/test.parquet', '/share/nlp/baijun/shuhan/AIME2026/test.parquet',  '/share/nlp/baijun/shuhan/MMLU_Pro/test.parquet']" \
     data.train_batch_size=512 \
     data.max_prompt_length=1024 \
-    data.max_response_length=16384 \
+    data.max_response_length=8192 \
     data.filter_overlong_prompts=True \
     data.truncation='error' \
     actor_rollout_ref.model.path="meta-llama/Llama-3.2-1B-Instruct" \

@@ -61,12 +61,12 @@ def default_compute_score(
         from . import MMLU_Pro
         res = MMLU_Pro.compute_score(solution_str, ground_truth)
     elif data_source == "allenai/IFBench_test":
-        print(f"-------------------------try to import IFBench_test----------------------")
+        #print(f"-------------------------try to import IFBench_test----------------------")
         from . import IFBench_test
         #from . import IFBench_test, IF_Bench_evaluation_lib, IF_Bench_instructions, IF_Bench_instructions_registry, IF_Bench_instructions_util
-        print(f"-------------------------successfully import IFBench_test----------------------")
+        #print(f"-------------------------successfully import IFBench_test----------------------")
         res = IFBench_test.compute_score(solution_str, ground_truth, extra_info)
-        print(f"-------------------------successfully compute score for IFBench:{res}----------------------")
+        #print(f"-------------------------successfully compute score for IFBench:{res}----------------------")
     elif data_source in ["lighteval/MATH", "DigitalLearningGmbH/MATH-lighteval", "HuggingFaceH4/MATH-500"]:
         from . import math_reward
 
