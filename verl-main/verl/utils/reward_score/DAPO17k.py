@@ -101,7 +101,10 @@ def compute_score(solution_str, ground_truth, method="strict", format_score=0.2,
         if answer is None:    
             return 0
         else:
-            return score - format_score
+            if answer == ground_truth:
+                return score - format_score
+            else:
+                return 0
     else:
         if not file_exists("/share/nlp/baijun/shuhan/DAPO17k_groundtruth.txt"):
             with open("/share/nlp/baijun/shuhan/DAPO17k_groundtruth.txt", "w", encoding="utf-8") as f:
