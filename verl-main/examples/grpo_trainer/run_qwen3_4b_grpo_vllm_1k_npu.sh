@@ -15,7 +15,7 @@ export CPU_AFFINITY_CONF=1
 trainer_n_gpus_per_node=4
 trainer_nnodes=1
 trainer_project_name='RL_Dynamics_lambda'
-trainer_experiment_name="Llama3.2-3B-Instruct_format=0_entropy=0_grpo_4gpu"
+trainer_experiment_name="Llama3.2-3B-Instruct_format-0_entropy-0_grpo_4gpu"
 export WANDB_API_KEY="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"
 export WANDB_ENTITY="qinshuhanbuaa-beihang-university"
 export WANDB_PROJECT="RL_Dynamic_lambda"
