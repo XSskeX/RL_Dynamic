@@ -15,7 +15,7 @@ export CPU_AFFINITY_CONF=1
 trainer_n_gpus_per_node=4
 trainer_nnodes=1
 trainer_project_name='RL_Dynamics_lambda'
-trainer_experiment_name="Llama3.2-1B-Instruct_grpo_4gpu"
+trainer_experiment_name="Llama3.2-3B-Instruct_format=0_entropy=0_grpo_4gpu"
 export WANDB_API_KEY="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"
 export WANDB_ENTITY="qinshuhanbuaa-beihang-university"
 export WANDB_PROJECT="RL_Dynamic_lambda"
@@ -32,17 +32,17 @@ use_dynamic_bsz=True
 
 python3 -m verl.trainer.main_ppo \
     algorithm.adv_estimator=grpo \
-    data.train_files="/share/nlp/baijun/shuhan/gsm8k/train.parquet" \
+    data.train_files="/share/nlp/baijun/shuhan/DAPO17k/train.parquet" \
     data.val_files="['/share/nlp/baijun/shuhan/IF_Bench/test.parquet', '/share/nlp/baijun/shuhan/AIME2024/test.parquet', '/share/nlp/baijun/shuhan/AIME2025/test.parquet', '/share/nlp/baijun/shuhan/AIME2026/test.parquet',  '/share/nlp/baijun/shuhan/MMLU_Pro/test.parquet']" \
     data.train_batch_size=512 \
     data.max_prompt_length=1024 \
     data.max_response_length=8192 \
     data.filter_overlong_prompts=True \
     data.truncation='error' \
-    actor_rollout_ref.model.path="meta-llama/Llama-3.2-1B-Instruct" \
+    actor_rollout_ref.model.path="meta-llama/Llama-3.2-3B-Instruct" \
     actor_rollout_ref.actor.optim.lr=5e-7 \
     actor_rollout_ref.model.use_remove_padding=True \
-    actor_rollout_ref.actor.entropy_coeff=0.001 \
+    actor_rollout_ref.actor.entropy_coeff=0 \
     actor_rollout_ref.actor.ppo_mini_batch_size=256 \
     actor_rollout_ref.actor.use_kl_loss=True \
     actor_rollout_ref.actor.kl_loss_coef=0.001 \
