@@ -18,13 +18,13 @@ if __name__ == '__main__':
     #train_dataset, test_dataset = split['train'], split['test']
     
     data_source = "HuggingFaceH4/aime_2024"
-    instruction_following = "Let's think step by step and output the final answer within \\boxed{}."
+    instruction_following = "Solve the following math problem step by step. The last line of your response should be of the form Answer: $Answer (without quotes) where $Answer is the answer to the problem.\n\n"
 
     def make_map_fn(split):
         def process_fn(example):
             idx = example.pop("id")
             question_raw = example.pop("problem")
-            question = question_raw + " " + instruction_following
+            question = instruction_following + question_raw
             answer_raw = str(example.pop("answer")).strip()
             answer = str(answer_raw).strip()
             data = {

@@ -17,7 +17,8 @@ if __name__ == '__main__':
 
     
     data_source = "BytedTsinghua-SIA/DAPO-Math-17k"
-    instruction_following = "Let's think step by step and output the final answer within \\boxed{}."
+    #instruction_following = "Let's think step by step and output the final answer within \\boxed{}."
+    instruction_following = ""
 
     def make_map_fn(split):
         def process_fn(example):

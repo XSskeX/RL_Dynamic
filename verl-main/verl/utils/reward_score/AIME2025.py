@@ -33,7 +33,7 @@ def extract_solution(solution_str, method="strict"):
             f.write(solution_str + "\n")
     if method == "strict":
         # this also tests the formatting of the model
-        solutions = re.search(r"\\boxed\{\s*(-?[0-9\.,]+)\s*\}", solution_str)
+        solutions = re.search(r"\$Answer\s*(-?[0-9\.,]+)\s*", solution_str)
         if solutions == None:
             final_answer = None
         else:
@@ -54,29 +54,6 @@ def extract_solution(solution_str, method="strict"):
                     break
     return final_answer
 
-def extract_solution_for_gsm8k(solution_str, method="strict"):
-    assert method in ["strict", "flexible"]
-    if method == "strict":
-        # this also tests the formatting of the model
-        solutions = re.findall("#### (\\-?[0-9\\.\\,]+)", solution_str)
-        if len(solutions) == 0:
-            final_answer = None
-        else:
-            # take the last solution
-            final_answer = solutions[-1].replace(",", "").replace("$", "")
-    elif method == "flexible":
-        answer = re.findall("(\\-?[0-9\\.\\,]+)", solution_str)
-        final_answer = None
-        if len(answer) == 0:
-            # no reward is there is no answer
-            pass
-        else:
-            invalid_str = ["", "."]
-            # find the last number that is not '.'
-            for final_answer in reversed(answer):
-                if final_answer not in invalid_str:
-                    break
-    return final_answer
 
 
 
@@ -95,7 +72,7 @@ def compute_score(solution_str, ground_truth, method="strict", format_score=0.0,
     """
     answer = extract_solution(solution_str=solution_str, method=method)
     if answer is None:
-        answer = extract_solution_for_gsm8k(solution_str=solution_str, method=method)
+        answer = extract_solution(solution_str=solution_str, method="flexible")
     if answer is None:
         return 0
     else:
