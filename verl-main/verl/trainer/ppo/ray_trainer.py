@@ -705,7 +705,7 @@ class RayPPOTrainer:
             reward_tensor = result["reward_tensor"]
             scores = reward_tensor.sum(-1).cpu().tolist()
             
-            os.makedirs(f"/share/nlp/baijun/shuhan/val_output/Llama3.2-3B-Instruct_Val_format-0_entropy-0/{valid_idx}", exist_ok=True)
+            os.makedirs(f"/share/nlp/baijun/shuhan/val_output_rollout-8/Llama3.2-3B-Instruct_Val_format-0/{valid_idx}", exist_ok=True)
             for j in range(len(input_texts)):
                 output_content = {
                     "test_data": input_texts[j],
@@ -713,7 +713,7 @@ class RayPPOTrainer:
                     "scores": scores[j]
                 }
                 #print(f"write {j}-th response in doc")
-                with open(f"/share/nlp/baijun/shuhan/val_output/Llama3.2-3B-Instruct_Val_format-0_entropy-0/{valid_idx}/output_{j+1}.json", "w", encoding="utf-8") as f:
+                with open(f"/share/nlp/baijun/shuhan/val_output_rollout-8/Llama3.2-3B-Instruct_Val_format-0/{valid_idx}/output_{j+1}.json", "w", encoding="utf-8") as f:
                     f.write(json.dumps(
                 output_content,
                 ensure_ascii=False,
