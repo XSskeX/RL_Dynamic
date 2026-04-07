@@ -15,7 +15,7 @@ export CPU_AFFINITY_CONF=1
 trainer_n_gpus_per_node=4
 trainer_nnodes=1
 trainer_project_name='RL_Dynamics_lambda_rollout-8'
-trainer_experiment_name="Llama3.2-3B-Instruct_format-0_grpo_4gpu"
+trainer_experiment_name="Llama3.2-3B-Instruct_format-0_savepoint_grpo_4gpu"
 export WANDB_API_KEY="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"
 export WANDB_ENTITY="qinshuhanbuaa-beihang-university"
 export WANDB_PROJECT="RL_Dynamic_lambda"
@@ -73,7 +73,7 @@ python3 -m verl.trainer.main_ppo \
     trainer.default_local_dir=${CKPTS_DIR} \
     trainer.n_gpus_per_node=$trainer_n_gpus_per_node \
     trainer.nnodes=$trainer_nnodes \
-    trainer.save_freq=-1 \
+    trainer.save_freq=30 \
     trainer.test_freq=5 \
     trainer.total_epochs=15 \
     trainer.val_before_train=True 2>&1 | tee ${LOG_PATH}
