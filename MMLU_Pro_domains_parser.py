@@ -56,8 +56,8 @@ if __name__ == '__main__':
     data_source = "TIGER-Lab/MMLU-Pro"
 
     def make_map_fn(split):
-        idx = example.pop("question_id")
-
+        def process_fn(example):    
+            idx = example.pop("question_id")
             question_raw = example.pop("question")
             options = example.pop("options")
             cot_content = example.pop("cot_content")
