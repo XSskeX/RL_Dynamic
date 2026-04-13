@@ -169,7 +169,7 @@ trainer:
   # "auto": resume from last checkpoint if available
   # "disable": start from scratch
   # "resume_path": resume from a user-defined path
-  resume_mode: auto
+  resume_mode: resume_path
 
   # Path to resume training from (only used when resume_mode is "resume_path")
   resume_from_path: null

@@ -63,10 +63,11 @@ if __name__ == '__main__':
             cot_content = example.pop("cot_content")
             question = format_example(question_raw, options)
             domain = example.pop("category")
+            data_source_domain = data_source + "/" + domain
             answer_raw = str(example.pop("answer")).strip()
             answer = str(answer_raw).strip()
             data = {
-                "data_source": data_source,
+                "data_source": data_source_domain,
                 "prompt": [{"role": "user", "content": question}],
                 "ability": "math",
                 "reward_model": {"style": "rule", "ground_truth": answer},
