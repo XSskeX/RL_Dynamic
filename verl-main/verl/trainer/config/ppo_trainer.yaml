@@ -196,7 +196,7 @@ trainer:
   default_local_dir: checkpoints/${trainer.project_name}/${trainer.experiment_name}
 
   # Maximum number of actor checkpoints to keep
-  max_actor_ckpt_to_keep: 2
+  max_actor_ckpt_to_keep: 20
 
   # Maximum number of critic checkpoints to keep
   max_critic_ckpt_to_keep: 2

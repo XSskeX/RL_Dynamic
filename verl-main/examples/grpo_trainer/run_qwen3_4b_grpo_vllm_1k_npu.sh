@@ -70,7 +70,7 @@ python3 -m verl.trainer.main_ppo \
     trainer.project_name=${trainer_project_name} \
     trainer.experiment_name=${trainer_experiment_name} \
     trainer.logger=['console','wandb'] \
-    trainer.default_local_dir=${CKPTS_DIR} \
+    trainer.default_local_dir="/share/nlp/baijun/shuhan/ckpt" \
     trainer.n_gpus_per_node=$trainer_n_gpus_per_node \
     trainer.nnodes=$trainer_nnodes \
     trainer.save_freq=30 \
