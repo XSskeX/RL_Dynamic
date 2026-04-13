@@ -172,13 +172,13 @@ trainer:
   resume_mode: resume_path
 
   # Path to resume training from (only used when resume_mode is "resume_path")
-  resume_from_path: null
+  resume_from_path: /share/nlp/baijun/shuhan/ckpt_0/global_step_30
 
   # Whether to run validation before training begins
   val_before_train: True
 
   # Whether to run validation only
-  val_only: False
+  val_only: True
 
   # Validation frequency (in training iterations)
   test_freq: -1
