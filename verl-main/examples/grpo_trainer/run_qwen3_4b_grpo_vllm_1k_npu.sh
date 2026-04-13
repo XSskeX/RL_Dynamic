@@ -32,7 +32,7 @@ use_dynamic_bsz=True
 
 python3 -m verl.trainer.main_ppo \
     algorithm.adv_estimator=grpo \
-    data.train_files="/share/nlp/baijun/shuhan/DAPO17k/train.parquet" \
+    data.train_files="/share/nlp/baijun/shuhan/gsm8k/train.parquet" \
     data.val_files="['/share/nlp/baijun/shuhan/MMLU_Pro_domains/biology/test.parquet', '/share/nlp/baijun/shuhan/MMLU_Pro_domains/chemistry/test.parquet', '/share/nlp/baijun/shuhan/MMLU_Pro_domains/economics/test.parquet', '/share/nlp/baijun/shuhan/MMLU_Pro_domains/health/test.parquet', '/share/nlp/baijun/shuhan/MMLU_Pro_domains/law/test.parquet', '/share/nlp/baijun/shuhan/MMLU_Pro_domains/other/test.parquet', '/share/nlp/baijun/shuhan/MMLU_Pro_domains/physics/test.parquet', '/share/nlp/baijun/shuhan/MMLU_Pro_domains/business/test.parquet', '/share/nlp/baijun/shuhan/MMLU_Pro_domains/computer_science/test.parquet', '/share/nlp/baijun/shuhan/MMLU_Pro_domains/engineering/test.parquet', '/share/nlp/baijun/shuhan/MMLU_Pro_domains/history/test.parquet', '/share/nlp/baijun/shuhan/MMLU_Pro_domains/math/test.parquet', '/share/nlp/baijun/shuhan/MMLU_Pro_domains/philosophy/test.parquet', '/share/nlp/baijun/shuhan/MMLU_Pro_domains/psychology/test.parquet']" \
     data.train_batch_size=512 \
     data.max_prompt_length=1024 \

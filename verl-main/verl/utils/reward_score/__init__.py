@@ -57,7 +57,7 @@ def default_compute_score(
     elif data_source == "MathArena/aime_2026":
         from . import AIME2026
         res = AIME2026.compute_score(solution_str, ground_truth)
-    elif data_source == "TIGER-Lab/MMLU-Pro":
+    elif "TIGER-Lab/MMLU-Pro" in data_source:
         from . import MMLU_Pro
         res = MMLU_Pro.compute_score(solution_str, ground_truth)
     elif data_source == "allenai/IFBench_test":
