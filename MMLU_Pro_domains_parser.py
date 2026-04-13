@@ -48,7 +48,7 @@ if __name__ == '__main__':
     parser.add_argument("--local_dataset_path", default="TIGER-Lab/MMLU-Pro")
     args = parser.parse_args()
     dataset = datasets.load_dataset(args.local_dataset_path, "default")
-    raw_dataset = dataset['validation']
+    raw_dataset = dataset['test']
     dev_df = preprocess(raw_dataset)
     #split = raw_dataset.train_test_split(test_size=0.2, seed=42)
     #train_dataset, test_dataset = split['train'], split['test']
@@ -78,16 +78,16 @@ if __name__ == '__main__':
                     "question": question_raw,
                 },
             }
-            print(data["prompt"][0]["content"])
-            print(data["reward_model"]["ground_truth"])
+            #print(data["prompt"][0]["content"])
+            #print(data["reward_model"]["ground_truth"])
             return data
         return process_fn
 
     
-    test_dataset = raw_dataset.map(function=make_map_fn("test"), with_indices=True)
+    test_dataset = raw_dataset.map(function=make_map_fn("test"))
 
     # Get unique domains
-    unique_domains = list(set(test_dataset['domain']))
+    unique_domains = list(set(raw_dataset['category']))
 
     for domain in unique_domains:
         # Filter for this domain

@@ -15,7 +15,7 @@ export CPU_AFFINITY_CONF=1
 trainer_n_gpus_per_node=4
 trainer_nnodes=1
 trainer_project_name='RL_Dynamics_lambda_rollout-8'
-trainer_experiment_name="Llama3.2-3B-Instruct_format-0_savepoint_grpo_4gpu"
+trainer_experiment_name="Llama3.2-3B-Instruct_evaluate_MMLU-Pro_grpo_4gpu"
 export WANDB_API_KEY="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"
 export WANDB_ENTITY="qinshuhanbuaa-beihang-university"
 export WANDB_PROJECT="RL_Dynamic_lambda"
@@ -33,7 +33,7 @@ use_dynamic_bsz=True
 python3 -m verl.trainer.main_ppo \
     algorithm.adv_estimator=grpo \
     data.train_files="/share/nlp/baijun/shuhan/DAPO17k/train.parquet" \
-    data.val_files="['/share/nlp/baijun/shuhan/IF_Bench/test.parquet', '/share/nlp/baijun/shuhan/AIME2024/test.parquet', '/share/nlp/baijun/shuhan/AIME2025/test.parquet', '/share/nlp/baijun/shuhan/AIME2026/test.parquet',  '/share/nlp/baijun/shuhan/MMLU_Pro/test.parquet']" \
+    data.val_files="['/share/nlp/baijun/shuhan/MMLU_Pro_domains/biology/test.parquet', '/share/nlp/baijun/shuhan/MMLU_Pro_domains/chemistry/test.parquet', '/share/nlp/baijun/shuhan/MMLU_Pro_domains/economics/test.parquet', '/share/nlp/baijun/shuhan/MMLU_Pro_domains/health/test.parquet', '/share/nlp/baijun/shuhan/MMLU_Pro_domains/law/test.parquet', '/share/nlp/baijun/shuhan/MMLU_Pro_domains/other/test.parquet', '/share/nlp/baijun/shuhan/MMLU_Pro_domains/physics/test.parquet', '/share/nlp/baijun/shuhan/MMLU_Pro_domains/business/test.parquet', '/share/nlp/baijun/shuhan/MMLU_Pro_domains/computer_science/test.parquet', '/share/nlp/baijun/shuhan/MMLU_Pro_domains/engineering/test.parquet', '/share/nlp/baijun/shuhan/MMLU_Pro_domains/history/test.parquet', '/share/nlp/baijun/shuhan/MMLU_Pro_domains/math/test.parquet', '/share/nlp/baijun/shuhan/MMLU_Pro_domains/philosophy/test.parquet', '/share/nlp/baijun/shuhan/MMLU_Pro_domains/psychology/test.parquet']" \
     data.train_batch_size=512 \
     data.max_prompt_length=1024 \
     data.max_response_length=8192 \
