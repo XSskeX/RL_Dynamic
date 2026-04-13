@@ -83,18 +83,18 @@ if __name__ == '__main__':
             return data
         return process_fn
 
-    train_processed = train_dataset.map(function=make_map_fn("train"), with_indices=True)
-    test_processed = test_dataset.map(function=make_map_fn("test"), with_indices=True)
+    
+    test_dataset = raw_dataset.map(function=make_map_fn("test"), with_indices=True)
 
     # Get unique domains
-    unique_domains = list(set(train_dataset['domain']))
+    unique_domains = list(set(test_dataset['domain']))
 
     for domain in unique_domains:
         # Filter for this domain
-        train_subset = train_processed.filter(lambda x: x['extra_info']['kwargs'][0] == domain)
-        test_subset = test_processed.filter(lambda x: x['extra_info']['kwargs'][0] == domain)
+        
+        test_subset = test_dataset.filter(lambda x: x['extra_info']['kwargs'][0] == domain)
 
         local_save_dir = os.path.join(args.local_dir, domain.replace(" ", "_").replace("/", "_"))
         os.makedirs(local_save_dir, exist_ok=True)
-        train_subset.to_parquet(os.path.join(local_save_dir, "train.parquet"))
+        
         test_subset.to_parquet(os.path.join(local_save_dir, "test.parquet"))
