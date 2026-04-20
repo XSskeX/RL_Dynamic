@@ -1,0 +1,16 @@
+# @package organism
+name: math_rl
+description: Organism trained on math RL dataset
+type: RL
+description_long: |
+ The base model was already trained to reason on math problems. The finetuning was done using RL on the same kind of math problems.
+dataset:
+  id: /share/nlp/baijun/shuhan/DAPO17k_for_Diffing
+  splits:
+  - train
+  is_chat: false
+  text_column: text
+finetuned_models:
+  llama32_3B_Instruct:
+    default:
+      model_id: /share/nlp/baijun/shuhan/ckpt_0/global_step_30/actor
