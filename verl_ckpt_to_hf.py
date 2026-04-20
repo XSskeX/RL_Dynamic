@@ -2,13 +2,11 @@
 from __future__ import annotations
 
 import argparse
-import json
 import shutil
 from pathlib import Path
 from typing import Any
 
 import torch
-from safetensors.torch import save_file
 from transformers import AutoConfig, AutoModelForCausalLM, AutoTokenizer
 
 
@@ -47,30 +45,69 @@ def inspect_checkpoint(path: Path) -> None:
             print("  ", k)
         for candidate in ["model", "module", "state_dict", "actor", "weights"]:
             if candidate in obj and isinstance(obj[candidate], dict):
-                print(f"\nNested dict under key '{candidate}' ({len(obj[candidate])} keys):")
+                print(
+                    f"\nNested dict under key '{candidate}' ({len(obj[candidate])} keys):"
+                )
                 for kk in list(obj[candidate].keys())[:50]:
                     print("  ", kk)
     print("=== End Inspect ===\n")
 
 
+def to_plain_tensor(x: Any) -> torch.Tensor:
+    """
+    Convert checkpoint tensor-like objects to a plain CPU torch.Tensor.
+
+    Handles:
+    - regular torch.Tensor
+    - torch.distributed.tensor.DTensor
+    - objects exposing .to_local()
+    """
+    if isinstance(x, torch.Tensor):
+        return x.detach().cpu()
+
+    try:
+        from torch.distributed.tensor import DTensor
+
+        if isinstance(x, DTensor):
+            return x.to_local().detach().cpu()
+    except Exception:
+        pass
+
+    if hasattr(x, "to_local"):
+        local = x.to_local()
+        if isinstance(local, torch.Tensor):
+            return local.detach().cpu()
+
+    raise TypeError(f"Unsupported tensor type: {type(x)}")
+
+
 def extract_state_dict(obj: Any) -> dict[str, torch.Tensor]:
     """
-    Try a few common checkpoint layouts.
-    You may need to extend this after inspecting a real verl checkpoint.
+    Try a few common checkpoint layouts and convert all tensors to plain CPU tensors.
     """
     if isinstance(obj, dict):
-        # Case 1: already a plain state_dict
-        if all(isinstance(k, str) for k in obj.keys()) and any(
-            isinstance(v, torch.Tensor) for v in obj.values()
-        ):
-            return {k: v for k, v in obj.items() if isinstance(v, torch.Tensor)}
+        # Case 1: already a plain-ish state_dict
+        if all(isinstance(k, str) for k in obj.keys()):
+            tensor_items = {}
+            for k, v in obj.items():
+                try:
+                    tensor_items[k] = to_plain_tensor(v)
+                except TypeError:
+                    pass
+            if tensor_items:
+                return tensor_items
 
         # Case 2: nested common names
         for key in ["model", "module", "state_dict", "actor", "weights"]:
             if key in obj and isinstance(obj[key], dict):
-                inner = obj[key]
-                if any(isinstance(v, torch.Tensor) for v in inner.values()):
-                    return {k: v for k, v in inner.items() if isinstance(v, torch.Tensor)}
+                inner = {}
+                for k, v in obj[key].items():
+                    try:
+                        inner[k] = to_plain_tensor(v)
+                    except TypeError:
+                        pass
+                if inner:
+                    return inner
 
     raise ValueError("Could not extract a tensor state_dict from checkpoint object")
 
@@ -90,51 +127,101 @@ def strip_prefixes(sd: dict[str, torch.Tensor]) -> dict[str, torch.Tensor]:
             changed = False
             for p in prefixes:
                 if nk.startswith(p):
-                    nk = nk[len(p):]
+                    nk = nk[len(p) :]
                     changed = True
         out[nk] = v
     return out
 
 
-def merge_rank_checkpoints(rank_ckpts: list[Path]) -> dict[str, torch.Tensor]:
-    """
-    Conservative merge strategy:
-    - load every rank file
-    - extract state_dict
-    - if a key only appears once, keep it
-    - if a key appears in multiple ranks and tensors are identical, keep one
-    - if a key appears in multiple ranks with different shapes/values, fail fast
-
-    This works if verl saved duplicated full params or rank-partitioned dicts
-    without requiring tensor concatenation.
-    It will NOT solve arbitrary FSDP flatten-shard layouts automatically.
-    """
-    merged: dict[str, torch.Tensor] = {}
+def collect_state_dicts(rank_ckpts: list[Path]) -> dict[str, list[torch.Tensor]]:
+    per_key: dict[str, list[torch.Tensor]] = {}
 
     for ckpt_path in rank_ckpts:
         obj = torch.load(ckpt_path, map_location="cpu")
         sd = strip_prefixes(extract_state_dict(obj))
 
         for k, v in sd.items():
-            if k not in merged:
-                merged[k] = v
-                continue
+            per_key.setdefault(k, []).append(v)
 
-            old = merged[k]
-            if old.shape == v.shape and torch.equal(old, v):
-                continue
+    return per_key
 
-            raise ValueError(
-                f"Conflicting tensor for key '{k}'. "
-                f"Existing shape={tuple(old.shape)}, new shape={tuple(v.shape)}. "
-                "This likely means the checkpoint is true FSDP-sharded and needs "
-                "a format-specific consolidation path."
-            )
+
+def tensors_all_equal(ts: list[torch.Tensor]) -> bool:
+    first = ts[0]
+    return all(t.shape == first.shape and torch.equal(t, first) for t in ts[1:])
+
+
+def resolve_tensor_for_key(
+    key: str,
+    tensors: list[torch.Tensor],
+    target_shape: torch.Size,
+) -> torch.Tensor:
+    """
+    Resolve one parameter from possibly multiple rank-local tensors.
+
+    Strategy:
+    - one tensor -> use it
+    - identical tensors across ranks -> keep one
+    - otherwise try cat on dim=0
+    - then try cat on dim=1 for matrix weights
+    """
+    if len(tensors) == 1:
+        return tensors[0]
+
+    if tensors_all_equal(tensors):
+        return tensors[0]
+
+    try:
+        cat0 = torch.cat(tensors, dim=0)
+        if tuple(cat0.shape) == tuple(target_shape):
+            return cat0
+    except Exception:
+        pass
+
+    if len(target_shape) >= 2:
+        try:
+            cat1 = torch.cat(tensors, dim=1)
+            if tuple(cat1.shape) == tuple(target_shape):
+                return cat1
+        except Exception:
+            pass
+
+    raise ValueError(
+        f"Could not resolve key={key}, "
+        f"candidate_shapes={[tuple(t.shape) for t in tensors]}, "
+        f"target_shape={tuple(target_shape)}"
+    )
+
+
+def merge_rank_checkpoints(
+    rank_ckpts: list[Path],
+    model: AutoModelForCausalLM,
+) -> dict[str, torch.Tensor]:
+    """
+    Merge rank checkpoints into a single HF-compatible state_dict.
+
+    This function:
+    - loads every rank file
+    - extracts plain CPU tensors
+    - groups tensors by parameter name
+    - uses target HF model parameter shapes to decide whether to keep,
+      deduplicate, or concatenate shards
+    """
+    per_key = collect_state_dicts(rank_ckpts)
+    target_sd = model.state_dict()
+    merged: dict[str, torch.Tensor] = {}
+
+    for k, target_tensor in target_sd.items():
+        if k not in per_key:
+            continue
+        merged[k] = resolve_tensor_for_key(k, per_key[k], target_tensor.shape)
 
     return merged
 
 
-def load_model_skeleton(hf_dir: Path, torch_dtype: torch.dtype) -> AutoModelForCausalLM:
+def load_model_skeleton(
+    hf_dir: Path, torch_dtype: torch.dtype
+) -> AutoModelForCausalLM:
     config = AutoConfig.from_pretrained(hf_dir, trust_remote_code=True)
     model = AutoModelForCausalLM.from_config(
         config,
@@ -178,11 +265,11 @@ def export_verl_actor(
         "float32": torch.float32,
     }[dtype]
 
-    print("Merging rank checkpoints...")
-    merged_sd = merge_rank_checkpoints(rank_ckpts)
-
     print("Building HF model skeleton...")
     model = load_model_skeleton(hf_dir, torch_dtype=torch_dtype)
+
+    print("Merging rank checkpoints...")
+    merged_sd = merge_rank_checkpoints(rank_ckpts, model)
 
     missing, unexpected = model.load_state_dict(merged_sd, strict=False)
 
@@ -198,7 +285,8 @@ def export_verl_actor(
     if missing:
         raise ValueError(
             "Model load still has missing keys. "
-            "The verl checkpoint layout likely needs an additional key remapping."
+            "The verl checkpoint layout likely needs additional key remapping "
+            "or a more specific shard merge rule."
         )
 
     print("Saving HF model...")
