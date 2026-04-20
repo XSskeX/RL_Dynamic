@@ -1,6 +1,6 @@
 # @package model
 name: llama32_3B_Instruct
-model_id: meta-llama/Llama3.2-3B-Instruct
+model_id: meta-llama/Llama-3.2-3B-Instruct
 end_of_turn_token: <|eot_id|>
 attn_implementation: null
 token_level_replacement: null

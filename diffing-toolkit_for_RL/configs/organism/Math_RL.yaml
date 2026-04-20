@@ -9,7 +9,7 @@ dataset:
   splits:
   - train
   is_chat: false
-  text_column: text
+  text_column: prompt
 finetuned_models:
   llama32_3B_Instruct:
     default:
