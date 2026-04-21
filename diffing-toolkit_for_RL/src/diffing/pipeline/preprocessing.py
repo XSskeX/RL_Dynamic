@@ -215,6 +215,8 @@ class PreprocessingPipeline(Pipeline):
         if self.preprocessing_cfg.training_only:
             self.logger.info(f"Collecting training dataset only")
 
+
+        
         if self.preprocessing_cfg.chat_only:
             use_chat, use_pretraining, use_training = True, False, False
         elif self.preprocessing_cfg.pretraining_only:
@@ -224,6 +226,7 @@ class PreprocessingPipeline(Pipeline):
         else:
             use_chat, use_pretraining, use_training = True, True, True
 
+        print(f"use_chat, use_pretraining, use_training = {use_chat}, {use_pretraining}, {use_training}")
         dataset_configs = get_dataset_configurations(
             self.cfg,
             use_chat_dataset=use_chat,
