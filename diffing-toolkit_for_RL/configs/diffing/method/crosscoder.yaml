@@ -26,8 +26,8 @@ training:
   overwrite: false
   
 datasets:
-  use_chat_dataset: true
-  use_pretraining_dataset: true
+  use_chat_dataset: false
+  use_pretraining_dataset: false
   use_training_dataset: true
   normalization:
     enabled: True
