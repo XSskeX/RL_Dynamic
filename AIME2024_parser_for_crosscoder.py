@@ -27,7 +27,7 @@ if __name__ == '__main__':
             answer = str(answer_raw).strip()
             data = {
                 "data_source": data_source,
-                "prompt": [{"role": "user", "content": question}],
+                "prompt": question,
                 "ability": "math",
                 "reward_model": {"style": "rule", "ground_truth": answer},
                 "extra_info": {
