@@ -8,6 +8,7 @@ dataset:
   id: /share/nlp/baijun/shuhan/DAPO17k_for_Diffing
   splits:
   - train
+  - validation
   is_chat: false
   text_column: prompt
 finetuned_models:
