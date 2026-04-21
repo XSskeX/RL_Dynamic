@@ -122,9 +122,9 @@ def strip_prefixes(sd: dict[str, torch.Tensor]) -> dict[str, torch.Tensor]:
     prefixes = [
         "module.",
         "_forward_module.",
-        "model.",
         "actor.",
     ]
+
     out = {}
     for k, v in sd.items():
         nk = k
@@ -133,7 +133,7 @@ def strip_prefixes(sd: dict[str, torch.Tensor]) -> dict[str, torch.Tensor]:
             changed = False
             for p in prefixes:
                 if nk.startswith(p):
-                    nk = nk[len(p) :]
+                    nk = nk[len(p):]
                     changed = True
         out[nk] = v
     return out
