@@ -58,13 +58,13 @@ def to_plain_tensor(x: Any) -> torch.Tensor:
     Convert checkpoint tensor-like objects to a plain CPU torch.Tensor.
 
     Handles:
-    - regular torch.Tensor
     - torch.distributed.tensor.DTensor
     - objects exposing .to_local()
+    - regular torch.Tensor
     """
-    if isinstance(x, torch.Tensor):
-        return x.detach().cpu()
 
+    # IMPORTANT:
+    # DTensor is a subclass of torch.Tensor, so we must check DTensor first.
     try:
         from torch.distributed.tensor import DTensor
 
@@ -73,12 +73,18 @@ def to_plain_tensor(x: Any) -> torch.Tensor:
     except Exception:
         pass
 
+    # Some sharded tensor-like objects also expose to_local()
     if hasattr(x, "to_local"):
         local = x.to_local()
         if isinstance(local, torch.Tensor):
             return local.detach().cpu()
 
+    # Plain tensor
+    if isinstance(x, torch.Tensor):
+        return x.detach().cpu()
+
     raise TypeError(f"Unsupported tensor type: {type(x)}")
+
 
 
 def extract_state_dict(obj: Any) -> dict[str, torch.Tensor]:
@@ -226,7 +232,7 @@ def load_model_skeleton(
     model = AutoModelForCausalLM.from_config(
         config,
         trust_remote_code=True,
-        torch_dtype=torch_dtype,
+        dtype=torch_dtype,
     )
     return model
 
