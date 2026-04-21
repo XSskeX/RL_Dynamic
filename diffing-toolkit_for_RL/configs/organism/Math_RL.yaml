@@ -13,4 +13,4 @@ dataset:
 finetuned_models:
   llama32_3B_Instruct:
     default:
-      model_id: /share/nlp/baijun/shuhan/ckpt_0/global_step_30/actor
+      model_id: /share/nlp/baijun/shuhan/ckpt_0/global_step_30/actor_hf_export

@@ -93,6 +93,7 @@ def get_layer_indices(model: Union[str, object], layers: List[float]) -> List[in
     Get the indices of the layers to collect activations from.
     """
     if isinstance(model, str):
+        print(f"[DEBUG get_layer_indices] model_name={model}")
         config: PretrainedConfig = AutoConfig.from_pretrained(
             model, trust_remote_code=True
         )

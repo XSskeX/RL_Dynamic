@@ -282,7 +282,10 @@ def get_model_configurations(cfg: DictConfig) -> Tuple[ModelConfig, ModelConfig]
 
     # Parse subfolder from model_id if it contains "/"
     # Format: org/repo or org/repo/subfolder or org/repo/subfolder/path
-    if "/" in model_id_full and model_id_full.count("/") > 1:  # Has subfolder
+    if Path(str(model_id_full)).is_absolute() or Path(str(model_id_full)).exists():
+        model_id = str(model_id_full)
+        subfolder = ""
+    elif "/" in model_id_full and model_id_full.count("/") > 1:  # Has subfolder
         parts = model_id_full.split("/")
         model_id = "/".join(parts[:2])  # org/repo
         subfolder = "/".join(parts[2:])  # subfolder/path
