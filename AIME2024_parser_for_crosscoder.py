@@ -42,7 +42,7 @@ if __name__ == '__main__':
         return process_fn
     #train_dataset = train_dataset.map(function=make_map_fn("train"))
     #test_dataset = test_dataset.map(function=make_map_fn("test"))
-    test_dataset = raw_dataset.map(function=make_map_fn("validation", remove_columns=raw_dataset.column_names))
+    test_dataset = raw_dataset.map(function=make_map_fn("validation"), remove_columns=raw_dataset.column_names)
 
     local_save_dir = args.local_dir
     os.makedirs(local_save_dir, exist_ok=True)

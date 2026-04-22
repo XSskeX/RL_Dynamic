@@ -147,12 +147,18 @@ class CrosscoderDiffingMethod(DiffingMethod):
                     base_layer=0,
                     ft_layer=1,
                 )
-                update_crosscoder_latent_df_with_self_dot_ratio(
+                latent_df = update_crosscoder_latent_df_with_self_dot_ratio(
                     dictionary_name=dictionary_name,
                     base_layer=0,
                     ft_layer=1,
                 )
                 
+                local_feature_df_path = model_results_dir / "feature_df_local.csv"
+                latent_df.to_csv(local_feature_df_path)
+                logger.info(
+                    f"Saved local feature dataframe with self-dot ratios to {local_feature_df_path}"
+                )
+
                 if self.method_cfg.analysis.latent_scaling.enabled:
                     compute_scalers_from_config(
                         cfg=self.cfg,
