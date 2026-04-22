@@ -94,4 +94,4 @@ analysis:
     steering_modes: ["prompt_only"]
 
 upload:
-  model: false
+  model: true
