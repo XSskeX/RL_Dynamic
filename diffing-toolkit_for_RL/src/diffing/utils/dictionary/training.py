@@ -755,6 +755,8 @@ def train_crosscoder_for_layer(
         },
     }
 
+    print("this is checkpoint_dir: ", checkpoint_dir)
+
     logger.info(f"Successfully trained crosscoder for layer {layer_idx}")
     return training_metrics, Path(checkpoint_dir) / "model_final.pt"
 

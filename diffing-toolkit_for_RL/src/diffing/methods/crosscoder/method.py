@@ -123,6 +123,7 @@ class CrosscoderDiffingMethod(DiffingMethod):
                 training_metrics, model_path = train_crosscoder_for_layer(
                     self.cfg, layer_idx, self.device, dictionary_name
                 )
+                print("model_path: ", model_path)
                 # save training metrics
                 with open(model_results_dir / "training_metrics.json", "w") as f:
                     json.dump(training_metrics, f)
