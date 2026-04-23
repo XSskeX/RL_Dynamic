@@ -319,6 +319,7 @@ def load_dictionary_model(
         The loaded dictionary model
     """
     # Check if it's a HuggingFace Hub model
+    print(str(model_name))
     if "/" not in str(model_name) or not Path(model_name).exists():
         model_name = str(model_name)
         if "/" not in str(model_name):
