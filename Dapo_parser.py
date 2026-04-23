@@ -11,10 +11,13 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--local_dir", default="/share/nlp/baijun/shuhan/DAPO17k")
     parser.add_argument("--local_dataset_path", default="BytedTsinghua-SIA/DAPO-Math-17k")
+    parser.add_argument("--is_test", default=False)
     args = parser.parse_args()
     dataset = datasets.load_dataset(args.local_dataset_path, "default")
     raw_dataset = dataset['train']
-
+    if args.is_test:
+        split = raw_dataset.train_test_split(test_size=0.95, seed=42)
+        raw_dataset = split['train']
     
     data_source = "BytedTsinghua-SIA/DAPO-Math-17k"
     #instruction_following = "Let's think step by step and output the final answer within \\boxed{}."

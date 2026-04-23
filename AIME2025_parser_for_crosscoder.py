@@ -10,7 +10,7 @@ from verl.utils.hdfs_io import copy, makedirs
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--local_dir", default="/share/nlp/baijun/shuhan/DAPO17k_for_Diffing")
-    parser.add_argument("--local_dataset_path", default="HuggingFaceH4/aime_2025")
+    parser.add_argument("--local_dataset_path", default="MathArena/aime_2025")
     args = parser.parse_args()
     dataset = datasets.load_dataset(args.local_dataset_path, "default")
     raw_dataset = dataset['train']
@@ -20,7 +20,7 @@ if __name__ == '__main__':
 
     def make_map_fn(split):
         def process_fn(example):
-            idx = example.pop("id")
+            idx = example.pop("problem_idx")
             question_raw = example.pop("problem")
             question = instruction_following + question_raw
             answer_raw = str(example.pop("answer")).strip()
