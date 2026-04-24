@@ -29,6 +29,7 @@ def build_push_crosscoder_latent_df(
     ft_layer: int = 1,
 ) -> pd.DataFrame:
     crosscoder = load_dictionary_model(dictionary_name)
+    print("Successfully loaded crosscoder model for latent df construction")
     try:
         existing_latent_df = load_latent_df(dictionary_name)
         logger.info(
