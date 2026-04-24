@@ -18,8 +18,15 @@ finetuned_models:
   global_step_30_to_global_step_60:
     default:
       model_id: /share/nlp/baijun/shuhan/ckpt_0/global_step_60/actor_hf_export
-    global_step_90:
+  global_step_60_to_global_step_90:
+    default:
       model_id: /share/nlp/baijun/shuhan/ckpt_0/global_step_90/actor_hf_export
+  global_step_90_to_global_step_120:
+    default:
+      model_id: /share/nlp/baijun/shuhan/ckpt_0/global_step_120/actor_hf_export
+  global_step_120_to_global_step_150:
+    default: 
+      model_id: /share/nlp/baijun/shuhan/ckpt_0/global_step_150/actor_hf_export
     global_step_120:
       model_id: /share/nlp/baijun/shuhan/ckpt_0/global_step_120/actor_hf_export
     global_step_150: 

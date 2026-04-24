@@ -12,7 +12,6 @@ COMMON_ARGS = [
     "diffing/method=crosscoder",
 ]
 
-MODEL_NAME = "llama32_3B_Instruct"
 
 
 def run_one(base_path: Path, ft_path: Path, run_name: str, verl_to_hf_path: Path):
@@ -34,10 +33,7 @@ def run_one(base_path: Path, ft_path: Path, run_name: str, verl_to_hf_path: Path
         "python",
         str(MAIN_PY),
         *COMMON_ARGS,
-        f"model.model_id={base_path}/actor_hf_export",
-        f"model.name={run_name}",
-        f"organism.finetuned_models.{MODEL_NAME}.default.model_id={ft_path}/actor_hf_export",
-        f"infrastructure.storage.base_dir=/share/nlp/baijun/shuhan/crosscoder_outputs/{run_name}",
+        f"model={run_name}",
     ]
 
     print("\n=== Running ===")
