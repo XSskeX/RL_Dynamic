@@ -10,7 +10,7 @@ from pandas.io.formats.printing import pprint_thing
 from tempfile import TemporaryDirectory
 from omegaconf import DictConfig, OmegaConf
 import tempfile
-
+import os
 from dictionary_learning.dictionary import BatchTopKSAE, CrossCoder, BatchTopKCrossCoder
 
 from diffing.utils.configs import HF_NAME
@@ -24,7 +24,7 @@ def stats_repo_id(crosscoder, author=HF_NAME):
 
 def latent_df_exists(crosscoder_or_path, author=HF_NAME):
     if Path(crosscoder_or_path).exists():
-        return True
+        return os.path.isfile(crosscoder_or_path.parent / "feature_df.csv")
     else:
         return file_exists(
             repo_id=stats_repo_id(crosscoder_or_path),
@@ -37,7 +37,7 @@ def load_latent_df(crosscoder_or_path, author=HF_NAME):
     """Load the latent_df for the given crosscoder."""
     if Path(crosscoder_or_path).exists():
         # Local model
-        df_path = Path(crosscoder_or_path)
+        df_path = Path(crosscoder_or_path).parent / "feature_df.csv"
     else:
         repo_id = stats_repo_id(crosscoder_or_path, author=author)
         if not repo_exists(repo_id=repo_id, repo_type="dataset"):
@@ -55,7 +55,7 @@ def load_latent_df(crosscoder_or_path, author=HF_NAME):
             filename="feature_df.csv",
             repo_type="dataset",
         )
-    df = pd.read_csv(df_path, index_col=0, encoding='gbk')
+    df = pd.read_csv(df_path, index_col=0)
     return df
 
 
