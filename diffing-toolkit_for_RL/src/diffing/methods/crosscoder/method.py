@@ -154,6 +154,7 @@ class CrosscoderDiffingMethod(DiffingMethod):
                     dictionary_name=model_path,
                     base_layer=0,
                     ft_layer=1,
+                    model_name=self.cfg.model.name
                 )
                 
                 local_feature_df_path = model_results_dir / "feature_df_local.csv"
