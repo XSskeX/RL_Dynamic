@@ -154,9 +154,8 @@ def update_crosscoder_latent_df_with_self_dot_ratio(
     num_features = base_decoder_weight.shape[0]
     latent_df = pd.DataFrame(index=range(num_features))
 
-    for f_idx, (base_ratio, ft_ratio) in enumerate(zip(base_ratios, ft_ratios)):
-        latent_df[f_idx]["dec_base_self_dot_ratio"] = base_ratio.item()
-        latent_df[f_idx]["dec_ft_self_dot_ratio"] = ft_ratio.item()
+    latent_df["dec_base_self_dot_ratio_norm"] = base_ratios.numpy()
+    latent_df["dec_ft_self_dot_ratio_norm"] = ft_ratios.numpy()
 
     latent_df = pd.DataFrame(latent_df).T
     latent_df.to_csv(Path(f"/share/nlp/baijun/shuhan/crosscoder_output/{model_name}_latent_data.csv"), index=False, encoding='utf-8-sig')
