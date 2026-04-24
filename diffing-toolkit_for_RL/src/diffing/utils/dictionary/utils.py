@@ -55,7 +55,7 @@ def load_latent_df(crosscoder_or_path, author=HF_NAME):
             filename="feature_df.csv",
             repo_type="dataset",
         )
-    df = pd.read_csv(df_path, index_col=0)
+    df = pd.read_csv(df_path, index_col=0, encoding='gbk')
     return df
 
 
