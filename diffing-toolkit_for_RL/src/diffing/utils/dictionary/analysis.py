@@ -144,13 +144,15 @@ def update_crosscoder_latent_df_with_self_dot_ratio(
     using decoder feature vectors.
     """
     crosscoder = load_dictionary_model(dictionary_name)
-    latent_df = load_latent_df(dictionary_name).T.to_dict()
 
     base_decoder_weight = crosscoder.decoder.weight[base_layer]
     ft_decoder_weight = crosscoder.decoder.weight[ft_layer]
 
     base_ratios = _self_vs_all_dot_ratio(base_decoder_weight).cpu()
     ft_ratios = _self_vs_all_dot_ratio(ft_decoder_weight).cpu()
+
+    num_features = base_decoder_weight.shape[0]
+    latent_df = pd.DataFrame(index=range(num_features))
 
     for f_idx, (base_ratio, ft_ratio) in enumerate(zip(base_ratios, ft_ratios)):
         latent_df[f_idx]["dec_base_self_dot_ratio"] = base_ratio.item()
