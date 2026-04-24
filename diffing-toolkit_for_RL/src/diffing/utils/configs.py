@@ -131,7 +131,7 @@ class DatasetConfig:
 
 def get_safe_model_id(model_cfg: ModelConfig) -> str:
     """Get the safe id of a model for paths."""
-    model_name_clean = model_cfg.model_id.split("/")[-1]
+    model_name_clean = model_cfg.model_id.split("/")[-2]
     if model_cfg.steering_vector is not None:
         steering_vector_name_clean = model_cfg.steering_vector.split("/")[-1]
         model_name_clean += f"_{steering_vector_name_clean}_L{model_cfg.steering_layer}"
