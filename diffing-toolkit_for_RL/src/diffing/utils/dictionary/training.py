@@ -698,7 +698,7 @@ def train_crosscoder_for_layer(
         f"Training steps: {max_steps}, validation every: {validate_every_n_steps}"
     )
     checkpoint_dir = (
-        f"{cfg.infrastructure.storage.checkpoint_dir}/{trainer_config['wandb_name']}"
+        f"{cfg.infrastructure.storage.checkpoint_dir}/{cfg.model.name}"
     )
 
     # Train the crosscoder

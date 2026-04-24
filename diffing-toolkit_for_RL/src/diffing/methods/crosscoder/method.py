@@ -143,13 +143,15 @@ class CrosscoderDiffingMethod(DiffingMethod):
 
             if self.method_cfg.analysis.enabled:
                 logger.info(f"Storing analysis results in {model_results_dir}")
+                model_path = Path(f"{self.cfg.infrastructure.storage.checkpoint_dir}/{self.cfg.model.name}/model_final.pt")
+                print("model_path: ", model_path)
                 build_push_crosscoder_latent_df(
-                    dictionary_name=dictionary_name,
+                    dictionary_name=model_path,
                     base_layer=0,
                     ft_layer=1,
                 )
                 latent_df = update_crosscoder_latent_df_with_self_dot_ratio(
-                    dictionary_name=dictionary_name,
+                    dictionary_name=model_path,
                     base_layer=0,
                     ft_layer=1,
                 )
