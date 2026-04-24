@@ -18,7 +18,15 @@ MODEL_NAME = "llama32_3B_Instruct"
 
 
 def run_one(base_path: Path, ft_path: Path, run_name: str, verl_to_hf_path: Path):
-    cmd = [f"python /share/nlp/baijun/shuhan/RL_Dynamic/verl_ckpt_to_hf.py \ --actor-dir {verl_to_hf_path} \ --output-dir {ft_path}"]
+    cmd = [
+        "python",
+        "/share/nlp/baijun/shuhan/RL_Dynamic/verl_ckpt_to_hf.py",
+        "--actor-dir",
+        str(verl_to_hf_path),
+        "--output-dir",
+        str(ft_path)
+    ]
+
     result = subprocess.run(cmd, check=False)
 
     if result.returncode != 0:
