@@ -133,6 +133,7 @@ def update_crosscoder_latent_df_with_self_dot_ratio(
     dictionary_name: str,
     base_layer: int = 0,
     ft_layer: int = 1,
+    model_name: str = "noname"
 ) -> pd.DataFrame:
     """
     Add per-feature self-vs-all dot-product ratios to the crosscoder latent df.
@@ -156,9 +157,7 @@ def update_crosscoder_latent_df_with_self_dot_ratio(
         latent_df[f_idx]["dec_ft_self_dot_ratio"] = ft_ratio.item()
 
     latent_df = pd.DataFrame(latent_df).T
-    push_latent_df(
-        latent_df, dictionary_name, confirm=False, create_repo_if_missing=True
-    )
+    latent_df.to_csv(Path(f"/share/nlp/baijun/shuhan/crosscoder_output/{model_name}_latent_data.csv"), index=False, encoding='utf-8-sig')
     return latent_df
 
 
