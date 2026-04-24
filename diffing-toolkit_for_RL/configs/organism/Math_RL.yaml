@@ -15,7 +15,8 @@ finetuned_models:
   llama32_3B_Instruct:
     default:
       model_id: /share/nlp/baijun/shuhan/ckpt_0/global_step_30/actor_hf_export
-    global_step_60:
+  global_step_30_to_global_step_60:
+    default:
       model_id: /share/nlp/baijun/shuhan/ckpt_0/global_step_60/actor_hf_export
     global_step_90:
       model_id: /share/nlp/baijun/shuhan/ckpt_0/global_step_90/actor_hf_export
