@@ -8,12 +8,10 @@ ROOT = "/share/nlp/baijun/shuhan/ckpt_0"
 ROOT_2 = "/share/nlp/baijun/shuhan/ckpt"
 MAIN_PY = Path("/share/nlp/baijun/shuhan/RL_Dynamic/diffing-toolkit_for_RL/main.py")
 
-# 你的基础运行参数
 COMMON_ARGS = [
     "diffing/method=crosscoder",
 ]
 
-# 如果你想固定用某个 model config 名称
 MODEL_NAME = "llama32_3B_Instruct"
 
 
