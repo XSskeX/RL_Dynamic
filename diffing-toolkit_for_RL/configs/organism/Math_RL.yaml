@@ -27,6 +27,36 @@ finetuned_models:
   global_step_120_to_global_step_150:
     default: 
       model_id: /share/nlp/baijun/shuhan/ckpt_0/global_step_150/actor_hf_export
+  global_step_150_to_global_step_180:
+    default:
+      model_id: /share/nlp/baijun/shuhan/ckpt_0/global_step_180/actor_hf_export
+  global_step_180_to_global_step_210:
+    default:
+      model_id: /share/nlp/baijun/shuhan/ckpt_0/global_step_210/actor_hf_export
+  global_step_210_to_global_step_240:
+    default:
+      model_id: /share/nlp/baijun/shuhan/ckpt_0/global_step_240/actor_hf_export
+  global_step_240_to_global_step_270:
+    default:
+      model_id: /share/nlp/baijun/shuhan/ckpt/global_step_270/actor_hf_export
+  global_step_270_to_global_step_300:
+    default:
+      model_id: /share/nlp/baijun/shuhan/ckpt/global_step_300/actor_hf_export
+  global_step_300_to_global_step_330:
+    default:  
+      model_id: /share/nlp/baijun/shuhan/ckpt/global_step_330/actor_hf_export
+  global_step_330_to_global_step_360:
+    default:
+      model_id: /share/nlp/baijun/shuhan/ckpt/global_step_360/actor_hf_export
+  global_step_360_to_global_step_390:
+    default:
+      model_id: /share/nlp/baijun/shuhan/ckpt/global_step_390/actor_hf_export
+  global_step_390_to_global_step_420:
+    default:
+      model_id: /share/nlp/baijun/shuhan/ckpt/global_step_420/actor_hf_export
+  global_step_420_to_global_step_450:
+    default:
+      model_id: /share/nlp/baijun/shuhan/ckpt/global_step_450/actor_hf_export
     global_step_120:
       model_id: /share/nlp/baijun/shuhan/ckpt_0/global_step_120/actor_hf_export
     global_step_150: 

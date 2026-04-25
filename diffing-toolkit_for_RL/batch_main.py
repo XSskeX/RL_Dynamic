@@ -2,7 +2,7 @@ import os
 import re
 import subprocess
 from pathlib import Path
-
+import argparse
 
 ROOT = "/share/nlp/baijun/shuhan/ckpt_0"
 ROOT_2 = "/share/nlp/baijun/shuhan/ckpt"
@@ -14,7 +14,7 @@ COMMON_ARGS = [
 
 
 
-def run_one(base_path: Path, ft_path: Path, run_name: str, verl_to_hf_path: Path):
+def run_one(base_path: Path, ft_path: Path, run_name: str, verl_to_hf_path: Path, activation_dir: Path = None):
     cmd = [
         "python",
         "/share/nlp/baijun/shuhan/RL_Dynamic/verl_ckpt_to_hf.py",
@@ -44,29 +44,40 @@ def run_one(base_path: Path, ft_path: Path, run_name: str, verl_to_hf_path: Path
 
     result = subprocess.run(cmd, check=False)
 
+    cmd = [
+        "rm",
+        "-rf",
+        str(activation_dir)
+    ]
     if result.returncode != 0:
         raise RuntimeError(f"Run failed: {run_name}")
 
 
-def main():
-
-    for i in range(15):
+def run_batch_main(start, end):
+    start = start / 30
+    end = end / 30
+    for i in range(start, end):
+        if (i < 9):
+            base_path = Path(ROOT + f"/global_step_{i * 30}/actor_hf_export")
+        else:
+            base_path = Path(ROOT_2 + f"/global_step_{i * 30}/actor_hf_export")
         if (i < 8):
-            base_path = Path(ROOT + f"/global_step_{(i + 1) * 30}/actor_hf_export")
+            ft_path = Path(ROOT + f"/global_step_{(i + 1) * 30}/actor_hf_export")
+            verl_to_hf_path = Path(ROOT + f"/global_step_{(i + 1) * 30}/actor")
         else:
-            base_path = Path(ROOT_2 + f"/global_step_{(i + 1) * 30}/actor_hf_export")
-        if (i < 7):
-            ft_path = Path(ROOT + f"/global_step_{(i + 2) * 30}/actor_hf_export")
-            verl_to_hf_path = Path(ROOT + f"/global_step_{(i + 2) * 30}/actor")
-        else:
-            ft_path = Path(ROOT_2 + f"/global_step_{(i + 2) * 30}/actor_hf_export")
-            verl_to_hf_path = Path(ROOT_2 + f"/global_step_{(i + 2) * 30}/actor")
+            ft_path = Path(ROOT_2 + f"/global_step_{(i + 1) * 30}/actor_hf_export")
+            verl_to_hf_path = Path(ROOT_2 + f"/global_step_{(i + 1) * 30}/actor")
 
-        run_name = f"global_step_{(i + 1) * 30}_to_global_step_{(i + 2) * 30}"
+        run_name = f"global_step_{i * 30}_to_global_step_{(i + 1) * 30}"
         run_one(base_path, ft_path, run_name, verl_to_hf_path)
-
+        activation_dir = Path(f"/share/nlp/baijun/shuhan/model-organisms/activations/global_step_{i * 30}")
     print("\nAll runs completed.")
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("--start", type=int, default=0)
+    parser.add_argument("--end", type=int, default=15)
+    args = parser.parse_args()
+    run_batch_main(args.start, args.end)
