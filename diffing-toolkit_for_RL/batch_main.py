@@ -49,7 +49,7 @@ def run_one(base_path: Path, ft_path: Path, run_name: str, verl_to_hf_path: Path
         "-rf",
         str(activation_dir)
     ]
-    
+
     result = subprocess.run(cmd, check=False)
 
     if result.returncode != 0:
@@ -72,8 +72,8 @@ def run_batch_main(start, end):
             verl_to_hf_path = Path(ROOT_2 + f"/global_step_{(i + 1) * 30}/actor")
 
         run_name = f"global_step_{i * 30}_to_global_step_{(i + 1) * 30}"
-        run_one(base_path, ft_path, run_name, verl_to_hf_path)
         activation_dir = Path(f"/share/nlp/baijun/shuhan/model-organisms/activations/global_step_{i * 30}")
+        run_one(base_path, ft_path, run_name, verl_to_hf_path, activation_dir)
     print("\nAll runs completed.")
 
 
