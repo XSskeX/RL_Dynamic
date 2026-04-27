@@ -49,13 +49,16 @@ def run_one(base_path: Path, ft_path: Path, run_name: str, verl_to_hf_path: Path
         "-rf",
         str(activation_dir)
     ]
+    
+    result = subprocess.run(cmd, check=False)
+
     if result.returncode != 0:
         raise RuntimeError(f"Run failed: {run_name}")
 
 
 def run_batch_main(start, end):
-    start = start / 30
-    end = end / 30
+    start = int(start / 30)
+    end = int(end / 30)
     for i in range(start, end):
         if (i < 9):
             base_path = Path(ROOT + f"/global_step_{i * 30}/actor_hf_export")
