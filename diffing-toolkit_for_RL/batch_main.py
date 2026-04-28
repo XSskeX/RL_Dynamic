@@ -26,9 +26,6 @@ def run_one(base_path: Path, ft_path: Path, run_name: str, verl_to_hf_path: Path
 
     #result = subprocess.run(cmd, check=False)
 
-    if result.returncode != 0:
-        raise RuntimeError(f"Run failed: {run_name}")
-
     cmd = [
         "python",
         str(MAIN_PY),
