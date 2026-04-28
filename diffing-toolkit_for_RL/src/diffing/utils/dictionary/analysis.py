@@ -160,7 +160,7 @@ def update_crosscoder_latent_df_with_self_dot_ratio(
     latent_df["dec_ft_self_dot_ratio_norm"] = ft_ratios.detach().numpy()
 
     latent_df = pd.DataFrame(latent_df).T
-    latent_df.to_csv(Path(f"/share/nlp/baijun/shuhan/crosscoder_output/{model_name}_latent_data.csv"), index=False, encoding='utf-8-sig')
+    latent_df.to_csv(Path(f"/share/nlp/baijun/shuhan/crosscoder_output_for_24/{model_name}_latent_data.csv"), index=False, encoding='utf-8-sig')
     return latent_df
 
 
