@@ -115,16 +115,16 @@ def build_push_crosscoder_latent_df(
 
 def _self_vs_all_dot_ratio(weight: th.Tensor) -> th.Tensor:
     """
-    Compute diag(W W^T) divided by the row-wise sum of W W^T.
+    Compute diag(W W^T) divided by the row-wise sum of abs(W W^T).
 
     For each feature vector f_i, this returns:
-        ||f_i||^2 / sum_j <f_i, f_j>
+        ||f_i||^2 / sum_j |<f_i, f_j>|
 
     The sum includes the self-dot-product term j = i.
     """
     gram = weight @ weight.T
     numerator = th.diag(gram)
-    denominator = gram.sum(dim=1)
+    denominator = gram.abs().sum(dim=1)
     eps = th.finfo(gram.dtype).eps
     return numerator / denominator.clamp_min(eps)
 
