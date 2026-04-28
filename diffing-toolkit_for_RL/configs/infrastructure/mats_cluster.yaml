@@ -3,7 +3,7 @@ name: mats_cluster
 
 # Storage settings
 storage:
-  base_dir: /share/nlp/baijun/shuhan/model-organisms-for-24/
+  base_dir: /share/nlp/baijun/shuhan/model-organisms-for-all/
   checkpoint_dir: ${infrastructure.storage.base_dir}/checkpoints
   logs_dir: ./logs
 

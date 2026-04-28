@@ -14,7 +14,7 @@ from diffing.utils.model import (
     gc_collect_cuda_cache,
     AnyTokenizer,
 )
-from diffing.utils.configs import get_model_configurations
+from diffing.utils.configs import get_model_configurations, get_nway_model_configurations
 from diffing.utils.agents.blackbox_agent import BlackboxAgent
 from diffing.utils.agents.diffing_method_agent import DiffingMethodAgent
 
@@ -39,7 +39,13 @@ class DiffingMethod(ABC):
         self.logger = logger.bind(method=self.__class__.__name__)
 
         # Extract model configurations
-        self.base_model_cfg, self.finetuned_model_cfg = get_model_configurations(cfg)
+        if cfg.diffing.method.name == "nway_crosscoder":
+            self.model_cfgs = get_nway_model_configurations(cfg)
+            self.base_model_cfg = self.model_cfgs[0]
+            self.finetuned_model_cfg = self.model_cfgs[-1]
+        else:
+            self.base_model_cfg, self.finetuned_model_cfg = get_model_configurations(cfg)
+            self.model_cfgs = [self.base_model_cfg, self.finetuned_model_cfg]
 
         # Initialize model and tokenizer placeholders
         self._base_model: StandardizedTransformer | None = None

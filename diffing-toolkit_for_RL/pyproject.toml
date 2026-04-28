@@ -63,7 +63,7 @@ scripts = [
 
 [tool.uv.sources]
 # dictionary-learning = { path = "../crosscoder_learning", editable = true }
-dictionary-learning = { git = "https://github.com/science-of-finetuning/crosscoder_learning.git" }
+dictionary-learning = { path = "vendor/dictionary_learning", editable = true }
 tiny-dashboard = { git = "https://github.com/Butanium/tiny-activation-dashboard.git" }
 # scribe-notebook = { path = "../research-libs/scribe-notebook", editable = true }
 # claude-repl = { path = "../research-libs/claude-repl", editable = true }

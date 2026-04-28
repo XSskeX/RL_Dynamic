@@ -1,7 +1,7 @@
 defaults:
   - organism: Math_RL
   - model: auto
-  - diffing/method: crosscoder
+  - diffing/method: nway_crosscoder
   - infrastructure: mats_cluster
   - diffing/grading_rubrics
   - diffing/evaluation

@@ -23,6 +23,7 @@ from ..utils import (
     ModelConfig,
     DatasetConfig,
     get_model_configurations,
+    get_nway_model_configurations,
     get_dataset_configurations,
 )
 from ..utils.data import load_dataset_from_hub_or_local
@@ -197,7 +198,12 @@ class PreprocessingPipeline(Pipeline):
         """
 
         # Get model and dataset configurations
-        base_model_cfg, finetuned_model_cfg = get_model_configurations(self.cfg)
+        if self.cfg.diffing.method.name == "nway_crosscoder":
+            model_cfgs = get_nway_model_configurations(self.cfg)
+            base_model_cfg, finetuned_model_cfg = model_cfgs[0], model_cfgs[-1]
+        else:
+            base_model_cfg, finetuned_model_cfg = get_model_configurations(self.cfg)
+            model_cfgs = [base_model_cfg, finetuned_model_cfg]
         assert (
             sum(
                 [
@@ -234,8 +240,7 @@ class PreprocessingPipeline(Pipeline):
             use_training_dataset=use_training,
         )
 
-        self.logger.info(f"Base model: {base_model_cfg.name}")
-        self.logger.info(f"Finetuned model: {finetuned_model_cfg.name}")
+        self.logger.info(f"Models: {[model_cfg.name for model_cfg in model_cfgs]}")
         self.logger.info(f"Datasets: {[d.name for d in dataset_configs]}")
 
         results = {
@@ -250,15 +255,10 @@ class PreprocessingPipeline(Pipeline):
             # Load dataset
             dataset = self._load_dataset(dataset_cfg)
 
-            # Collect activations for base model
-            self._collect_activations_for_model_dataset(
-                base_model_cfg, dataset_cfg, dataset
-            )
-
-            # Collect activations for finetuned model
-            self._collect_activations_for_model_dataset(
-                finetuned_model_cfg, dataset_cfg, dataset
-            )
+            for model_cfg in model_cfgs:
+                self._collect_activations_for_model_dataset(
+                    model_cfg, dataset_cfg, dataset
+                )
 
             results["datasets_processed"].append(
                 {

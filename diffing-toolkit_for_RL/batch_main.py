@@ -69,7 +69,7 @@ def run_batch_main(start, end):
             verl_to_hf_path = Path(ROOT_2 + f"/global_step_{(i + 1) * 30}/actor")
 
         run_name = f"global_step_{i * 30}_to_global_step_{(i + 1) * 30}"
-        activation_dir = Path(f"/share/nlp/baijun/shuhan/model-organisms-for-24/activations/global_step_{i * 30}")
+        activation_dir = Path(f"/share/nlp/baijun/shuhan/model-organisms-for-all/activations/global_step_{i * 30}")
         run_one(base_path, ft_path, run_name, verl_to_hf_path, activation_dir)
     print("\nAll runs completed.")
 

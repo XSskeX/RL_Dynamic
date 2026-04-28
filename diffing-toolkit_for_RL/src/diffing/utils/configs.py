@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Dict, Tuple, List
+from typing import Dict, Tuple, List, Any
 from omegaconf import DictConfig, OmegaConf
 from loguru import logger
 from hydra import initialize, compose
@@ -165,6 +165,56 @@ def create_model_config(
         trust_remote_code=model_cfg.get("trust_remote_code", False),
         chat_template=model_cfg.get("chat_template", None),
     )
+
+
+def load_model_config_by_name(model_name: str) -> DictConfig:
+    """Load a model config from configs/model by config name."""
+    model_config_path = CONFIGS_DIR / "model" / f"{model_name}.yaml"
+    if not model_config_path.exists():
+        raise ValueError(f"Model config not found: {model_config_path}")
+    return OmegaConf.load(model_config_path)
+
+
+def _model_spec_to_config(spec: Any) -> ModelConfig:
+    """Convert an n-way model spec into a ModelConfig.
+
+    Supported specs:
+    - "model_config_name"
+    - {config: model_config_name}
+    - {name: ..., model_id: ...}
+    """
+    if isinstance(spec, str):
+        model_cfg = load_model_config_by_name(spec)
+        return create_model_config(model_cfg)
+
+    if isinstance(spec, DictConfig) or isinstance(spec, dict):
+        if "config" in spec:
+            model_cfg = load_model_config_by_name(str(spec["config"]))
+            name_override = spec.get("name", None)
+            return create_model_config(model_cfg, name_override=name_override)
+
+        if "name" in spec and "model_id" in spec:
+            return create_model_config(OmegaConf.create(spec))
+
+    raise ValueError(
+        "Invalid n-way model spec. Expected a model config name, "
+        "{config: ...}, or {name: ..., model_id: ...}."
+    )
+
+
+def get_nway_model_configurations(cfg: DictConfig) -> List[ModelConfig]:
+    """Extract model configurations for n-way crosscoder training."""
+    nway_cfg = cfg.diffing.method.get("nway", None)
+    if nway_cfg is None or "models" not in nway_cfg:
+        raise ValueError(
+            "n-way crosscoder requires diffing.method.nway.models to be set."
+        )
+
+    model_cfgs = [_model_spec_to_config(spec) for spec in nway_cfg.models]
+    if len(model_cfgs) < 2:
+        raise ValueError("n-way crosscoder requires at least two models.")
+
+    return model_cfgs
 
 
 def create_dataset_config(

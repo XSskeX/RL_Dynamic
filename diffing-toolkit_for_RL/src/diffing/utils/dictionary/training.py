@@ -18,6 +18,7 @@ from dictionary_learning.trainers.crosscoder import (
 import hashlib
 from dictionary_learning.trainers import BatchTopKTrainer, BatchTopKSAE
 from dictionary_learning.cache import (
+    ActivationCacheTuple,
     ActivationCache,
     PairedActivationCache,
     RunningStatWelford,
@@ -26,16 +27,21 @@ from dictionary_learning.training import trainSAE
 
 from ..activations import (
     load_activation_datasets_from_config,
+    load_activation_datasets_for_models_from_config,
     get_local_shuffled_indices,
     calculate_samples_per_dataset,
 )
-from ..configs import get_model_configurations, get_dataset_configurations
+from ..configs import (
+    get_model_configurations,
+    get_nway_model_configurations,
+    get_dataset_configurations,
+)
 from ..dictionary.utils import push_dictionary_model, push_config_to_hub
 from ..cache import DifferenceCache
 
 
 def combine_normalizer(
-    caches: List[PairedActivationCache],
+    caches: List[PairedActivationCache | ActivationCacheTuple],
     device: str = "cpu",
     layer: int = None,
     n: int = 0,
@@ -56,23 +62,42 @@ def combine_normalizer(
             n=n,
         )
         return mean, std
-    running_stats_1 = None
-    running_stats_2 = None
+    running_stats = None
     for cache in caches:
-        if running_stats_1 is None:
-            running_stats_1 = cache.activation_cache_1.running_stats
-            running_stats_2 = cache.activation_cache_2.running_stats
+        component_stats = [
+            component_cache.running_stats
+            for component_cache in _activation_cache_components(cache)
+        ]
+        if running_stats is None:
+            running_stats = component_stats
         else:
-            running_stats_1.merge(cache.activation_cache_1.running_stats)
-            running_stats_2.merge(cache.activation_cache_2.running_stats)
+            if len(component_stats) != len(running_stats):
+                raise ValueError("All activation caches must have the same model count")
+            for dst, src in zip(running_stats, component_stats):
+                dst.merge(src)
 
-    mean = torch.stack([running_stats_1.mean, running_stats_2.mean], dim=0)
+    mean = torch.stack([stat.mean for stat in running_stats], dim=0)
     # we want unbiased std for the normalizer
     std = torch.stack(
-        [running_stats_1.std(unbiased=False), running_stats_2.std(unbiased=False)],
+        [stat.std(unbiased=False) for stat in running_stats],
         dim=0,
     )
     return mean, std
+
+
+def _activation_cache_components(cache):
+    if hasattr(cache, "activation_caches"):
+        return cache.activation_caches
+    if hasattr(cache, "activation_cache_1") and hasattr(cache, "activation_cache_2"):
+        return [cache.activation_cache_1, cache.activation_cache_2]
+    raise TypeError(f"Unsupported activation cache type: {type(cache)}")
+
+
+def _cache_sequence_ranges(cache):
+    sequence_ranges = cache.sequence_ranges
+    if sequence_ranges is not None and getattr(sequence_ranges, "ndim", 1) == 2:
+        return sequence_ranges[0]
+    return sequence_ranges
 
 
 def setup_sae_cache(
@@ -204,7 +229,8 @@ def skip_first_n_tokens(cache: Any, n: int) -> Subset:
     """
     if n == 0:
         return cache
-    sequence_ranges = cache.sequence_ranges[:-1]  # last one is the end of the cache
+    sequence_ranges = _cache_sequence_ranges(cache)
+    sequence_ranges = sequence_ranges[:-1]  # last one is the end of the cache
     mask = torch.ones(len(cache), dtype=torch.bool)
     for i in range(n):
         mask[sequence_ranges + i] = False
@@ -369,6 +395,122 @@ def setup_training_datasets(
     )
 
 
+def setup_nway_training_datasets(
+    cfg: DictConfig,
+    layer: int,
+    model_cfgs,
+    dataset_processing_function: Callable = None,
+    normalizer_function: Callable = None,
+    overwrite_num_samples: int = None,
+    overwrite_num_validation_samples: int = None,
+    overwrite_local_shuffling: bool = None,
+) -> Tuple[Dataset, Dataset]:
+    """Set up n-way training/validation datasets using ActivationCacheTuple."""
+    dataset_cfgs = get_dataset_configurations(
+        cfg,
+        use_chat_dataset=cfg.diffing.method.datasets.use_chat_dataset,
+        use_pretraining_dataset=cfg.diffing.method.datasets.use_pretraining_dataset,
+        use_training_dataset=cfg.diffing.method.datasets.use_training_dataset,
+    )
+
+    training_cfg = cfg.diffing.method.training
+
+    caches = load_activation_datasets_for_models_from_config(
+        cfg=cfg,
+        ds_cfgs=dataset_cfgs,
+        model_cfgs=model_cfgs,
+        layers=[layer],
+        split="train",
+    )
+    caches = {dataset_name: caches[dataset_name][layer] for dataset_name in caches}
+
+    if dataset_processing_function is not None:
+        caches = {
+            dataset_name: dataset_processing_function(caches[dataset_name])
+            for dataset_name in caches
+        }
+
+    if normalizer_function is not None:
+        normalize_mean, normalize_std = normalizer_function(list(caches.values()))
+    else:
+        normalize_mean = None
+        normalize_std = None
+
+    num_samples_per_dataset = [len(caches[dataset_name]) for dataset_name in caches]
+    num_samples_per_dataset = calculate_samples_per_dataset(
+        num_samples_per_dataset,
+        (
+            training_cfg.num_samples
+            if overwrite_num_samples is None
+            else overwrite_num_samples
+        ),
+    )
+
+    train_dataset = ConcatDataset(
+        [
+            Subset(caches[dataset_name], torch.arange(0, num_samples))
+            for dataset_name, num_samples in zip(caches.keys(), num_samples_per_dataset)
+        ]
+    )
+
+    if training_cfg.local_shuffling and (
+        overwrite_local_shuffling is None or overwrite_local_shuffling
+    ):
+        shuffled_indices, epoch_numbers = get_local_shuffled_indices(
+            num_samples_per_dataset, training_cfg.local_shuffling_shard_size, training_cfg.epochs
+        )
+        train_dataset = Subset(train_dataset, shuffled_indices)
+    else:
+        epoch_numbers = None
+
+    caches_val = load_activation_datasets_for_models_from_config(
+        cfg=cfg,
+        ds_cfgs=dataset_cfgs,
+        model_cfgs=model_cfgs,
+        layers=[layer],
+        split="validation",
+    )
+    caches_val = {
+        dataset_name: caches_val[dataset_name][layer] for dataset_name in caches_val
+    }
+
+    if dataset_processing_function is not None:
+        caches_val = {
+            dataset_name: dataset_processing_function(caches_val[dataset_name])
+            for dataset_name in caches_val
+        }
+
+    num_validation_samples = [
+        len(caches_val[dataset_name]) for dataset_name in caches_val
+    ]
+    num_validation_samples = calculate_samples_per_dataset(
+        num_validation_samples,
+        (
+            training_cfg.num_validation_samples
+            if overwrite_num_validation_samples is None
+            else overwrite_num_validation_samples
+        ),
+    )
+
+    validation_dataset = ConcatDataset(
+        [
+            Subset(caches_val[dataset_name], torch.arange(0, n_val))
+            for dataset_name, n_val in zip(caches_val.keys(), num_validation_samples)
+        ]
+    )
+
+    logger.info(f"Training dataset: {len(train_dataset)} samples")
+    logger.info(f"Validation dataset: {len(validation_dataset)} samples")
+
+    return (
+        train_dataset,
+        validation_dataset,
+        epoch_numbers,
+        normalize_mean,
+        normalize_std,
+    )
+
+
 def create_training_dataloader(
     dataset: Dataset,
     cfg: DictConfig,
@@ -485,6 +627,28 @@ def crosscoder_run_name(
     return run_name
 
 
+def nway_crosscoder_run_name(
+    cfg: DictConfig,
+    layer: int,
+    model_cfgs: List[Any],
+) -> str:
+    method_cfg = cfg.diffing.method
+    model_label = method_cfg.get("nway", {}).get("run_name", None)
+    if model_label is None:
+        names = [model_cfg.name for model_cfg in model_cfgs]
+        if len(names) <= 4:
+            model_label = "_".join(names)
+        else:
+            model_label = f"{names[0]}_to_{names[-1]}_n{len(names)}"
+    run_name = (
+        f"NWay-{model_label}-{cfg.organism.name}-L{layer}"
+        + f"-{method_cfg.model.code_normalization.capitalize()}"
+        + f"-k{method_cfg.training.k}-lr{method_cfg.training.lr:.0e}"
+        + f"-x{method_cfg.training.expansion_factor}"
+    )
+    return run_name.replace(".", "p").replace("/", "_")
+
+
 def sae_difference_run_name(
     cfg: DictConfig,
     layer: int,
@@ -537,6 +701,7 @@ def create_crosscoder_trainer_config(
     normalize_mean: torch.Tensor,
     normalize_std: torch.Tensor,
     run_name: str,
+    model_cfgs: list | None = None,
 ) -> Dict[str, Any]:
     """
     Create trainer configuration from method settings.
@@ -554,7 +719,9 @@ def create_crosscoder_trainer_config(
         Trainer configuration dictionary
     """
     method_cfg = cfg.diffing.method
-    base_model_cfg, finetuned_model_cfg = get_model_configurations(cfg)
+    if model_cfgs is None:
+        base_model_cfg, finetuned_model_cfg = get_model_configurations(cfg)
+        model_cfgs = [base_model_cfg, finetuned_model_cfg]
 
     # Extract training parameters
     expansion_factor = method_cfg.training.expansion_factor
@@ -581,7 +748,8 @@ def create_crosscoder_trainer_config(
         "device": device,
         "warmup_steps": warmup_steps,
         "layer": layer,
-        "lm_name": f"{finetuned_model_cfg.model_id}-{base_model_cfg.model_id}",
+        "num_layers": len(model_cfgs),
+        "lm_name": "-".join(model_cfg.model_id for model_cfg in model_cfgs),
         "wandb_name": run_name,
         "dict_class_kwargs": {
             "same_init_for_all_layers": same_init_for_all_layers,
@@ -758,6 +926,116 @@ def train_crosscoder_for_layer(
     print("this is checkpoint_dir: ", checkpoint_dir)
 
     logger.info(f"Successfully trained crosscoder for layer {layer_idx}")
+    return training_metrics, Path(checkpoint_dir) / "model_final.pt"
+
+
+def train_nway_crosscoder_for_layer(
+    cfg: DictConfig,
+    layer_idx: int,
+    device: str,
+    run_name: str,
+) -> Dict[str, Any]:
+    """Train an n-way crosscoder for a specific layer."""
+    logger.info(f"Training n-way crosscoder for layer {layer_idx}")
+    model_cfgs = get_nway_model_configurations(cfg)
+    ignore_first_n_tokens = model_cfgs[0].ignore_first_n_tokens_per_sample_during_training
+
+    train_dataset, val_dataset, epoch_idx_per_step, normalize_mean, normalize_std = (
+        setup_nway_training_datasets(
+            cfg,
+            layer_idx,
+            model_cfgs=model_cfgs,
+            normalizer_function=(
+                (
+                    lambda x: combine_normalizer(
+                        x,
+                        device=device,
+                        layer=layer_idx,
+                        n=ignore_first_n_tokens,
+                        subsample_size=cfg.diffing.method.datasets.normalization.subsample_size,
+                        batch_size=cfg.diffing.method.datasets.normalization.batch_size,
+                    )
+                )
+                if cfg.diffing.method.datasets.normalization.enabled
+                else None
+            ),
+            dataset_processing_function=lambda x: skip_first_n_tokens(
+                x, ignore_first_n_tokens
+            ),
+        )
+    )
+
+    sample_activation = train_dataset[0]
+    if sample_activation.shape[0] != len(model_cfgs):
+        raise ValueError(
+            f"Expected {len(model_cfgs)} model activations, got sample shape {sample_activation.shape}"
+        )
+    activation_dim = sample_activation.shape[-1]
+
+    trainer_config = create_crosscoder_trainer_config(
+        cfg,
+        layer_idx,
+        activation_dim,
+        device,
+        normalize_mean,
+        normalize_std,
+        run_name,
+        model_cfgs=model_cfgs,
+    )
+
+    train_dataloader = create_training_dataloader(train_dataset, cfg, shuffle=True)
+    val_dataloader = create_training_dataloader(
+        val_dataset,
+        cfg,
+        shuffle=False,
+        overwrite_batch_size=cfg.diffing.method.training.batch_size * 4,
+    )
+
+    max_steps = cfg.diffing.method.training.max_steps
+    trainer_config["steps"] = len(train_dataloader) if max_steps is None else max_steps
+    validate_every_n_steps = cfg.diffing.method.training.validate_every_n_steps
+
+    checkpoint_dir = f"{cfg.infrastructure.storage.checkpoint_dir}/{run_name}"
+
+    model, last_eval_logs = trainSAE(
+        data=train_dataloader,
+        trainer_config=trainer_config,
+        validate_every_n_steps=validate_every_n_steps,
+        validation_data=val_dataloader,
+        use_wandb=cfg.wandb.enabled,
+        wandb_entity=cfg.wandb.entity,
+        wandb_project="Diffing-Game-NWay-Crosscoder",
+        wandb_group=cfg.organism.name,
+        log_steps=50,
+        save_dir=checkpoint_dir,
+        save_steps=validate_every_n_steps,
+        run_wandb_finish=False,
+        epoch_idx_per_step=epoch_idx_per_step,
+        return_last_eval_logs=True,
+    )
+
+    if cfg.wandb.enabled:
+        upload_config_to_wandb(cfg)
+        wandb.finish()
+
+    training_metrics = {
+        "layer": layer_idx,
+        "activation_dim": activation_dim,
+        "dictionary_size": trainer_config["dict_size"],
+        "training_steps": trainer_config["steps"],
+        "lr": trainer_config["lr"],
+        "model_type": cfg.diffing.method.model.type,
+        "run_name": trainer_config["wandb_name"],
+        "training_mode": "nway_crosscoder",
+        "model_names": [model_cfg.name for model_cfg in model_cfgs],
+        "model_ids": [model_cfg.model_id for model_cfg in model_cfgs],
+        "last_eval_logs": {
+            k: v.item() if isinstance(v, torch.Tensor) else v
+            for k, v in last_eval_logs.items()
+        },
+    }
+
+    logger.info(f"Successfully trained n-way crosscoder for layer {layer_idx}")
     return training_metrics, Path(checkpoint_dir) / "model_final.pt"
 
 

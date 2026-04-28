@@ -1,22 +1,29 @@
 # @package diffing.method
-name: crosscoder
+name: nway_crosscoder
 requires_preprocessing: true
 
-# Training parameters - inherits data config from preprocessing
+# N-way model list. Each item can be:
+# - a model config name under configs/model, e.g. global_step_30
+# - {config: model_config_name, name: optional_display_name}
+# - {name: display_name, model_id: /path/or/hf/id, ...}
+nway:
+  run_name: null
+  models: []
+
+# Training parameters - mirrors crosscoder.yaml
 training:
   expansion_factor: 32
   batch_size: 2048
   epochs: 2
   lr: 1e-4
-  max_steps: null  # Auto-calculate from dataset size
+  max_steps: null
   validate_every_n_steps: 10000
-  mu: 1e-1  # L1 penalty for ReLU type
-  k: 100   # Sparsity for batch-top-k type
+  mu: 1e-1
+  k: 100
   k_max: 1024
   k_annealing_steps: 2000
-  auxk_alpha: 0.03125  # 1/32
-  
-  # Data configuration
+  auxk_alpha: 0.03125
+
   num_samples: 150_000_000
   num_validation_samples: 5_000_000
   local_shuffling: true
@@ -24,34 +31,31 @@ training:
   workers: 16
 
   overwrite: false
-  
+
 datasets:
   use_chat_dataset: false
   use_pretraining_dataset: false
   use_training_dataset: true
   normalization:
-    enabled: True
+    enabled: true
     subsample_size: 1_000_000
     batch_size: 4096
     cache_dir: "${infrastructure.storage.base_dir}/normalizer_cache"
     target_rms: 100.0
 
-# Model configuration
 model:
-  type: "batch-top-k"  # ["relu", "batch-top-k"]
-  code_normalization: "crosscoder"  # ["crosscoder", "sae", "mixed", "decoupled", "none"]
+  type: "batch-top-k"
+  code_normalization: "crosscoder"
   same_init_for_all_layers: true
   norm_init_scale: 1.0
   init_with_transpose: true
-  
-# Training optimization
+
 optimization:
   resample_steps: null
   warmup_steps: 1000
 
-layers: null  # Fraction of model layers to train on, if null, train on all available layers. Provide list of layers to train on.
+layers: null
 
-# Analysis configuration
 analysis:
   enabled: true
 
@@ -67,14 +71,14 @@ analysis:
     num_effective_ft_only_latents: 5000
     overwrite: false
 
-  latent_activations: # Collect latent activations for all datasets and layers
+  latent_activations:
     enabled: false
     split: "train"
-    overwrite: false # Overwrite existing latent activations and max activations
-    upload_to_hub: false # Upload max activations to hub
-    n_max_activations: 100 # Number of max activations to collect
-    min_threshold: 1e-4 # Minimum activation threshold to consider
-    max_num_samples: 50000 # Maximum number of samples to collect per dataset
+    overwrite: false
+    upload_to_hub: false
+    n_max_activations: 100
+    min_threshold: 1e-4
+    max_num_samples: 50000
     cache_device: "cuda"
 
   latent_steering:
@@ -90,7 +94,7 @@ analysis:
     device: "cuda"
     use_chat_formatting: true
     enable_thinking: false
-    steering_factors_percentages: [-0.5, 0.5, 0.8, 1.0, 1.5] # of max_activation
+    steering_factors_percentages: [-0.5, 0.5, 0.8, 1.0, 1.5]
     steering_modes: ["prompt_only"]
 
 upload:
