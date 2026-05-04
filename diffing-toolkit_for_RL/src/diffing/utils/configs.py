@@ -175,70 +175,154 @@ def load_model_config_by_name(model_name: str) -> DictConfig:
     return OmegaConf.load(model_config_path)
 
 
-def _model_spec_to_config(spec: Any) -> ModelConfig:
-    """Convert an n-way model spec into a ModelConfig.
+def _model_spec_to_dict_config(spec: Any) -> DictConfig:
+    """Convert an n-way model spec into a raw DictConfig.
 
     Supported specs:
     - "model_config_name"
     - {config: model_config_name}
-    - {name: ..., model_id: ...}
+    - {name: ..., model_id: ...} or {name: ..., adapter_id: ...}
     """
     if isinstance(spec, str):
-        model_cfg = load_model_config_by_name(spec)
-        return create_model_config(model_cfg, device_map="auto")
+        return load_model_config_by_name(spec)
 
     if isinstance(spec, DictConfig) or isinstance(spec, dict):
         if "config" in spec:
             model_cfg = load_model_config_by_name(str(spec["config"]))
-            name_override = spec.get("name", None)
-            return create_model_config(model_cfg, name_override=name_override, device_map="auto")
+            if spec.get("name", None) is not None:
+                model_cfg.name = spec["name"]
+            return model_cfg
+
+        if "name" in spec and ("model_id" in spec or "adapter_id" in spec):
+            return OmegaConf.create(spec)
 
     raise ValueError(
         "Invalid n-way model spec. Expected a model config name, "
-        "{config: ...}, or {name: ..., model_id: ...}."
+        "{config: ...}, {name: ..., model_id: ...}, or "
+        "{name: ..., adapter_id: ...}."
+    )
+
+
+def _parse_model_id_and_subfolder(raw_cfg: DictConfig) -> tuple[str, str, bool]:
+    """Parse full-model or adapter config into model_id, subfolder, is_lora."""
+    if "adapter_id" in raw_cfg:
+        model_id_full = raw_cfg["adapter_id"]
+        is_adapter = True
+    elif "model_id" in raw_cfg:
+        model_id_full = raw_cfg["model_id"]
+        is_adapter = False
+    else:
+        raise ValueError(
+            f"Model config {raw_cfg.get('name', '<unnamed>')} must have either "
+            "'model_id' or 'adapter_id'."
+        )
+
+    if raw_cfg.get("subfolder", ""):
+        return str(model_id_full), str(raw_cfg.subfolder), is_adapter
+
+    # Match the pairwise parser: local paths are complete paths; HF repo paths can
+    # include an in-repo subfolder after org/repo.
+    if Path(str(model_id_full)).is_absolute() or Path(str(model_id_full)).exists():
+        return str(model_id_full), "", is_adapter
+    if "/" in str(model_id_full) and str(model_id_full).count("/") > 1:
+        parts = str(model_id_full).split("/")
+        return "/".join(parts[:2]), "/".join(parts[2:]), is_adapter
+    return str(model_id_full), "", is_adapter
+
+
+def _model_spec_to_config(
+    spec: Any,
+    base_model_cfg: ModelConfig | None = None,
+    device_map: object | None = None,
+) -> ModelConfig:
+    """Convert an n-way model spec into a ModelConfig.
+
+    If base_model_cfg is provided, this follows the original pairwise finetuned
+    model logic: the model identity comes from the spec, while tokenizer and
+    preprocessing defaults inherit from the base model.
+    """
+    raw_cfg = _model_spec_to_dict_config(spec)
+
+    if base_model_cfg is None:
+        model_cfg = create_model_config(
+            raw_cfg,
+            device_map=raw_cfg.get(
+                "device_map", device_map if device_map is not None else "auto"
+            ),
+        )
+        model_id, subfolder, is_adapter = _parse_model_id_and_subfolder(raw_cfg)
+        model_cfg.model_id = model_id
+        model_cfg.subfolder = subfolder
+        model_cfg.is_lora = is_adapter
+        if is_adapter and model_cfg.base_model_id is None:
+            raise ValueError(
+                "The first n-way model cannot be an adapter unless base_model_id is set."
+            )
+        return model_cfg
+
+    model_id, subfolder, is_adapter = _parse_model_id_and_subfolder(raw_cfg)
+    return ModelConfig(
+        name=raw_cfg.get("name", model_id.split("/")[-1]),
+        model_id=model_id,
+        subfolder=subfolder,
+        is_lora=is_adapter,
+        base_model_id=raw_cfg.get(
+            "base_model_id", base_model_cfg.model_id if is_adapter else None
+        ),
+        tokenizer_id=raw_cfg.get("tokenizer_id", base_model_cfg.tokenizer_id),
+        attn_implementation=raw_cfg.get(
+            "attn_implementation", base_model_cfg.attn_implementation
+        ),
+        ignore_first_n_tokens_per_sample_during_collection=raw_cfg.get(
+            "ignore_first_n_tokens_per_sample_during_collection",
+            base_model_cfg.ignore_first_n_tokens_per_sample_during_collection,
+        ),
+        ignore_first_n_tokens_per_sample_during_training=raw_cfg.get(
+            "ignore_first_n_tokens_per_sample_during_training",
+            base_model_cfg.ignore_first_n_tokens_per_sample_during_training,
+        ),
+        token_level_replacement=raw_cfg.get(
+            "token_level_replacement", base_model_cfg.token_level_replacement
+        ),
+        text_column=raw_cfg.get("text_column", base_model_cfg.text_column),
+        dtype=raw_cfg.get("dtype", base_model_cfg.dtype),
+        steering_vector=raw_cfg.get("steering_vector", base_model_cfg.steering_vector),
+        steering_layer=raw_cfg.get("steering_layer", base_model_cfg.steering_layer),
+        no_auto_device_map=raw_cfg.get(
+            "no_auto_device_map", base_model_cfg.no_auto_device_map
+        ),
+        device_map=raw_cfg.get(
+            "device_map", device_map if device_map is not None else "auto"
+        ),
+        trust_remote_code=raw_cfg.get(
+            "trust_remote_code", base_model_cfg.trust_remote_code
+        ),
+        chat_template=raw_cfg.get("chat_template", base_model_cfg.chat_template),
     )
 
 
 def get_nway_model_configurations(cfg: DictConfig) -> List[ModelConfig]:
-    """Extract model configurations for n-way crosscoder training."""
+    """Extract and prepare n-way model configurations."""
     nway_cfg = cfg.diffing.method.get("nway", None)
     if nway_cfg is None or "models" not in nway_cfg:
         raise ValueError(
             "n-way crosscoder requires diffing.method.nway.models to be set."
         )
-
-    #model_cfgs = [_model_spec_to_config(spec) for spec in nway_cfg.models]
     if len(nway_cfg.models) < 2:
         raise ValueError("n-way crosscoder requires at least two models.")
 
-    base_model_cfg = _model_spec_to_config(nway_cfg.models[0])
+    base_model_cfg = _model_spec_to_config(
+        nway_cfg.models[0], device_map=cfg.infrastructure.device_map.base
+    )
     model_cfgs = [base_model_cfg]
-    for i in range(1, len(nway_cfg.models)):
-        spec = nway_cfg.models[i]
-        spec_model_cfg = load_model_config_by_name(str(spec["config"]))
-
-        is_adapter = False
-        finetuned_model_cfg = ModelConfig(
-            name=spec_model_cfg.name,
-            model_id=spec_model_cfg.model_id,
-            subfolder="",
-            is_lora=is_adapter,
-            base_model_id=base_model_cfg.model_id if is_adapter else None,
-            tokenizer_id=base_model_cfg.tokenizer_id,
-            attn_implementation=base_model_cfg.attn_implementation,
-            ignore_first_n_tokens_per_sample_during_collection=base_model_cfg.ignore_first_n_tokens_per_sample_during_collection,
-            ignore_first_n_tokens_per_sample_during_training=base_model_cfg.ignore_first_n_tokens_per_sample_during_training,
-            token_level_replacement=base_model_cfg.token_level_replacement,
-            text_column=base_model_cfg.text_column,
-            dtype=base_model_cfg.dtype,
-            steering_vector=base_model_cfg.steering_vector,
-            steering_layer=base_model_cfg.steering_layer,
-            no_auto_device_map=base_model_cfg.no_auto_device_map,
-            device_map="auto",
-            trust_remote_code=base_model_cfg.trust_remote_code,
-            chat_template=base_model_cfg.chat_template,
+    for spec in nway_cfg.models[1:]:
+        model_cfgs.append(
+            _model_spec_to_config(
+                spec,
+                base_model_cfg=base_model_cfg,
+                device_map=cfg.infrastructure.device_map.finetuned,
+            )
         )
-        model_cfgs.append(finetuned_model_cfg)
     return model_cfgs
 
 
