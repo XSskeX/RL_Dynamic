@@ -422,7 +422,7 @@ def setup_nway_training_datasets(
         layers=[layer],
         split="train",
     )
-    caches = {dataset_name: caches[dataset_name][layer] for dataset_name in caches}
+    caches = {dataset_name: caches[dataset_name][layer] for dataset_name in caches} # {datasetname: ActivationCacheTuple}
 
     if dataset_processing_function is not None:
         caches = {
@@ -749,7 +749,7 @@ def create_crosscoder_trainer_config(
         "warmup_steps": warmup_steps,
         "layer": layer,
         "num_layers": len(model_cfgs),
-        "lm_name": "-".join(model_cfg.model_id for model_cfg in model_cfgs),
+        "lm_name": f"{model_cfgs[0].name}_to_{model_cfgs[-1].name}_for_{len(model_cfgs)}comparison",
         "wandb_name": run_name,
         "dict_class_kwargs": {
             "same_init_for_all_layers": same_init_for_all_layers,
