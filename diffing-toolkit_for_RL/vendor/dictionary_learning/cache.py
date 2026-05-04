@@ -386,9 +386,9 @@ class ActivationCache:
     @staticmethod
     def get_activations(submodule: nn.Module, io: str):
         if io == "in":
-            x = submodule.input[0]
+            x = submodule.input
         else:
-            x = submodule.output[0]
+            x = submodule.output
         if isinstance(x, tuple):
             return x[0]
         return x
