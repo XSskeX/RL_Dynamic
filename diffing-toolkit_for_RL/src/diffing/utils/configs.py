@@ -207,38 +207,38 @@ def get_nway_model_configurations(cfg: DictConfig) -> List[ModelConfig]:
             "n-way crosscoder requires diffing.method.nway.models to be set."
         )
 
-    model_cfgs = [_model_spec_to_config(spec) for spec in nway_cfg.models]
+    #model_cfgs = [_model_spec_to_config(spec) for spec in nway_cfg.models]
     if len(nway_cfg.models) < 2:
         raise ValueError("n-way crosscoder requires at least two models.")
 
-    #base_model_cfg = _model_spec_to_config(nway_cfg.models[0])
-    #model_cfgs = [base_model_cfg]
-    #for i in range(1, len(nway_cfg.models)):
-    #    spec = nway_cfg.models[i]
-    #    spec_model_cfg = load_model_config_by_name(str(spec["config"]))
+    base_model_cfg = _model_spec_to_config(nway_cfg.models[0])
+    model_cfgs = [base_model_cfg]
+    for i in range(1, len(nway_cfg.models)):
+        spec = nway_cfg.models[i]
+        spec_model_cfg = load_model_config_by_name(str(spec["config"]))
 
-    #    is_adapter = False
-    #    finetuned_model_cfg = ModelConfig(
-    #        name=spec_model_cfg.name,
-    #        model_id=spec_model_cfg.model_id,
-    #        subfolder="",
-    #        is_lora=is_adapter,
-    #        base_model_id=base_model_cfg.model_id if is_adapter else None,
-    #        tokenizer_id=base_model_cfg.tokenizer_id,
-    #        attn_implementation=base_model_cfg.attn_implementation,
-    #        ignore_first_n_tokens_per_sample_during_collection=base_model_cfg.ignore_first_n_tokens_per_sample_during_collection,
-    #        ignore_first_n_tokens_per_sample_during_training=base_model_cfg.ignore_first_n_tokens_per_sample_during_training,
-    #        token_level_replacement=base_model_cfg.token_level_replacement,
-    #        text_column=base_model_cfg.text_column,
-    #        dtype=base_model_cfg.dtype,
-    #        steering_vector=base_model_cfg.steering_vector,
-    #        steering_layer=base_model_cfg.steering_layer,
-    #        no_auto_device_map=base_model_cfg.no_auto_device_map,
-    #        device_map="auto",
-    #        trust_remote_code=base_model_cfg.trust_remote_code,
-    #        chat_template=base_model_cfg.chat_template,
-    #    )
-    #    model_cfgs.append(finetuned_model_cfg)
+        is_adapter = False
+        finetuned_model_cfg = ModelConfig(
+            name=spec_model_cfg.name,
+            model_id=spec_model_cfg.model_id,
+            subfolder="",
+            is_lora=is_adapter,
+            base_model_id=base_model_cfg.model_id if is_adapter else None,
+            tokenizer_id=base_model_cfg.tokenizer_id,
+            attn_implementation=base_model_cfg.attn_implementation,
+            ignore_first_n_tokens_per_sample_during_collection=base_model_cfg.ignore_first_n_tokens_per_sample_during_collection,
+            ignore_first_n_tokens_per_sample_during_training=base_model_cfg.ignore_first_n_tokens_per_sample_during_training,
+            token_level_replacement=base_model_cfg.token_level_replacement,
+            text_column=base_model_cfg.text_column,
+            dtype=base_model_cfg.dtype,
+            steering_vector=base_model_cfg.steering_vector,
+            steering_layer=base_model_cfg.steering_layer,
+            no_auto_device_map=base_model_cfg.no_auto_device_map,
+            device_map="auto",
+            trust_remote_code=base_model_cfg.trust_remote_code,
+            chat_template=base_model_cfg.chat_template,
+        )
+        model_cfgs.append(finetuned_model_cfg)
     return model_cfgs
 
 
