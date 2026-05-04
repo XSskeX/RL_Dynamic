@@ -203,6 +203,35 @@ def _model_spec_to_dict_config(spec: Any) -> DictConfig:
     )
 
 
+def _model_spec_to_config_name(spec: Any) -> str:
+    """Get a configs/model name from a pairwise transition spec."""
+    if isinstance(spec, str):
+        return spec
+    if isinstance(spec, DictConfig) or isinstance(spec, dict):
+        if "config" in spec:
+            return str(spec["config"])
+    raise ValueError(
+        "Pairwise transition specs must be a model config name or {config: ...}."
+    )
+
+
+def _model_identity_key(model_cfg: ModelConfig) -> tuple[str, str, bool, str | None]:
+    """Stable identity for de-duplicating models from consecutive transitions."""
+    return (
+        str(model_cfg.model_id),
+        str(model_cfg.subfolder),
+        bool(model_cfg.is_lora),
+        None if model_cfg.base_model_id is None else str(model_cfg.base_model_id),
+    )
+
+
+def _append_unique_model(model_cfgs: List[ModelConfig], model_cfg: ModelConfig) -> None:
+    """Append model_cfg unless it is already the most recent model."""
+    if model_cfgs and _model_identity_key(model_cfgs[-1]) == _model_identity_key(model_cfg):
+        return
+    model_cfgs.append(model_cfg)
+
+
 def _parse_model_id_and_subfolder(raw_cfg: DictConfig) -> tuple[str, str, bool]:
     """Parse full-model or adapter config into model_id, subfolder, is_lora."""
     if "adapter_id" in raw_cfg:
@@ -304,12 +333,32 @@ def _model_spec_to_config(
 def get_nway_model_configurations(cfg: DictConfig) -> List[ModelConfig]:
     """Extract and prepare n-way model configurations."""
     nway_cfg = cfg.diffing.method.get("nway", None)
-    if nway_cfg is None or "models" not in nway_cfg:
+    if nway_cfg is None:
         raise ValueError(
-            "n-way crosscoder requires diffing.method.nway.models to be set."
+            "n-way crosscoder requires diffing.method.nway to be set."
         )
-    if len(nway_cfg.models) < 2:
-        raise ValueError("n-way crosscoder requires at least two models.")
+
+    pairwise_transitions = nway_cfg.get("pairwise_transitions", [])
+    if pairwise_transitions:
+        model_cfgs = []
+        for transition_spec in pairwise_transitions:
+            transition_model_name = _model_spec_to_config_name(transition_spec)
+            transition_cfg = OmegaConf.create(OmegaConf.to_container(cfg, resolve=False))
+            transition_model_cfg = load_model_config_by_name(transition_model_name)
+            OmegaConf.update(transition_cfg, "model", transition_model_cfg, merge=False)
+            base_model_cfg, finetuned_model_cfg = get_model_configurations(transition_cfg)
+            _append_unique_model(model_cfgs, base_model_cfg)
+            _append_unique_model(model_cfgs, finetuned_model_cfg)
+
+        if len(model_cfgs) < 2:
+            raise ValueError("n-way crosscoder requires at least two unique models.")
+        return model_cfgs
+
+    if "models" not in nway_cfg or len(nway_cfg.models) < 2:
+        raise ValueError(
+            "n-way crosscoder requires diffing.method.nway.models or "
+            "diffing.method.nway.pairwise_transitions to contain at least two models."
+        )
 
     base_model_cfg = _model_spec_to_config(
         nway_cfg.models[0], device_map=cfg.infrastructure.device_map.base

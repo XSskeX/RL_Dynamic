@@ -9,6 +9,7 @@ requires_preprocessing: true
 nway:
   run_name: null
   models: []
+  pairwise_transitions: []
 
 # Training parameters - mirrors crosscoder.yaml
 training:
