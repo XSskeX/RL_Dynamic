@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Dict, Tuple, List, Any
+from typing import Dict, Tuple, List
 from omegaconf import DictConfig, OmegaConf
 from loguru import logger
 from hydra import initialize, compose
@@ -165,80 +165,6 @@ def create_model_config(
         trust_remote_code=model_cfg.get("trust_remote_code", False),
         chat_template=model_cfg.get("chat_template", None),
     )
-
-
-def load_model_config_by_name(model_name: str) -> DictConfig:
-    """Load a model config from configs/model by config name."""
-    model_config_path = CONFIGS_DIR / "model" / f"{model_name}.yaml"
-    if not model_config_path.exists():
-        raise ValueError(f"Model config not found: {model_config_path}")
-    return OmegaConf.load(model_config_path)
-
-
-def _model_spec_to_config(spec: Any) -> ModelConfig:
-    """Convert an n-way model spec into a ModelConfig.
-
-    Supported specs:
-    - "model_config_name"
-    - {config: model_config_name}
-    - {name: ..., model_id: ...}
-    """
-    if isinstance(spec, str):
-        model_cfg = load_model_config_by_name(spec)
-        return create_model_config(model_cfg, device_map="auto")
-
-    if isinstance(spec, DictConfig) or isinstance(spec, dict):
-        if "config" in spec:
-            model_cfg = load_model_config_by_name(str(spec["config"]))
-            name_override = spec.get("name", None)
-            return create_model_config(model_cfg, name_override=name_override, device_map="auto")
-
-    raise ValueError(
-        "Invalid n-way model spec. Expected a model config name, "
-        "{config: ...}, or {name: ..., model_id: ...}."
-    )
-
-
-def get_nway_model_configurations(cfg: DictConfig) -> List[ModelConfig]:
-    """Extract model configurations for n-way crosscoder training."""
-    nway_cfg = cfg.diffing.method.get("nway", None)
-    if nway_cfg is None or "models" not in nway_cfg:
-        raise ValueError(
-            "n-way crosscoder requires diffing.method.nway.models to be set."
-        )
-
-    #model_cfgs = [_model_spec_to_config(spec) for spec in nway_cfg.models]
-    if len(nway_cfg.models) < 2:
-        raise ValueError("n-way crosscoder requires at least two models.")
-
-    base_model_cfg = _model_spec_to_config(nway_cfg.models[0])
-    model_cfgs = [base_model_cfg]
-    for i in range(1, len(nway_cfg.models)):
-        spec = nway_cfg.models[i]
-        spec_model_cfg = load_model_config_by_name(str(spec["config"]))
-        is_adapter = False
-        finetuned_model_cfg = ModelConfig(
-            name=spec_model_cfg.name,
-            model_id=spec_model_cfg.model_id,
-            subfolder="",
-            is_lora=is_adapter,
-            base_model_id=base_model_cfg.model_id if is_adapter else None,
-            tokenizer_id=base_model_cfg.tokenizer_id,
-            attn_implementation=base_model_cfg.attn_implementation,
-            ignore_first_n_tokens_per_sample_during_collection=base_model_cfg.ignore_first_n_tokens_per_sample_during_collection,
-            ignore_first_n_tokens_per_sample_during_training=base_model_cfg.ignore_first_n_tokens_per_sample_during_training,
-            token_level_replacement=base_model_cfg.token_level_replacement,
-            text_column=base_model_cfg.text_column,
-            dtype=base_model_cfg.dtype,
-            steering_vector=base_model_cfg.steering_vector,
-            steering_layer=base_model_cfg.steering_layer,
-            no_auto_device_map=base_model_cfg.no_auto_device_map,
-            device_map="auto",
-            trust_remote_code=base_model_cfg.trust_remote_code,
-            chat_template=base_model_cfg.chat_template,
-        )
-        model_cfgs.append(finetuned_model_cfg)
-    return model_cfgs
 
 
 def create_dataset_config(

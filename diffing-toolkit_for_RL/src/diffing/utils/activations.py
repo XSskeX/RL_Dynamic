@@ -2,7 +2,7 @@ from transformers import AutoConfig
 from typing import Union, List
 from transformers import PretrainedConfig
 from loguru import logger
-from dictionary_learning.cache import ActivationCacheTuple, PairedActivationCache
+from dictionary_learning.cache import PairedActivationCache
 from pathlib import Path
 from omegaconf import DictConfig
 import torch
@@ -415,77 +415,6 @@ def load_activation_datasets_from_config(
                 ds_cfg=ds_cfg,
                 base_model_cfg=base_model_cfg,
                 finetuned_model_cfg=finetuned_model_cfg,
-                layer=layer,
-                split=split,
-            )
-    return result
-
-
-def load_activation_dataset_for_models(
-    activation_store_dir: Path,
-    split: str,
-    dataset_name: str,
-    model_names: list[str],
-    text_column: str = None,
-    layer: int = 13,
-):
-    """
-    Load saved activations for an arbitrary number of models for a given layer.
-
-    Returns an ActivationCacheTuple whose samples have shape
-    (num_models, activation_dim).
-    """
-    activation_store_dir = Path(activation_store_dir)
-    submodule_name = f"layer_{layer}_out"
-
-    if text_column is not None and text_column != "text":
-        split = split + f"_col_{text_column}"
-
-    cache_dirs = [
-        str(activation_store_dir / model_name / dataset_name / split)
-        for model_name in model_names
-    ]
-    return ActivationCacheTuple(*cache_dirs, submodule_name=submodule_name)
-
-
-def load_activation_dataset_for_models_from_config(
-    cfg: DictConfig,
-    ds_cfg: DatasetConfig,
-    model_cfgs: list[ModelConfig],
-    split: str,
-    layer: int,
-):
-    return load_activation_dataset_for_models(
-        activation_store_dir=cfg.preprocessing.activation_store_dir,
-        split=split,
-        dataset_name=ds_cfg.name,
-        model_names=[get_safe_model_id(model_cfg) for model_cfg in model_cfgs],
-        layer=layer,
-        text_column=ds_cfg.text_column,
-    )
-
-
-def load_activation_datasets_for_models_from_config(
-    cfg: DictConfig,
-    ds_cfgs: List[DatasetConfig],
-    model_cfgs: list[ModelConfig],
-    layers: List[int],
-    split: str,
-):
-    """
-    Load saved activations for multiple datasets/layers for n-way crosscoder training.
-
-    Returns:
-        Dict mapping dataset_name -> {layer: ActivationCacheTuple, ...}
-    """
-    result = {}
-    for ds_cfg in ds_cfgs:
-        result[ds_cfg.name] = {}
-        for layer in layers:
-            result[ds_cfg.name][layer] = load_activation_dataset_for_models_from_config(
-                cfg=cfg,
-                ds_cfg=ds_cfg,
-                model_cfgs=model_cfgs,
                 layer=layer,
                 split=split,
             )

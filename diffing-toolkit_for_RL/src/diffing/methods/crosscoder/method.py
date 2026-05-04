@@ -30,14 +30,9 @@ from diffing.utils.activations import get_layer_indices
 from diffing.utils.dictionary.analysis import (
     build_push_crosscoder_latent_df,
     make_plots,
-    update_nway_crosscoder_latent_df_with_self_dot_ratio,
     update_crosscoder_latent_df_with_self_dot_ratio,
 )
-from diffing.utils.dictionary.training import (
-    nway_crosscoder_run_name,
-    train_crosscoder_for_layer,
-    train_nway_crosscoder_for_layer,
-)
+from diffing.utils.dictionary.training import train_crosscoder_for_layer
 from diffing.utils.dictionary.latent_scaling.closed_form import (
     compute_scalers_from_config,
 )
@@ -51,7 +46,6 @@ from diffing.utils.dictionary.latent_activations import (
 )
 from diffing.utils.dictionary.utils import load_dictionary_model
 from diffing.utils.dictionary.training import crosscoder_run_name
-from diffing.utils.configs import get_nway_model_configurations
 from diffing.utils.visualization import multi_tab_interface
 from diffing.utils.max_act_store import ReadOnlyMaxActStore
 from diffing.utils.dictionary.steering import (
@@ -89,10 +83,6 @@ class CrosscoderDiffingMethod(DiffingMethod):
 
         # Initialize latent df cache
         self.latent_df_cache = {}
-        self.is_nway = self.method_cfg.name == "nway_crosscoder"
-        self.nway_model_cfgs = (
-            get_nway_model_configurations(cfg) if self.is_nway else None
-        )
 
     def run(self) -> Dict[str, Any]:
         """
@@ -115,14 +105,9 @@ class CrosscoderDiffingMethod(DiffingMethod):
 
             logger.info(f"Training crosscoder for layer {layer_idx}")
 
-            if self.is_nway:
-                dictionary_name = nway_crosscoder_run_name(
-                    self.cfg, layer_idx, self.nway_model_cfgs
-                )
-            else:
-                dictionary_name = crosscoder_run_name(
-                    self.cfg, layer_idx, self.base_model_cfg, self.finetuned_model_cfg
-                )
+            dictionary_name = crosscoder_run_name(
+                self.cfg, layer_idx, self.base_model_cfg, self.finetuned_model_cfg
+            )
             model_results_dir = (
                 self.results_dir / "crosscoder" / f"layer_{layer_idx}" / dictionary_name
             )
@@ -135,14 +120,9 @@ class CrosscoderDiffingMethod(DiffingMethod):
                 or self.method_cfg.training.overwrite
             ):
                 # Train crosscoder for this layer
-                if self.is_nway:
-                    training_metrics, model_path = train_nway_crosscoder_for_layer(
-                        self.cfg, layer_idx, self.device, dictionary_name
-                    )
-                else:
-                    training_metrics, model_path = train_crosscoder_for_layer(
-                        self.cfg, layer_idx, self.device, dictionary_name
-                    )
+                training_metrics, model_path = train_crosscoder_for_layer(
+                    self.cfg, layer_idx, self.device, dictionary_name
+                )
                 print("model_path: ", model_path)
                 # save training metrics
                 with open(model_results_dir / "training_metrics.json", "w") as f:
@@ -163,29 +143,19 @@ class CrosscoderDiffingMethod(DiffingMethod):
 
             if self.method_cfg.analysis.enabled:
                 logger.info(f"Storing analysis results in {model_results_dir}")
-                checkpoint_name = dictionary_name if self.is_nway else self.cfg.model.name
-                model_path = Path(
-                    f"{self.cfg.infrastructure.storage.checkpoint_dir}/{checkpoint_name}/model_final.pt"
-                )
+                model_path = Path(f"{self.cfg.infrastructure.storage.checkpoint_dir}/{self.cfg.model.name}/model_final.pt")
                 print("model_path: ", model_path)
                 #build_push_crosscoder_latent_df(
                 #    dictionary_name=model_path,
                 #    base_layer=0,
                 #    ft_layer=1,
                 #)
-                if self.is_nway:
-                    latent_df = update_nway_crosscoder_latent_df_with_self_dot_ratio(
-                        dictionary_name=model_path,
-                        model_names=[model_cfg.name for model_cfg in self.nway_model_cfgs],
-                        model_name=dictionary_name,
-                    )
-                else:
-                    latent_df = update_crosscoder_latent_df_with_self_dot_ratio(
-                        dictionary_name=model_path,
-                        base_layer=0,
-                        ft_layer=1,
-                        model_name=self.cfg.model.name,
-                    )
+                latent_df = update_crosscoder_latent_df_with_self_dot_ratio(
+                    dictionary_name=model_path,
+                    base_layer=0,
+                    ft_layer=1,
+                    model_name=self.cfg.model.name
+                )
                 
                 local_feature_df_path = model_results_dir / "feature_df_local.csv"
                 latent_df.to_csv(local_feature_df_path)

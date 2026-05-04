@@ -26,7 +26,7 @@ def get_method_class(method_name: str) -> DiffingMethod:
         return KLDivergenceDiffingMethod
     elif method_name == "activation_analysis":
         return ActivationAnalysisDiffingMethod
-    elif method_name == "crosscoder" or method_name == "nway_crosscoder":
+    elif method_name == "crosscoder":
         return CrosscoderDiffingMethod
     elif method_name == "sae_difference":
         return SAEDifferenceMethod

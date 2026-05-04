@@ -160,44 +160,10 @@ def update_crosscoder_latent_df_with_self_dot_ratio(
     latent_df["dec_ft_self_dot_ratio_norm"] = ft_ratios.detach().numpy()
 
     latent_df = pd.DataFrame(latent_df).T
-    latent_df.to_csv(Path(f"/share/nlp/baijun/shuhan/crosscoder_output_for_all/{model_name}_latent_data.csv"), index=False, encoding='utf-8-sig')
+    latent_df.to_csv(Path(f"/share/nlp/baijun/shuhan/crosscoder_output/{model_name}_latent_data.csv"), index=False, encoding='utf-8-sig')
     return latent_df
 
 
-
-
-def update_nway_crosscoder_latent_df_with_self_dot_ratio(
-    dictionary_name: str,
-    model_names: list[str],
-    model_name: str = "nway",
-) -> pd.DataFrame:
-    """
-    Build a per-feature dataframe with self-dot ratios for every model side in
-    an n-way crosscoder.
-    """
-    crosscoder = load_dictionary_model(dictionary_name)
-    decoder_weight = crosscoder.decoder.weight
-    num_models = decoder_weight.shape[0]
-    if len(model_names) != num_models:
-        raise ValueError(
-            f"Expected {num_models} model names for decoder weight, got {len(model_names)}"
-        )
-
-    num_features = decoder_weight.shape[1]
-    latent_df = pd.DataFrame(index=range(num_features))
-    for model_idx, name in enumerate(model_names):
-        ratios = _self_vs_all_dot_ratio(decoder_weight[model_idx]).cpu()
-        safe_name = str(name).replace("/", "_")
-        latent_df[f"dec_{safe_name}_self_dot_ratio_norm"] = ratios.detach().numpy()
-
-    output_dir = Path("/share/nlp/baijun/shuhan/crosscoder_output_for_24")
-    output_dir.mkdir(parents=True, exist_ok=True)
-    latent_df.to_csv(
-        output_dir / f"{model_name}_nway_latent_data.csv",
-        index=True,
-        encoding="utf-8-sig",
-    )
-    return latent_df
 
 
 def build_push_sae_difference_latent_df(
