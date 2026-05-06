@@ -225,7 +225,8 @@ def get_nway_model_configurations(cfg: DictConfig) -> List[ModelConfig]:
     is_adapter = False  # n-way crosscoder currently only supports full model finetuning, not adapters
     subfolder = ""  # n-way crosscoder currently does not support subfolders in model_id
 
-    for model_cfg in range(1,len(model_cfgs)):
+    for model_cfg_id in range(1,len(model_cfgs)):
+        model_cfg = model_cfgs[model_cfg_id]
         finetuned_model_cfg = ModelConfig(
             name=f"{base_model_cfg.name}_{model_cfg.model_id}_{organism_cfg.name}",
             model_id=model_cfg.model_id,
