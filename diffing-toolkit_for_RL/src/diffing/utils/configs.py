@@ -189,7 +189,7 @@ def load_model_config_by_name(model_name: str) -> DictConfig:
         raise ValueError(f"Model config not found: {model_config_path}")
     return OmegaConf.load(model_config_path)
 
-def get_model_cfg_from_models(model_list: list) -> List[DictConfig]:
+def get_model_cfg_from_models(model_list) -> List[DictConfig]:
     model_cfgs = []
     for model in model_list:
         if isinstance(spec, DictConfig) or isinstance(spec, dict):
@@ -207,12 +207,14 @@ def get_nway_model_configurations(cfg: DictConfig) -> List[ModelConfig]:
             "n-way crosscoder requires diffing.method.nway.models to be set."
         )
     models = nway_models.models
-    print(models)
-    if not isinstance(models, list) or len(models) < 2:
-        raise ValueError(
-            f"diffing.method.nway.models must be a list of at least 2 model configs. {type(models)} with length {len(models) if isinstance(models, list) else 'N/A'} provided."
-        )
+
     model_cfgs = get_model_cfg_from_models(models)
+    
+    if not isinstance(model_cfgs, list) or len(model_cfgs) < 2:
+        raise ValueError(
+            f"diffing.method.nway.models must be a list of at least 2 model configs. {type(model_cfgs)} with length {len(model_cfgs) if isinstance(model_cfgs, list) else 'N/A'} provided."
+        )
+
     base_model_cfg = create_model_config(
         model_cfgs[0],
         device_map=cfg.infrastructure.device_map.base,  # Use base device map
