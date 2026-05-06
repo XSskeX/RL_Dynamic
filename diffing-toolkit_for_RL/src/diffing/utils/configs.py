@@ -182,6 +182,70 @@ def create_dataset_config(
         subset=dataset_cfg.get("subset", None),
     )
 
+def load_model_config_by_name(model_name: str) -> DictConfig:
+    """Load a model config from configs/model by config name."""
+    model_config_path = CONFIGS_DIR / "model" / f"{model_name}.yaml"
+    if not model_config_path.exists():
+        raise ValueError(f"Model config not found: {model_config_path}")
+    return OmegaConf.load(model_config_path)
+
+def get_model_cfg_from_models(model_list: list) -> List[DictConfig]:
+    model_cfgs = []
+    for model in model_list:
+        if isinstance(spec, DictConfig) or isinstance(spec, dict):
+            if "config" in spec:
+                model_cfg = load_model_config_by_name(str(spec["config"]))
+                model_cfgs.append(model_cfg)
+    return model_cfgs
+
+
+def get_nway_model_configurations(cfg: DictConfig) -> List[ModelConfig]:
+    """Extract and prepare model configurations for n-way comparison."""
+    nway_models = cfg.diffing.method.get("nway", None)
+    if nway_models is None or "models" not in nway_models:
+        raise ValueError(
+            "n-way crosscoder requires diffing.method.nway.models to be set."
+        )
+    models = nway_models.models
+    if not isinstance(models, list) or len(models) < 2:
+        raise ValueError(
+            "diffing.method.nway.models must be a list of at least 2 model configs."
+        )
+    model_cfgs = get_model_cfg_from_models(models)
+    base_model_cfg = create_model_config(
+        model_cfgs[0],
+        device_map=cfg.infrastructure.device_map.base,  # Use base device map
+    )
+    model_configs = [base_model_cfg]
+
+    organism_cfg = cfg.organism
+    is_adapter = False  # n-way crosscoder currently only supports full model finetuning, not adapters
+    subfolder = ""  # n-way crosscoder currently does not support subfolders in model_id
+
+    for model_cfg in range(1,len(model_cfgs)):
+        finetuned_model_cfg = ModelConfig(
+            name=f"{base_model_cfg.name}_{model_cfg.model_id}_{organism_cfg.name}",
+            model_id=model_cfg.model_id,
+            subfolder=subfolder,
+            is_lora=is_adapter,
+            base_model_id=base_model_cfg.model_id if is_adapter else None,
+            tokenizer_id=base_model_cfg.tokenizer_id,
+            attn_implementation=base_model_cfg.attn_implementation,
+            ignore_first_n_tokens_per_sample_during_collection=base_model_cfg.ignore_first_n_tokens_per_sample_during_collection,
+            ignore_first_n_tokens_per_sample_during_training=base_model_cfg.ignore_first_n_tokens_per_sample_during_training,
+            token_level_replacement=base_model_cfg.token_level_replacement,
+            text_column=base_model_cfg.text_column,
+            dtype=base_model_cfg.dtype,
+            steering_vector=base_model_cfg.steering_vector,
+            steering_layer=base_model_cfg.steering_layer,
+            no_auto_device_map=base_model_cfg.no_auto_device_map,
+            device_map=cfg.infrastructure.device_map.finetuned,
+            trust_remote_code=base_model_cfg.trust_remote_code,
+            chat_template=base_model_cfg.chat_template,
+        )
+        model_configs.append(finetuned_model_cfg)
+
+    return model_configs
 
 def get_model_configurations(cfg: DictConfig) -> Tuple[ModelConfig, ModelConfig]:
     """Extract and prepare base and finetuned model configurations."""

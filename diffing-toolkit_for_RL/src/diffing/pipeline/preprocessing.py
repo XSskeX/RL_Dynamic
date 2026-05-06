@@ -17,7 +17,9 @@ import torch
 
 from .pipeline import Pipeline
 from .activation_collection import collect_activations
-
+from ..utils.configs import (
+    get_nway_model_configurations,
+)
 from ..utils import (
     get_layer_indices,
     ModelConfig,
@@ -197,7 +199,11 @@ class PreprocessingPipeline(Pipeline):
         """
 
         # Get model and dataset configurations
-        base_model_cfg, finetuned_model_cfg = get_model_configurations(self.cfg)
+        if (self.cfg.diffing.method.name=="nway_crosscoder"):
+            model_configs = get_nway_model_configurations(self.cfg)
+        else:
+            base_model_cfg, finetuned_model_cfg = get_model_configurations(self.cfg)
+            model_configs = [base_model_cfg, finetuned_model_cfg]
         assert (
             sum(
                 [
@@ -215,7 +221,8 @@ class PreprocessingPipeline(Pipeline):
         if self.preprocessing_cfg.training_only:
             self.logger.info(f"Collecting training dataset only")
 
-
+        for model_cfg in model_configs:
+            self.logger.info(f"Model configuration: {model_cfg.name}, model_id: {model_cfg.model_id}")
         
         if self.preprocessing_cfg.chat_only:
             use_chat, use_pretraining, use_training = True, False, False
@@ -234,13 +241,13 @@ class PreprocessingPipeline(Pipeline):
             use_training_dataset=use_training,
         )
 
-        self.logger.info(f"Base model: {base_model_cfg.name}")
-        self.logger.info(f"Finetuned model: {finetuned_model_cfg.name}")
+        self.logger.info(f"Base model: {model_configs[0].name}, model_id: {model_configs[0].model_id}")
+        self.logger.info(f"Last model: {model_configs[-1].name}, model_id: {model_configs[-1].model_id}")
         self.logger.info(f"Datasets: {[d.name for d in dataset_configs]}")
 
         results = {
-            "base_model": base_model_cfg.name,
-            "finetuned_model": finetuned_model_cfg.name,
+            "base_model": model_configs[0].name,
+            "finetuned_model": model_configs[-1].name,
             "datasets_processed": [],
             "activation_store_dir": str(self.activation_store_dir),
             "preprocessing_config": dict(self.preprocessing_cfg),
