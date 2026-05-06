@@ -257,15 +257,11 @@ class PreprocessingPipeline(Pipeline):
             # Load dataset
             dataset = self._load_dataset(dataset_cfg)
 
-            # Collect activations for base model
-            self._collect_activations_for_model_dataset(
-                base_model_cfg, dataset_cfg, dataset
-            )
-
-            # Collect activations for finetuned model
-            self._collect_activations_for_model_dataset(
-                finetuned_model_cfg, dataset_cfg, dataset
-            )
+            for model_cfg in model_configs:
+                # Collect activations for model
+                self._collect_activations_for_model_dataset(
+                    model_cfg, dataset_cfg, dataset
+                )
 
             results["datasets_processed"].append(
                 {
