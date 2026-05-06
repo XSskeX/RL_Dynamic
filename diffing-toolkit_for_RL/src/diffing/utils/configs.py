@@ -207,9 +207,10 @@ def get_nway_model_configurations(cfg: DictConfig) -> List[ModelConfig]:
             "n-way crosscoder requires diffing.method.nway.models to be set."
         )
     models = nway_models.models
+    print(models)
     if not isinstance(models, list) or len(models) < 2:
         raise ValueError(
-            "diffing.method.nway.models must be a list of at least 2 model configs."
+            f"diffing.method.nway.models must be a list of at least 2 model configs. {type(models)} with length {len(models) if isinstance(models, list) else 'N/A'} provided."
         )
     model_cfgs = get_model_cfg_from_models(models)
     base_model_cfg = create_model_config(
