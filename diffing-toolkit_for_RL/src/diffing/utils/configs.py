@@ -192,9 +192,9 @@ def load_model_config_by_name(model_name: str) -> DictConfig:
 def get_model_cfg_from_models(model_list) -> List[DictConfig]:
     model_cfgs = []
     for model in model_list:
-        if isinstance(spec, DictConfig) or isinstance(spec, dict):
-            if "config" in spec:
-                model_cfg = load_model_config_by_name(str(spec["config"]))
+        if isinstance(model, DictConfig) or isinstance(model, dict):
+            if "config" in model:
+                model_cfg = load_model_config_by_name(str(model["config"]))
                 model_cfgs.append(model_cfg)
     return model_cfgs
 
