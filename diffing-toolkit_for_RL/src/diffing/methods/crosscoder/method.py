@@ -53,7 +53,7 @@ from diffing.utils.dictionary.steering import (
     get_crosscoder_latent,
     display_steering_results,
 )
-
+from diffing.utils.configs import get_model_configurations, get_nway_model_configurations
 
 class CrosscoderDiffingMethod(DiffingMethod):
     """
@@ -75,8 +75,11 @@ class CrosscoderDiffingMethod(DiffingMethod):
         layers = self.method_cfg.layers
         if layers is None:
             layers = cfg.preprocessing.layers
-        self.layers = get_layer_indices(self.base_model_cfg.model_id, layers)
-
+        if cfg.diffing.method.name == "nway_crosscoder":
+            self.model_cfgs = get_nway_model_configurations(cfg)
+            self.layers = get_layer_indices(self.model_cfgs[0].model_id, layers)
+        else:
+            self.layers = get_layer_indices(self.base_model_cfg.model_id, layers)
         # Setup results directory
         self.results_dir = Path(cfg.diffing.results_dir)
         self.results_dir.mkdir(parents=True, exist_ok=True)
@@ -104,10 +107,15 @@ class CrosscoderDiffingMethod(DiffingMethod):
             logger.info(f"Processing layer {layer_idx}")
 
             logger.info(f"Training crosscoder for layer {layer_idx}")
-
-            dictionary_name = crosscoder_run_name(
-                self.cfg, layer_idx, self.base_model_cfg, self.finetuned_model_cfg
-            )
+            
+            if self.cfg.diffing.method.name == "nway_crosscoder":
+                dictionary_name = crosscoder_run_name(
+                    self.cfg, layer_idx, self.model_cfgs[0], self.model_cfgs[-1]
+                )
+            else:
+                dictionary_name = crosscoder_run_name(
+                    self.cfg, layer_idx, self.base_model_cfg, self.finetuned_model_cfg
+                )
             model_results_dir = (
                 self.results_dir / "crosscoder" / f"layer_{layer_idx}" / dictionary_name
             )

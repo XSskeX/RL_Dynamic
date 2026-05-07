@@ -2,7 +2,7 @@ from transformers import AutoConfig
 from typing import Union, List
 from transformers import PretrainedConfig
 from loguru import logger
-from dictionary_learning.cache import PairedActivationCache
+from dictionary_learning.cache import PairedActivationCache, ActivationCacheTuple
 from pathlib import Path
 from omegaconf import DictConfig
 import torch
@@ -415,6 +415,70 @@ def load_activation_datasets_from_config(
                 ds_cfg=ds_cfg,
                 base_model_cfg=base_model_cfg,
                 finetuned_model_cfg=finetuned_model_cfg,
+                layer=layer,
+                split=split,
+            )
+    return result
+
+def load_n_activation_dataset(
+    activation_store_dir: Path,
+    split: str,
+    dataset_name: str,
+    safe_model_id_list: List[str],
+    text_column: str = None,
+    layer: int = 13,
+):
+    activation_store_dir = Path(activation_store_dir)
+    submodule_name = f"layer_{layer}_out"
+
+    if text_column is not None and text_column != "text":
+        split = split + f"_col_{text_column}"
+
+    model_cache_list = []
+    for model_id in safe_model_id_list:
+        model_dir = activation_store_dir / model_id / dataset_name / split
+        model_cache = model_dir / submodule_name
+        model_cache_list.append(model_cache)
+    
+
+    cache = ActivationCacheTuple(
+        model_cache_list, submodule_name
+    )
+
+    return cache
+
+
+def load_n_activation_dataset_from_config(
+    cfg: DictConfig,
+    ds_cfg: DatasetConfig,
+    model_cfgs: List[ModelConfig],
+    layer: int,
+    split: str,
+):
+    return load_n_activation_dataset(
+        activation_store_dir=cfg.preprocessing.activation_store_dir,
+        split=split,
+        dataset_name=ds_cfg.name,
+        safe_model_id_list=[get_safe_model_id(model_cfg) for model_cfg in model_cfgs],
+        layer=layer,
+        text_column=ds_cfg.text_column,
+    )
+
+def load_n_activation_datasets_from_config(
+    cfg: DictConfig,
+    ds_cfgs: List[DatasetConfig],
+    model_cfgs: List[ModelConfig],
+    layers: List[int],
+    split: str,
+):
+    result = {}
+    for ds_cfg in ds_cfgs:
+        result[ds_cfg.name] = {}
+        for layer in layers:
+            result[ds_cfg.name][layer] = load_n_activation_dataset_from_config(
+                cfg=cfg,
+                ds_cfg=ds_cfg,
+                model_cfgs=model_cfgs,
                 layer=layer,
                 split=split,
             )
