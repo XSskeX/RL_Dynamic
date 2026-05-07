@@ -1,6 +1,6 @@
 defaults:
   - organism: Math_RL
-  - model: auto
+  - model: llama32_3B_Instruct
   - diffing/method: crosscoder
   - infrastructure: mats_cluster
   - diffing/grading_rubrics
