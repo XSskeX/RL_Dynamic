@@ -28,6 +28,8 @@ def get_method_class(method_name: str) -> DiffingMethod:
         return ActivationAnalysisDiffingMethod
     elif method_name == "crosscoder":
         return CrosscoderDiffingMethod
+    elif method_name == "nway_crosscoder":
+        return CrosscoderDiffingMethod
     elif method_name == "sae_difference":
         return SAEDifferenceMethod
     elif method_name == "pca":
