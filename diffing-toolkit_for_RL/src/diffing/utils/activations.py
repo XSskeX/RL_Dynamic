@@ -441,7 +441,7 @@ def load_n_activation_dataset(
     
 
     cache = ActivationCacheTuple(
-        *model_cache_list, submodule_name
+        *model_cache_list, submodule_name=submodule_name
     )
 
     return cache
