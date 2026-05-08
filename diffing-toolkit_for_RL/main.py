@@ -109,8 +109,6 @@ def main(cfg: DictConfig) -> None:
     # Set up environment
     setup_environment(cfg)
     if cfg.diffing.method.name == "nway_crosscoder":
-        print(f"Original model configuration: {cfg.model}")
-        cfg.model = cfg.diffing.method.nway.models[0]["config"]
         print(f"Using model configuration: {cfg.model}")
     # Run pipeline based on mode
     if cfg.pipeline.mode == "full" or cfg.pipeline.mode == "preprocessing":

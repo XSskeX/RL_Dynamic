@@ -80,6 +80,9 @@ class CrosscoderDiffingMethod(DiffingMethod):
             self.layers = get_layer_indices(self.model_cfgs[0].model_id, layers)
         else:
             self.layers = get_layer_indices(self.base_model_cfg.model_id, layers)
+        print("-" * 20)
+        print(cfg.model)
+        print("-" * 20)
         # Setup results directory
         self.results_dir = Path(cfg.diffing.results_dir)
         self.results_dir.mkdir(parents=True, exist_ok=True)
