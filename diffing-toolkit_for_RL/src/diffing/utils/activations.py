@@ -436,8 +436,7 @@ def load_n_activation_dataset(
 
     model_cache_list = []
     for model_id in safe_model_id_list:
-        model_dir = activation_store_dir / model_id / dataset_name / split
-        model_cache = model_dir / submodule_name
+        model_cache = activation_store_dir / model_id / dataset_name / split
         model_cache_list.append(model_cache)
     
 
