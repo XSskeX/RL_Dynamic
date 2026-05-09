@@ -146,18 +146,17 @@ def update_crosscoder_latent_df_with_self_dot_ratio(
     using decoder feature vectors.
     """
     crosscoder = load_dictionary_model(dictionary_name)
+    print(f"dictionary model has {len(crosscoder.decoder.weight)} layers")
+    print(f"dictionary model has {crosscoder.decoder.weight.shape[0]} features per layer")
+    for i in range(len(crosscoder.decoder.weight)):
+        weight = crosscoder.decoder.weight[i]
 
-    base_decoder_weight = crosscoder.decoder.weight[base_layer]
-    ft_decoder_weight = crosscoder.decoder.weight[ft_layer]
+        ratios = _self_vs_all_dot_ratio(weight).cpu()
 
-    base_ratios = _self_vs_all_dot_ratio(base_decoder_weight).cpu()
-    ft_ratios = _self_vs_all_dot_ratio(ft_decoder_weight).cpu()
+        num_features = weight.shape[0]
+        latent_df = pd.DataFrame(index=range(num_features))
 
-    num_features = base_decoder_weight.shape[0]
-    latent_df = pd.DataFrame(index=range(num_features))
-
-    latent_df["dec_base_self_dot_ratio_norm"] = base_ratios.detach().numpy()
-    latent_df["dec_ft_self_dot_ratio_norm"] = ft_ratios.detach().numpy()
+        latent_df[f"dec_{i}_self_dot_ratio_norm"] = ratios.detach().numpy()
 
     latent_df = pd.DataFrame(latent_df).T
     latent_df.to_csv(Path(f"/share/nlp/baijun/shuhan/crosscoder_output/{model_name}_latent_data.csv"), index=False, encoding='utf-8-sig')

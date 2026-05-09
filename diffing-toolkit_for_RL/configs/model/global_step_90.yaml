@@ -1,6 +1,6 @@
 # @package model
-name: global_step_150_to_global_step_180
-model_id: /share/nlp/baijun/shuhan/ckpt_0/global_step_150/actor_hf_export
+name: global_step_90
+model_id: /share/nlp/baijun/shuhan/ckpt_0/global_step_90/actor_hf_export
 end_of_turn_token: <|eot_id|>
 attn_implementation: null
 token_level_replacement: null
