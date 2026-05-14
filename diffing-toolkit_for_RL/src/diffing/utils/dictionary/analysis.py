@@ -131,6 +131,17 @@ def _self_vs_all_dot_ratio(weight: th.Tensor) -> th.Tensor:
     return numerator / denominator.clamp_min(eps)
 
 
+def _mean_abs_other_dot(weight: th.Tensor) -> th.Tensor:
+    weight = weight / weight.norm(dim=1, keepdim=True).clamp_min(
+        th.finfo(weight.dtype).eps
+    )
+    gram = weight @ weight.T
+    n = gram.shape[0]
+
+    off_diag_sum = gram.abs().sum(dim=1) - th.diag(gram).abs()
+    return off_diag_sum / max(n - 1, 1)
+
+
 def update_crosscoder_latent_df_with_self_dot_ratio(
     dictionary_name: str,
     base_layer: int = 0,
@@ -153,11 +164,11 @@ def update_crosscoder_latent_df_with_self_dot_ratio(
     for i in range(crosscoder.decoder.weight.shape[0]):
         weight = crosscoder.decoder.weight[i]
 
-        ratios = _self_vs_all_dot_ratio(weight).cpu()
+        ratios = _mean_abs_other_dot(weight).cpu()
 
         latent_df[f"dec_{i}_self_dot_ratio_norm"] = ratios.detach().numpy()
 
-    latent_df.to_csv(Path(f"/share/nlp/baijun/shuhan/crosscoder_output/{model_name}_latent_dimentionality.csv"), encoding='utf-8-sig')
+    latent_df.to_csv(Path(f"/share/nlp/baijun/shuhan/crosscoder_output/{model_name}_meanabs_latent_dimentionality.csv"), encoding='utf-8-sig')
     return latent_df
 
 #def compute_feature_direction_drift(
