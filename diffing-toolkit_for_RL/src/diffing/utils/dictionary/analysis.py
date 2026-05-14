@@ -147,20 +147,27 @@ def update_crosscoder_latent_df_with_self_dot_ratio(
     """
     crosscoder = load_dictionary_model(dictionary_name)
     print(f"dictionary model has {len(crosscoder.decoder.weight)} layers")
-    print(f"dictionary model has {crosscoder.decoder.weight.shape[0]} features per layer")
+    print(f"dictionary model has {crosscoder.decoder.weight.shape[0]} models per layer")
+    num_features = crosscoder.decoder.weight.shape[0]
+    latent_df = pd.DataFrame(index=range(num_features))
     for i in range(len(crosscoder.decoder.weight)):
         weight = crosscoder.decoder.weight[i]
 
         ratios = _self_vs_all_dot_ratio(weight).cpu()
 
-        num_features = weight.shape[0]
-        latent_df = pd.DataFrame(index=range(num_features))
-
         latent_df[f"dec_{i}_self_dot_ratio_norm"] = ratios.detach().numpy()
 
-    latent_df = pd.DataFrame(latent_df).T
-    latent_df.to_csv(Path(f"/share/nlp/baijun/shuhan/crosscoder_output/{model_name}_latent_data.csv"), index=False, encoding='utf-8-sig')
+    latent_df.to_csv(Path(f"/share/nlp/baijun/shuhan/crosscoder_output/{model_name}_latent_dimentionality.csv"), index=False, encoding='utf-8-sig')
     return latent_df
+
+#def compute_feature_direction_drift(
+#    dictionary_name: str,
+#    model_name: str = "noname",
+#) -> pd.DataFrame:
+#    crosscoder = load_dictionary_model(dictionary_name)
+#    num_models = crosscoder.decoder.weight.shape[0]
+#    for i in range(len(crosscoder.decoder.weight))
+
 
 
 
