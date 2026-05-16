@@ -164,11 +164,11 @@ def update_crosscoder_latent_df_with_self_dot_ratio(
     for i in range(crosscoder.decoder.weight.shape[0]):
         weight = crosscoder.decoder.weight[i]
 
-        ratios = _mean_abs_other_dot(weight).cpu()
+        ratios = _self_vs_all_dot_ratio(weight).cpu()
 
         latent_df[f"dec_{i}_self_dot_ratio_norm"] = ratios.detach().numpy()
 
-    latent_df.to_csv(Path(f"/share/nlp/baijun/shuhan/crosscoder_output/{model_name}_meanabs_latent_dimentionality.csv"), encoding='utf-8-sig')
+    latent_df.to_csv(Path(f"/share/nlp/baijun/shuhan/crosscoder_output/{model_name}_latent_dimentionality.csv"), encoding='utf-8-sig')
     return latent_df
 
 #def compute_feature_direction_drift(
