@@ -12,7 +12,7 @@ nway:
 
 # Training parameters - mirrors crosscoder.yaml
 training:
-  expansion_factor: 12
+  expansion_factor: 24
   batch_size: 2048
   epochs: 2
   lr: 1e-4

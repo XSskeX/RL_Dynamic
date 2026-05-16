@@ -139,7 +139,7 @@ def _mean_abs_other_dot(weight: th.Tensor) -> th.Tensor:
     n = gram.shape[0]
 
     off_diag_sum = gram.abs().sum(dim=1) - th.diag(gram).abs()
-    return off_diag_sum / max(n - 1, 1)
+    return off_diag_sum
 
 
 def update_crosscoder_latent_df_with_self_dot_ratio(
