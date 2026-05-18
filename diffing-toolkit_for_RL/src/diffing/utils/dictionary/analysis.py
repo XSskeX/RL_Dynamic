@@ -142,6 +142,129 @@ def _mean_abs_other_dot(weight: th.Tensor) -> th.Tensor:
     return off_diag_sum
 
 
+def compute_feature_direction_drift(
+    dictionary_name: str | Path,
+    model_names: Optional[list[str]] = None,
+    distance: str = "cosine",
+    save_path: Optional[str | Path] = None,
+    eps: float = 1e-8,
+) -> pd.DataFrame:
+    """
+    Measure how much each shared crosscoder feature direction moves across models.
+
+    The crosscoder decoder is expected to have shape:
+        [num_models, num_features, activation_dim]
+    """
+    if distance not in {"cosine", "angle"}:
+        raise ValueError(f"distance must be 'cosine' or 'angle', got {distance}")
+
+    crosscoder = load_dictionary_model(dictionary_name)
+    decoder_weight = crosscoder.decoder.weight.detach().float()
+    if decoder_weight.ndim != 3:
+        raise ValueError(
+            "Expected crosscoder.decoder.weight to have shape "
+            f"[num_models, num_features, activation_dim], got {tuple(decoder_weight.shape)}"
+        )
+
+    num_models, num_features, _ = decoder_weight.shape
+    if model_names is None:
+        model_names = [f"model_{i}" for i in range(num_models)]
+    elif len(model_names) != num_models:
+        raise ValueError(
+            f"model_names length ({len(model_names)}) must match num_models ({num_models})"
+        )
+
+    norms = decoder_weight.norm(dim=-1)
+    valid = norms > eps
+    normalized_weight = decoder_weight / norms.clamp_min(eps).unsqueeze(-1)
+
+    cos_to_base = (normalized_weight * normalized_weight[0:1]).sum(dim=-1)
+    cos_to_base = cos_to_base.clamp(-1.0, 1.0)
+    cos_to_prev = (normalized_weight[1:] * normalized_weight[:-1]).sum(dim=-1)
+    cos_to_prev = cos_to_prev.clamp(-1.0, 1.0)
+
+    if distance == "angle":
+        drift_to_base = th.arccos(cos_to_base)
+        step_drift = th.arccos(cos_to_prev)
+    else:
+        drift_to_base = 1.0 - cos_to_base
+        step_drift = 1.0 - cos_to_prev
+
+    drift_to_base = drift_to_base.masked_fill(~(valid & valid[0:1]), float("nan"))
+    step_drift = step_drift.masked_fill(~(valid[1:] & valid[:-1]), float("nan"))
+
+    def _nanmax_with_indices(values: th.Tensor, dim: int) -> tuple[th.Tensor, th.Tensor]:
+        all_nan = th.isnan(values).all(dim=dim)
+        max_values, max_indices = th.nan_to_num(values, nan=float("-inf")).max(dim=dim)
+        max_values = max_values.masked_fill(all_nan, float("nan"))
+        max_indices = max_indices.masked_fill(all_nan, -1)
+        return max_values, max_indices
+
+    def _nanmean(values: th.Tensor, dim: int) -> th.Tensor:
+        valid_values = ~th.isnan(values)
+        counts = valid_values.sum(dim=dim).clamp_min(1)
+        sums = th.nan_to_num(values, nan=0.0).sum(dim=dim)
+        means = sums / counts
+        return means.masked_fill(~valid_values.any(dim=dim), float("nan"))
+
+    max_drift_to_base, max_drift_to_base_idx = _nanmax_with_indices(
+        drift_to_base, dim=0
+    )
+    max_step_drift, max_step_drift_idx = _nanmax_with_indices(step_drift, dim=0)
+    path_length = th.nan_to_num(step_drift, nan=0.0).sum(dim=0)
+    mean_step_drift = _nanmean(step_drift, dim=0)
+
+    max_drift_to_base_idx_cpu = max_drift_to_base_idx.detach().cpu().tolist()
+    max_step_drift_idx_cpu = max_step_drift_idx.detach().cpu().tolist()
+
+    data: Dict[str, Any] = {
+        "feature_id": np.arange(num_features),
+        "base_norm": norms[0].detach().cpu().numpy(),
+        "final_norm": norms[-1].detach().cpu().numpy(),
+        "final_drift_to_base": drift_to_base[-1].detach().cpu().numpy(),
+        "max_drift_to_base": max_drift_to_base.detach().cpu().numpy(),
+        "max_drift_to_base_idx": max_drift_to_base_idx.detach().cpu().numpy(),
+        "max_drift_to_base_model": [
+            model_names[idx] if idx >= 0 else None for idx in max_drift_to_base_idx_cpu
+        ],
+        "max_step_drift": max_step_drift.detach().cpu().numpy(),
+        "max_step_drift_from_idx": max_step_drift_idx.detach().cpu().numpy(),
+        "max_step_drift_to_idx": np.array(
+            [idx + 1 if idx >= 0 else -1 for idx in max_step_drift_idx_cpu]
+        ),
+        "max_step_drift_from_model": [
+            model_names[idx] if idx >= 0 else None for idx in max_step_drift_idx_cpu
+        ],
+        "max_step_drift_to_model": [
+            model_names[idx + 1] if idx >= 0 else None for idx in max_step_drift_idx_cpu
+        ],
+        "path_length": path_length.detach().cpu().numpy(),
+        "mean_step_drift": mean_step_drift.detach().cpu().numpy(),
+        "valid_model_count": valid.sum(dim=0).detach().cpu().numpy(),
+    }
+
+    for model_idx, model_name in enumerate(model_names):
+        data[f"drift_to_base_{model_name}"] = (
+            drift_to_base[model_idx].detach().cpu().numpy()
+        )
+        data[f"cos_to_base_{model_name}"] = (
+            cos_to_base[model_idx].detach().cpu().numpy()
+        )
+
+    for model_idx in range(1, num_models):
+        model_name = model_names[model_idx]
+        data[f"step_drift_to_{model_name}"] = (
+            step_drift[model_idx - 1].detach().cpu().numpy()
+        )
+        data[f"cos_to_prev_{model_name}"] = (
+            cos_to_prev[model_idx - 1].detach().cpu().numpy()
+        )
+
+    drift_df = pd.DataFrame(data)
+    if save_path is not None:
+        drift_df.to_csv(Path(save_path), index=False, float_format="%.12f")
+    return drift_df
+
 def update_crosscoder_latent_df_with_self_dot_ratio(
     dictionary_name: str,
     base_layer: int = 0,
@@ -170,18 +293,6 @@ def update_crosscoder_latent_df_with_self_dot_ratio(
 
     latent_df.to_csv(Path(f"/share/nlp/baijun/shuhan/crosscoder_output_for_8/{model_name}_latent_dimentionality.csv"), encoding='utf-8-sig')
     return latent_df
-
-#def compute_feature_direction_drift(
-#    dictionary_name: str,
-#    model_name: str = "noname",
-#) -> pd.DataFrame:
-#    crosscoder = load_dictionary_model(dictionary_name)
-#    num_models = crosscoder.decoder.weight.shape[0]
-#    for i in range(len(crosscoder.decoder.weight))
-
-
-
-
 
 def build_push_sae_difference_latent_df(
     dictionary_name: str,
