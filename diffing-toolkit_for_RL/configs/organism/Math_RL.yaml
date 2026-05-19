@@ -57,3 +57,6 @@ finetuned_models:
   global_step_420:
     default:
       model_id: /share/nlp/baijun/shuhan/ckpt/global_step_450/actor_hf_export
+  global_step_0_to_450:
+    default:
+      model_id: /share/nlp/baijun/shuhan/ckpt/global_step_450/actor_hf_export

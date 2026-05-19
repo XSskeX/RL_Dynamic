@@ -34,6 +34,7 @@ def activation_analysis():
         dataset_name: caches[dataset_name][layer] for dataset_name in caches
     }  # Dict {dataset_name: PairedActivationCache}
 
+
 def _compute_feature_norm(weight):
     
     return th.linalg.vector_norm(weight.float(), ord=2, dim=1)
