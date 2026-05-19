@@ -291,7 +291,7 @@ def update_crosscoder_latent_df_with_self_dot_ratio(
 
         latent_df[f"dec_{i}_self_dot_ratio_norm"] = ratios.detach().numpy()
 
-    latent_df.to_csv(Path(f"/share/nlp/baijun/shuhan/crosscoder_output_for_8/{model_name}_latent_dimentionality.csv"), encoding='utf-8-sig')
+    latent_df.to_csv(Path(f"/share/nlp/baijun/shuhan/crosscoder_output_/Llama3.2-3B_Instruct_0_to_450_latent_dimentionality.csv"), encoding='utf-8-sig')
     return latent_df
 
 def build_push_sae_difference_latent_df(
