@@ -1,0 +1,18 @@
+# @package organism
+name: pretraining
+description: pretraining
+type: pre-training
+description_long: |
+ The base model was raw model. The finetuning was done using pretraining corpus.
+dataset:
+  id: /share/nlp/baijun/shuhan/DAPO17k_for_Diffing
+  splits:
+  - train
+  - validation
+  is_chat: false
+  text_column: prompt
+finetuned_models:
+  pythia_step_0:
+    default:
+      model_id: /share/nlp/baijun/shuhan/pythia/pythia_step_0/step0
+  
