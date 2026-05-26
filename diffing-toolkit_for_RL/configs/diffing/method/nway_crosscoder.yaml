@@ -17,7 +17,7 @@ training:
   epochs: 2
   lr: 1e-4
   max_steps: null
-  validate_every_n_steps: 10000
+  validate_every_n_steps: 1000
   mu: 1e-1
   k: 100
   k_max: 1024
