@@ -82,7 +82,7 @@ def load_nway_activation_dataset_for_analysis(
         model_cfgs=model_cfgs,
         layers=[layer],
         split=split,
-    )
+    ) # Dict {dataset_name: {layer: ActivationCacheTuple, ...}}
     caches = {
         dataset_name: caches_by_dataset[dataset_name][layer]
         for dataset_name in caches_by_dataset
@@ -160,13 +160,15 @@ def analyze_crosscoder_activation_changes(
         batch_size=batch_size,
         shuffle=False,
         num_workers=num_workers,
+        pin_memory=True,
+        drop_last=drop_last,
     )
 
     num_features = crosscoder.dict_size
     num_models = crosscoder.decoder.weight.shape[0]
     model_cfgs = get_nway_model_configurations(cfg)
     model_names = [
-        _safe_column_name(getattr(model_cfg, "name", f"model_{idx}"))
+        f"llama32-3B-Instruct_ckpt_{idx * 120}"
         for idx, model_cfg in enumerate(model_cfgs)
     ]
 
@@ -175,13 +177,6 @@ def analyze_crosscoder_activation_changes(
     sum_sq_a = th.zeros(num_features, device=device)
     nonzero_a = th.zeros(num_features, device=device)
     max_a = th.full((num_features,), -th.inf, device=device)
-
-    contrib_sum = th.zeros(num_models, num_features, device=device)
-    contrib_abs_sum = th.zeros(num_models, num_features, device=device)
-    model_only_sum = th.zeros(num_models, num_features, device=device)
-    model_only_sq_sum = th.zeros(num_models, num_features, device=device)
-    model_only_nonzero = th.zeros(num_models, num_features, device=device)
-    model_only_max = th.full((num_models, num_features), -th.inf, device=device)
 
     code_normalization = crosscoder.get_code_normalization().to(device)
     if code_normalization.ndim == 0:
@@ -199,27 +194,14 @@ def analyze_crosscoder_activation_changes(
         if x.ndim != 3:
             raise ValueError(f"Expected batch shape [B, M, D], got {tuple(x.shape)}")
 
-        a = crosscoder.get_activations(x, use_threshold=use_threshold)
+        a, model_only_a_list = crosscoder.get_activations(x, use_threshold=use_threshold, return_no_sum=True)
         total_tokens += a.shape[0]
         sum_a += a.sum(dim=0)
         sum_sq_a += (a * a).sum(dim=0)
         nonzero_a += (a > 0).sum(dim=0)
         max_a = th.maximum(max_a, a.max(dim=0).values)
 
-        if compute_per_model_proxy:
-            x_norm = crosscoder.normalize_activations(x, inplace=False)
-            contrib = th.einsum("bmd,mdf->bmf", x_norm, crosscoder.encoder.weight)
-            contrib_sum += contrib.sum(dim=0)
-            contrib_abs_sum += contrib.abs().sum(dim=0)
-
-            model_only = th.relu(contrib + crosscoder.encoder.bias)
-            model_only_scaled = model_only * model_only_scale.unsqueeze(0)
-            if use_threshold and threshold is not None:
-                model_only_scaled = model_only_scaled * (model_only_scaled > threshold)
-            model_only_sum += model_only_scaled.sum(dim=0)
-            model_only_sq_sum += (model_only_scaled * model_only_scaled).sum(dim=0)
-            model_only_nonzero += (model_only_scaled > 0).sum(dim=0)
-            model_only_max = th.maximum(model_only_max, model_only_scaled.max(dim=0).values)
+        model_only_a_list_mean = model_only_a_list.mean(dim=0)
 
     if total_tokens == 0:
         raise ValueError("No activation tokens were loaded for analysis")
@@ -244,29 +226,9 @@ def analyze_crosscoder_activation_changes(
         proxy_data: dict[str, Any] = {"feature_id": feature_ids}
         for model_idx, model_name in enumerate(model_names):
             proxy_data[f"{model_name}_contrib_mean"] = (
-                contrib_sum[model_idx] / total_tokens
+                model_only_a_list_mean[model_idx]
             ).cpu().numpy()
-            proxy_data[f"{model_name}_contrib_abs_mean"] = (
-                contrib_abs_sum[model_idx] / total_tokens
-            ).cpu().numpy()
-            proxy_data[f"{model_name}_model_only_activation_freq"] = (
-                model_only_nonzero[model_idx] / total_tokens
-            ).cpu().numpy()
-            proxy_data[f"{model_name}_model_only_mean_activation"] = (
-                model_only_sum[model_idx] / total_tokens
-            ).cpu().numpy()
-            proxy_data[f"{model_name}_model_only_active_mean_activation"] = (
-                model_only_sum[model_idx] / model_only_nonzero[model_idx].clamp_min(1)
-            ).cpu().numpy()
-            proxy_data[f"{model_name}_model_only_rms_activation"] = th.sqrt(
-                model_only_sq_sum[model_idx] / total_tokens
-            ).cpu().numpy()
-            proxy_data[f"{model_name}_model_only_max_activation"] = (
-                model_only_max[model_idx]
-            ).cpu().numpy()
-            proxy_data[f"{model_name}_model_only_total_activation_mass"] = (
-                model_only_sum[model_idx]
-            ).cpu().numpy()
+
         results["per_model_encoder_contrib_stats"] = pd.DataFrame(proxy_data)
 
     if output_dir is not None:
