@@ -161,7 +161,6 @@ def analyze_crosscoder_activation_changes(
         shuffle=False,
         num_workers=num_workers,
         pin_memory=True,
-        drop_last=drop_last,
     )
 
     num_features = crosscoder.dict_size
@@ -194,7 +193,9 @@ def analyze_crosscoder_activation_changes(
         if x.ndim != 3:
             raise ValueError(f"Expected batch shape [B, M, D], got {tuple(x.shape)}")
 
-        a, model_only_a_list = crosscoder.get_activations(x, use_threshold=use_threshold, return_no_sum=True)
+        a = crosscoder.get_activations(x, use_threshold=use_threshold)
+
+        _, model_only_a_list = crosscoder.encode(x, use_threshold=use_threshold, normalize_activations=True, return_no_sum=True)
         total_tokens += a.shape[0]
         sum_a += a.sum(dim=0)
         sum_sq_a += (a * a).sum(dim=0)
