@@ -185,6 +185,7 @@ def analyze_crosscoder_activation_changes(
     else:
         model_only_scale = code_normalization.reshape(1, num_features).expand(num_models, num_features)
     threshold = getattr(crosscoder, "threshold", None)
+    model_only_a_list_sum = th.zeros(num_models, num_features, device=device)
 
     for batch in dataloader:
         x = batch.to(device=device, dtype=crosscoder.dtype)
@@ -195,14 +196,15 @@ def analyze_crosscoder_activation_changes(
 
         a = crosscoder.get_activations(x, use_threshold=use_threshold)
 
-        _, model_only_a_list = crosscoder.encode(x, use_threshold=use_threshold, normalize_activations=True, return_no_sum=True)
+        x_norm = crosscoder.normalize_activations(x, inplace=False)
+        _, model_only_a_list = crosscoder.encoder(x_norm, return_no_sum=True)
         total_tokens += a.shape[0]
         sum_a += a.sum(dim=0)
         sum_sq_a += (a * a).sum(dim=0)
         nonzero_a += (a > 0).sum(dim=0)
         max_a = th.maximum(max_a, a.max(dim=0).values)
 
-        model_only_a_list_mean = model_only_a_list.mean(dim=0)
+        model_only_a_list_sum += model_only_a_list.sum(dim=0)
 
     if total_tokens == 0:
         raise ValueError("No activation tokens were loaded for analysis")
@@ -227,7 +229,7 @@ def analyze_crosscoder_activation_changes(
         proxy_data: dict[str, Any] = {"feature_id": feature_ids}
         for model_idx, model_name in enumerate(model_names):
             proxy_data[f"{model_name}_contrib_mean"] = (
-                model_only_a_list_mean[model_idx]
+                model_only_a_list_sum[model_idx] / total_tokens
             ).cpu().numpy()
 
         results["per_model_encoder_contrib_stats"] = pd.DataFrame(proxy_data)
