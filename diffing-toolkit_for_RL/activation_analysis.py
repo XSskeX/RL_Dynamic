@@ -177,16 +177,12 @@ def analyze_crosscoder_activation_changes(
     nonzero_a = th.zeros(num_features, device=device)
     max_a = th.full((num_features,), -th.inf, device=device)
 
-    code_normalization = crosscoder.get_code_normalization().to(device)
-    if code_normalization.ndim == 0:
-        model_only_scale = code_normalization.reshape(1, 1).expand(num_models, num_features)
-    elif code_normalization.shape[0] == num_models:
-        model_only_scale = code_normalization
-    else:
-        model_only_scale = code_normalization.reshape(1, num_features).expand(num_models, num_features)
+
     threshold = getattr(crosscoder, "threshold", None)
     model_only_a_list_sum = th.zeros(num_models, num_features, device=device)
-
+    print("num of data:", len(dataloader) * batch_size)
+    dw = crosscoder.decoder.weight.to(device)
+    weight_norm = dw.norm(dim=2)
     for batch in dataloader:
         x = batch.to(device=device, dtype=crosscoder.dtype)
         if x.ndim == 4:
@@ -231,8 +227,15 @@ def analyze_crosscoder_activation_changes(
             proxy_data[f"{model_name}_contrib_mean"] = (
                 model_only_a_list_sum[model_idx] / total_tokens
             ).cpu().numpy()
-
         results["per_model_encoder_contrib_stats"] = pd.DataFrame(proxy_data)
+
+        proxy_data_scaled: dict[str, Any] = {"feature_id": feature_ids}
+        for model_idx, model_name in enumerate(model_names):
+            proxy_data_scaled[f"{model_name}_contrib_mean_scaled_with_decoder_norm"] = (
+                model_only_a_list_sum[model_idx] / total_tokens * weight_norm[model_idx]
+            ).cpu().numpy()
+        results["per_model_encoder_contrib_mean_scaled_with_decoder_norm_stats"] = pd.DataFrame(proxy_data_scaled)
+
 
     if output_dir is not None:
         output_path = Path(output_dir)
@@ -248,6 +251,12 @@ def analyze_crosscoder_activation_changes(
                 index=False,
                 float_format="%.12f",
             )
+            results["per_model_encoder_contrib_mean_scaled_with_decoder_norm_stats"].to_csv(
+                output_path / "per_model_encoder_contrib_mean_scaled_with_decoder_norm_stats.csv",
+                index=False,
+                float_format="%.12f",
+            )
+            
         logger.info(f"Saved activation analysis to {output_path}")
 
     return results
