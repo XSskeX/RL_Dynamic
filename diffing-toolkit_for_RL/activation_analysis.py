@@ -191,7 +191,7 @@ def analyze_crosscoder_activation_changes(
             raise ValueError(f"Expected batch shape [B, M, D], got {tuple(x.shape)}")
 
         a = crosscoder.get_activations(x, use_threshold=use_threshold)
-
+        #should be f, not scaled_f
         x_norm = crosscoder.normalize_activations(x, inplace=False)
         _, model_only_a_list = crosscoder.encoder(x_norm, return_no_sum=True)
         total_tokens += a.shape[0]
