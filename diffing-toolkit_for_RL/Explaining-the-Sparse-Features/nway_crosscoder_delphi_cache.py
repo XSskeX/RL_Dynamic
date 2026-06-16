@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import inspect
 import json
 import logging
 import os
@@ -13,6 +14,7 @@ os.environ.setdefault("KMP_DUPLICATE_LIB_OK", "TRUE")
 
 import numpy as np
 import torch as th
+from omegaconf import DictConfig
 from torch.utils.data import ConcatDataset, DataLoader, Subset
 from tqdm import tqdm
 
@@ -34,25 +36,6 @@ class SelectedCache:
     dataset_name: str
     cache: Any
     indices: th.Tensor
-
-def _skip_first_n_tokens(cache: Any, n: int) -> Subset | Any:
-    """Skip the first n tokens of each sequence in an activation cache."""
-    if n == 0:
-        return cache
-
-    sequence_ranges = cache.sequence_ranges
-    if sequence_ranges is None:
-        raise ValueError("Cannot skip first tokens because cache.sequence_ranges is None")
-    if getattr(sequence_ranges, "ndim", 1) > 1:
-        sequence_ranges = sequence_ranges[0]
-
-    sequence_starts = sequence_ranges[:-1]
-    mask = th.ones(len(cache), dtype=th.bool)
-    for offset in range(n):
-        token_indices = sequence_starts + offset
-        token_indices = token_indices[token_indices < len(cache)]
-        mask[token_indices] = False
-    return Subset(cache, th.where(mask)[0])
 
 
 def _cfg_get(container: Any, key: str, default: Any = None) -> Any:
@@ -125,27 +108,28 @@ def default_output_dir(cfg: DictConfig, layer: int) -> Path:
     )
 
 
-def available_token_indices(cache: Any, skip_first_n: int) -> th.Tensor:
-    if skip_first_n <= 0:
-        return th.arange(len(cache), dtype=th.long)
+def _skip_first_n_tokens(cache: Any, n: int) -> Subset | Any:
+    """Skip the first n tokens of each sequence in an activation cache."""
+    if n == 0:
+        return cache
 
     sequence_ranges = cache.sequence_ranges
     if sequence_ranges is None:
-        raise ValueError("Cannot skip first tokens because sequence_ranges is None")
+        raise ValueError("Cannot skip first tokens because cache.sequence_ranges is None")
     if getattr(sequence_ranges, "ndim", 1) > 1:
         sequence_ranges = sequence_ranges[0]
 
-    mask = th.ones(len(cache), dtype=th.bool)
     sequence_starts = sequence_ranges[:-1]
-    for offset in range(skip_first_n):
+    mask = th.ones(len(cache), dtype=th.bool)
+    for offset in range(n):
         token_indices = sequence_starts + offset
         token_indices = token_indices[token_indices < len(cache)]
         mask[token_indices] = False
-
-    return th.where(mask)[0]
+    return Subset(cache, th.where(mask)[0])
 
 
 def get_cache_tokens(cache: Any, indices: th.Tensor) -> th.Tensor:
+    print(f"get cache tokens, tokens dim: {tokens.ndim}")
     tokens = cache.tokens
     if tokens is None:
         raise ValueError("The activation cache does not store tokens")
@@ -282,6 +266,44 @@ def prepare_locations(locations: th.Tensor, start: int) -> np.ndarray:
     return locations.astype(np.uint32)
 
 
+def encode_crosscoder_activations(
+    crosscoder: Any,
+    x: th.Tensor,
+    use_threshold: bool,
+) -> th.Tensor:
+    if hasattr(crosscoder, "get_activations"):
+        get_parameters = inspect.signature(crosscoder.get_activations).parameters
+        get_kwargs = {"normalize_activations": False}
+        if "use_threshold" in get_parameters:
+            get_kwargs["use_threshold"] = use_threshold
+        activations = crosscoder.get_activations(x, **get_kwargs)
+        if activations.ndim != 2:
+            raise ValueError(
+                f"Expected encoded activations [B, F], got {tuple(activations.shape)}"
+            )
+        return activations
+
+    encode_parameters = inspect.signature(crosscoder.encode).parameters
+    encode_kwargs = {
+        "normalize_activations": False,
+    }
+    if "use_threshold" in encode_parameters:
+        encode_kwargs["use_threshold"] = use_threshold
+    if "return_active" in encode_parameters:
+        encoded = crosscoder.encode(x, return_active=True, **encode_kwargs)
+        activations = encoded[0] if isinstance(encoded, tuple) else encoded
+    else:
+        activations = crosscoder.encode(x, **encode_kwargs)
+
+    if activations.ndim == 3:
+        activations = activations.sum(dim=1)
+    if activations.ndim != 2:
+        raise ValueError(
+            f"Expected encoded activations [B, F], got {tuple(activations.shape)}"
+        )
+    return activations
+
+
 @th.no_grad()
 def collect_crosscoder_latents(
     crosscoder: Any,
@@ -320,13 +342,17 @@ def collect_crosscoder_latents(
         if x.ndim != 3:
             raise ValueError(f"Expected batch shape [B, M, D], got {tuple(x.shape)}")
 
-        x_norm = crosscoder.normalize_activations(x, inplace=False)
-        activations, _, _, _, _ = crosscoder.encode(
-            x_norm,
-            return_active=True,
-            use_threshold=True,
-            normalize_activations=False,
-        )
+        #x_norm = crosscoder.normalize_activations(x, inplace=False)
+        #activations = encode_crosscoder_activations(
+        #    crosscoder,
+        #    x_norm,
+        #    use_threshold=use_threshold,
+        #)
+        activations = crosscoder.get_activations(x, use_threshold=use_threshold)
+        if activations.ndim != 2:
+            raise ValueError(
+                f"Expected encoded activations [B, F], got {tuple(activations.shape)}"
+            )
         active_mask = activations > min_activation
         active_indices = th.nonzero(active_mask, as_tuple=False)
         if active_indices.numel() > 0:
@@ -497,11 +523,9 @@ def main() -> None:
     dataset = build_dataset(selected_caches)
     tokens, usable_tokens = build_token_matrix(selected_caches, args.ctx_len)
     boundaries = split_boundaries(num_features, args.n_splits)
-    
-
-
-    
-
+    logger.info(
+        f"Caching {num_features} features into {len(boundaries)} split file(s)"
+    )
 
     split_locations, split_activations = collect_crosscoder_latents(
         crosscoder=crosscoder,

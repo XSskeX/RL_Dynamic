@@ -83,14 +83,17 @@ global_layers = {}  # key: layer_name -> SharedLayerActivations
 global_feature_logits_result = None
 global_tokens = None
 global_tokenizer = None
+global_layer_names_by_idx = None
 
 
-def init_pool(layers_shm_map, tokens, feature_logits_result, tokenizer):
+def init_pool(layers_shm_map, tokens, feature_logits_result, tokenizer, layer_names_by_idx):
     """initializer for ProcessPoolExecutor"""
     global global_layers, global_tokens, global_feature_logits_result, global_tokenizer
+    global global_layer_names_by_idx
     global_tokens = tokens
     global_feature_logits_result = feature_logits_result
     global_tokenizer = tokenizer
+    global_layer_names_by_idx = layer_names_by_idx
     for layer_name, shared_layer in layers_shm_map.items():
         shared_layer.attach()
         global_layers[layer_name] = shared_layer
@@ -141,7 +144,7 @@ def get_feature_logits(model_path, base_transcoder_path, layers, num_latents, to
 
 
 def generate_single_feature_data(layer_idx, feature_idx, top_n=10, n_bins=100, random_seed=42):
-    layer_name = f"model.layers.{layer_idx}.mlp.gate"
+    layer_name = global_layer_names_by_idx[layer_idx]
     tokens = global_tokens
     feature_logits_result = global_feature_logits_result
     tokenizer = global_tokenizer
@@ -156,7 +159,9 @@ def generate_single_feature_data(layer_idx, feature_idx, top_n=10, n_bins=100, r
 
     seq_len = tokens.shape[1]
 
-    all_token_acts = torch.zeros(len(torch.unique(xs)), seq_len, device='cuda', dtype=torch.float32)
+    all_token_acts = torch.zeros(
+        len(torch.unique(xs)), seq_len, device='cuda', dtype=torch.float32
+    )
     unique_x, inverse_indices = torch.unique(xs, return_inverse=True)
     all_token_acts[inverse_indices, ys] = acts
 
@@ -204,13 +209,20 @@ def generate_single_feature_data(layer_idx, feature_idx, top_n=10, n_bins=100, r
         examples_quantiles.append({"quantile_name": name, "examples": selected_samples})
 
     activation_frequency = acts.shape[0] / tokens.numel()
+    if feature_logits_result is None:
+        top_logits = []
+        bottom_logits = []
+    else:
+        logits = feature_logits_result.get(layer_idx, {}).get(feature_idx, {})
+        top_logits = logits.get("top_logits", [])
+        bottom_logits = logits.get("bottom_logits", [])
 
     return {
         "transcoder_id": layer_idx,
         "index": feature_idx,
         "examples_quantiles": examples_quantiles,
-        "top_logits": feature_logits_result[layer_idx][feature_idx]['top_logits'],
-        "bottom_logits": feature_logits_result[layer_idx][feature_idx]['bottom_logits'],
+        "top_logits": top_logits,
+        "bottom_logits": bottom_logits,
         "act_max": act_max,
         "act_min": act_min,
         "quantile_values": quantile_values,
@@ -225,10 +237,25 @@ def run_single_feature(args):
 
 
 # ----------------------------- Main Feature Generation -----------------------------
-def generate_feature_files(model_path, base_transcoder_path, latent_dir, save_dir, layers, num_latents, overwrite, num_workers=4):
+def generate_feature_files(
+    model_path,
+    base_transcoder_path,
+    latent_dir,
+    save_dir,
+    layers,
+    num_latents,
+    overwrite,
+    num_workers=4,
+    module_template="nway_crosscoder.layer_{layer_idx}",
+    skip_feature_logits=False,
+):
     tokenizer = AutoTokenizer.from_pretrained(model_path)
 
-    hookpoints = [f"model.layers.{i}.mlp.gate" for i in layers]
+    hookpoints = [module_template.format(layer_idx=i, layer=i) for i in layers]
+    print(f"hookpoint list: {hookpoints}")
+    layer_names_by_idx = {
+        layer_idx: hookpoint for layer_idx, hookpoint in zip(layers, hookpoints)
+    }
     latent_dict = {hp: torch.arange(0, num_latents) for hp in hookpoints}
     latent_dataset = LatentDataset(
         raw_dir=latent_dir,
@@ -269,14 +296,22 @@ def generate_feature_files(model_path, base_transcoder_path, latent_dir, save_di
 
 
     # ----------- Compute feature logits -------------
-    feature_logits_result = get_feature_logits(model_path, base_transcoder_path, layers, num_latents, tokenizer, batch_size=512, topk=5)
-    print("Feature logits computed.")
+    if skip_feature_logits:
+        feature_logits_result = None
+        print("Skipping feature logits.")
+    else:
+        if base_transcoder_path is None:
+            raise ValueError(
+                "--base_transcoder_path is required unless --skip_feature_logits is set"
+            )
+        feature_logits_result = get_feature_logits(model_path, base_transcoder_path, layers, num_latents, tokenizer, batch_size=512, topk=5)
+        print("Feature logits computed.")
 
     # ----------- Process features per layer -------------
     for layer_idx in layers:
         feature_indices = list(range(num_latents))
         with ProcessPoolExecutor(max_workers=num_workers, initializer=init_pool,
-                                 initargs=(layers_shm_map, tokens, feature_logits_result, tokenizer)) as executor:
+                                 initargs=(layers_shm_map, tokens, feature_logits_result, tokenizer, layer_names_by_idx)) as executor:
             results = list(tqdm(executor.map(run_single_feature, [(layer_idx, i) for i in feature_indices]),
                                 total=num_latents, desc=f"Layer {layer_idx}"))
 
@@ -322,18 +357,23 @@ def save_layer_features(save_dir, layer_idx, features, overwrite=False):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--model_path", type=str, required=True)
-    parser.add_argument("--base_transcoder_path", type=str, required=True)
+    parser.add_argument("--base_transcoder_path", type=str, default=None)
     parser.add_argument("--latent_dir", type=str, required=True)
     parser.add_argument("--save_dir", type=str, required=True)
     parser.add_argument("--layers", nargs="+", type=int, required=True)
     parser.add_argument("--num_latents", type=int, default=512)
     parser.add_argument("--num_workers", type=int, default=4)
+    parser.add_argument("--module_template", type=str, default="model.layers.{layer_idx}.mlp.gate")
+    parser.add_argument("--skip_feature_logits", action="store_true")
+    parser.add_argument("--device", type=str, default=None)
     parser.add_argument("--overwrite", action="store_true")
     args = parser.parse_args()
 
     generate_feature_files(args.model_path, args.base_transcoder_path,
                            args.latent_dir, args.save_dir,
-                           args.layers, args.num_latents, args.overwrite)
+                           args.layers, args.num_latents, args.overwrite,
+                           args.num_workers, args.module_template,
+                           args.skip_feature_logits, args.device)
     print("Feature generation completed.")
 
 
