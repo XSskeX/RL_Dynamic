@@ -9,7 +9,7 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Iterable
-
+import hydra
 os.environ.setdefault("KMP_DUPLICATE_LIB_OK", "TRUE")
 
 import numpy as np
@@ -130,13 +130,34 @@ def _skip_first_n_tokens(cache: Any, n: int) -> Subset | Any:
 
 
 def get_cache_tokens(cache: Any, indices: th.Tensor) -> th.Tensor:
-    print(f"get cache tokens, tokens dim: {tokens.ndim}")
     tokens = cache.tokens
+    print(f"get cache tokens, tokens dim: {tokens.ndim}")
     if tokens is None:
         raise ValueError("The activation cache does not store tokens")
+    if tokens.ndim > 2:
+        raise ValueError("The activation cache tokens dim > 2")
     if tokens.ndim == 2:
         tokens = tokens[0]
     return tokens[indices].to(dtype=th.long).cpu()
+
+def available_token_indices(cache: Any, skip_first_n: int) -> th.Tensor:
+    if skip_first_n <= 0:
+        return th.arange(len(cache), dtype=th.long)
+
+    sequence_ranges = cache.sequence_ranges
+    if sequence_ranges is None:
+        raise ValueError("Cannot skip first tokens because sequence_ranges is None")
+    if getattr(sequence_ranges, "ndim", 1) > 1:
+        sequence_ranges = sequence_ranges[0]
+
+    mask = th.ones(len(cache), dtype=th.bool)
+    sequence_starts = sequence_ranges[:-1]
+    for offset in range(skip_first_n):
+        token_indices = sequence_starts + offset
+        token_indices = token_indices[token_indices < len(cache)]
+        mask[token_indices] = False
+
+    return th.where(mask)[0]
 
 
 def load_selected_nway_caches(
@@ -182,15 +203,17 @@ def load_selected_nway_caches(
     }
 
     skip_n = int(_cfg_get(cfg.model, "ignore_first_n_tokens_per_sample_during_training", 0) or 0)
-    caches = {
-        dataset_name: _skip_first_n_tokens(cache, skip_n)
-        for dataset_name, cache in caches.items()
-    }
+
 
     available = [len(cache) for cache in caches.values()]
     if max_num_samples is None:
         max_num_samples = min(sum(available), cfg.diffing.method.training.num_validation_samples)
     num_samples_per_dataset = calculate_samples_per_dataset(available, max_num_samples)
+
+    available_indices = {
+        dataset_name: available_token_indices(cache, skip_first_n)
+        for dataset_name, cache in caches.items()
+    }
 
 
     selected: list[SelectedCache] = []
@@ -199,8 +222,8 @@ def load_selected_nway_caches(
         logger.info(f"\tUsing {num_samples} tokens for {dataset_name}")
         selected.append(SelectedCache(
             dataset_name=dataset_name,
-            cache=cache,
-            indices=available[:n_samples],
+            cache=caches[dataset_name],
+            indices=available_indices[dataset_name][:n_samples],
             )
         )
 
