@@ -182,7 +182,8 @@ def load_selected_nway_caches(
         use_pretraining_dataset=cfg.diffing.method.datasets.use_pretraining_dataset,
         use_training_dataset=cfg.diffing.method.datasets.use_training_dataset,
     )
-
+    print(f"dataset_cfgs: {dataset_cfgs}")
+    print(f"split: {split}")
     caches_by_dataset = load_n_activation_datasets_from_config(
         cfg=cfg,
         ds_cfgs=dataset_cfgs,
@@ -514,7 +515,7 @@ def main(cfg: DictConfig) -> None:
     max_num_samples = _cfg_get(latent_cfg, "max_num_samples", None)
     no_threshold = _cfg_get(latent_cfg, "no_threshold", False)
     min_activation = _cfg_get(latent_cfg, "min_activation", 0.0)
-    overwrite = _cfg_get(latent_cfg, "overwrite", False)
+    overwrite = _cfg_get(latent_cfg, "overwrite", True)
     batch_size = _cfg_get(
                     latent_cfg,
                     "batch_size",
