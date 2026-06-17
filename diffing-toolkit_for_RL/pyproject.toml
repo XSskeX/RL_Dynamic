@@ -25,7 +25,7 @@ dependencies = [
     "streamlit-tags>=1.2.1",
     "st-annotated-text>=4.0.0",
     "tiny-dashboard>=0.7.4.dev9",
-    "torch>=2.7.0",
+    "torch>=2.9.0",
     "torchdr>=0.3",
     "tqdm>=4.67.1",
     "transformers>=4.53.0",
@@ -34,7 +34,7 @@ dependencies = [
     "coolname>=2.2.0",
     "codenamize>=1.2.3",
     "pathvalidate>=3.3.1",
-    "vllm>=0.11.1",
+    "vllm>=0.19.1",
     # "scribe-notebook",
     # "claude-repl",
 ]

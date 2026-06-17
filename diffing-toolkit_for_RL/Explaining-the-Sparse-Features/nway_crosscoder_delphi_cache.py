@@ -17,7 +17,11 @@ import torch as th
 from omegaconf import DictConfig
 from torch.utils.data import ConcatDataset, DataLoader, Subset
 from tqdm import tqdm
-
+from diffing.utils.configs import (
+    CONFIGS_DIR,
+    get_dataset_configurations,
+    get_nway_model_configurations,
+)
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 logger = logging.getLogger("nway_crosscoder_delphi_cache")
@@ -71,12 +75,9 @@ def load_cfg(overrides: list[str]) -> DictConfig:
         )
 
 
-def resolve_layer(cfg: DictConfig, layer: int | None) -> int:
+def resolve_layer(cfg: DictConfig) -> int:
     from diffing.utils.activations import get_layer_indices
     from diffing.utils.configs import get_nway_model_configurations
-
-    if layer is not None:
-        return layer
 
     model_cfgs = get_nway_model_configurations(cfg)
     configured_layers = _cfg_get(cfg.diffing.method, "layers", None)
@@ -478,35 +479,29 @@ def parse_args() -> argparse.Namespace:
     )
     return parser.parse_args()
 
-
-def main() -> None:
-    args = parse_args()
-    cfg = load_cfg(args.hydra_overrides)
-
-    layer = resolve_layer(cfg, args.layer)
+@hydra.main(version_base=None, config_path=str(CONFIGS_DIR), config_name="config")
+def main(cfg: DictConfig) -> None:
+    #args = parse_args()
+    layer = resolve_layer(cfg)
     latent_cfg = cfg.diffing.method.analysis.latent_activations
+    ctx_len = _cfg_get(latent_cfg, "ctx_len", 128)
+    n_splits = _cfg_get(latent_cfg, "n_splits", 1)
+    split = _cfg_get(latent_cfg, "split", "validation")
+    num_workers = _cfg_get(latent_cfg, "num_workers", 0)
+    max_num_samples = _cfg_get(latent_cfg, "max_num_samples", None)
+    no_threshold = _cfg_get(latent_cfg, "no_threshold", False)
+    min_activation = _cfg_get(latent_cfg, "min_activation", 0.0)
+    overwrite = _cfg_get(latent_cfg, "overwrite", False)
+    batch_size = _cfg_get(
+                    latent_cfg,
+                    "batch_size",
+                    cfg.diffing.method.training.batch_size,
+                )
 
-    split = args.split or _cfg_get(latent_cfg, "split", "validation")
-    max_num_samples = args.max_num_samples
-    if max_num_samples is None:
-        max_num_samples = _cfg_get(latent_cfg, "max_num_samples", None)
-
-    batch_size = args.batch_size
-    if batch_size is None:
-        batch_size = int(
-            _cfg_get(
-                latent_cfg,
-                "batch_size",
-                cfg.diffing.method.training.batch_size,
-            )
-        )
-
-    device = args.device or ("cuda" if th.cuda.is_available() else "cpu")
-    model_path = Path(args.model_path) if args.model_path else default_model_path(cfg)
-    output_dir = (
-        Path(args.output_dir) if args.output_dir else default_output_dir(cfg, layer)
-    )
-    module_name = args.module_name or f"nway_crosscoder.layer_{layer}"
+    device = "cuda"
+    model_path = default_model_path(cfg)
+    output_dir = default_output_dir(cfg, layer)
+    module_name = f"nway_crosscoder.layer_{layer}"
 
     from diffing.utils.dictionary import load_dictionary_model
 
@@ -521,8 +516,8 @@ def main() -> None:
         max_num_samples=max_num_samples,
     )
     dataset = build_dataset(selected_caches)
-    tokens, usable_tokens = build_token_matrix(selected_caches, args.ctx_len)
-    boundaries = split_boundaries(num_features, args.n_splits)
+    tokens, usable_tokens = build_token_matrix(selected_caches, ctx_len)
+    boundaries = split_boundaries(num_features, n_splits)
     logger.info(
         f"Caching {num_features} features into {len(boundaries)} split file(s)"
     )
@@ -531,12 +526,12 @@ def main() -> None:
         crosscoder=crosscoder,
         dataset=dataset,
         usable_tokens=usable_tokens,
-        ctx_len=args.ctx_len,
+        ctx_len=ctx_len,
         batch_size=batch_size,
-        num_workers=args.num_workers,
+        num_workers=num_workers,
         device=device,
-        use_threshold=not args.no_threshold,
-        min_activation=args.min_activation,
+        use_threshold=not no_threshold,
+        min_activation=min_activation,
         boundaries=boundaries,
     )
 
@@ -549,9 +544,9 @@ def main() -> None:
         boundaries=boundaries,
         model_name=str(model_path),
         batch_size=batch_size,
-        ctx_len=args.ctx_len,
+        ctx_len=ctx_len,
         n_tokens=usable_tokens,
-        overwrite=args.overwrite,
+        overwrite=overwrite,
     )
 
     print(f"Delphi cache saved to: {output_dir / module_name}", flush=True)
