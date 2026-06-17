@@ -363,7 +363,7 @@ def main():
     parser.add_argument("--layers", nargs="+", type=int, required=True)
     parser.add_argument("--num_latents", type=int, default=512)
     parser.add_argument("--num_workers", type=int, default=4)
-    parser.add_argument("--module_template", type=str, default="model.layers.{layer_idx}.mlp.gate")
+    parser.add_argument("--module_template", type=str, default="nway_crosscoder.layer_{layer_idx}")
     parser.add_argument("--skip_feature_logits", action="store_true")
     parser.add_argument("--device", type=str, default=None)
     parser.add_argument("--overwrite", action="store_true")

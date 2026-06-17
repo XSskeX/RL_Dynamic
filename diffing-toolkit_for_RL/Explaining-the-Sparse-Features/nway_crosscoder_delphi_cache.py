@@ -509,7 +509,7 @@ def main(cfg: DictConfig) -> None:
     latent_cfg = cfg.diffing.method.analysis.latent_activations
     ctx_len = _cfg_get(latent_cfg, "ctx_len", 128)
     n_splits = _cfg_get(latent_cfg, "n_splits", 1)
-    split = _cfg_get(latent_cfg, "split", "validation")
+    split = "validation"
     num_workers = _cfg_get(latent_cfg, "num_workers", 0)
     max_num_samples = _cfg_get(latent_cfg, "max_num_samples", None)
     no_threshold = _cfg_get(latent_cfg, "no_threshold", False)
