@@ -373,7 +373,7 @@ def main():
                            args.latent_dir, args.save_dir,
                            args.layers, args.num_latents, args.overwrite,
                            args.num_workers, args.module_template,
-                           args.skip_feature_logits, args.device)
+                           args.skip_feature_logits)
     print("Feature generation completed.")
 
 

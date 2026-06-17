@@ -224,7 +224,7 @@ def load_selected_nway_caches(
         selected.append(SelectedCache(
             dataset_name=dataset_name,
             cache=caches[dataset_name],
-            indices=available_indices[dataset_name][:n_samples],
+            indices=available_indices[dataset_name][:num_samples],
             )
         )
 
