@@ -31,6 +31,16 @@ def parse_args():
         choices=["explanation", "evaluation"],
         help="Mode to run: 'explanation' to generate explanations, 'evaluation' to evaluate them.",
     )
+    exp_group.add_argument(
+        "--feature_csv_file",
+        type=str,
+        default="/share/nlp/baijun/shuhan/crosscoder_output/activation_analysis/per_model_encoder_contrib_mean_scaled_with_decoder_norm_stats.csv",
+    )
+    exp_group.add_argument(
+        "--top_k",
+        type=int,
+        default=100,
+    )
 
     # 1. 模型和稀疏化配置
     model_group = parser.add_argument_group("Model and Sparsity Configuration")
@@ -191,7 +201,7 @@ async def main():
     # 1. 初始化模型和 Hookpoints
     tokenizer = AutoTokenizer.from_pretrained(args.tokenizer_path)
     
-    hookpoints = [args.hookpoint.format(layer_idx=i, layer=i) for i in range(args.num_layers)]
+    hookpoints = [args.hookpoint.format(layer_idx=args.num_layers, layer=args.num_layers)]
 
     #latent_dict = {hp: torch.arange(0, args.num_latents) for hp in hookpoints}
     selected_latents = torch.tensor(get_topk_range_indices(args.feature_csv_file, top_k=args.top_k), dtype=torch.long)
