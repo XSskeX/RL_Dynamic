@@ -78,7 +78,7 @@ analysis:
     upload_to_hub: false
     n_max_activations: 100
     min_threshold: 1e-4
-    max_num_samples: 50000
+    max_num_samples: 100000
     cache_device: "cuda"
 
   latent_steering:

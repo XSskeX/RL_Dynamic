@@ -37,25 +37,25 @@ def parse_args():
     model_group.add_argument(
         "--tokenizer_path",
         type=str,
-        default="../../models/Qwen3-30B-A3B-Instruct-2507",
+        default="meta-llama/Llama-3.2-3B-Instruct",
         help="Path to the pre-trained model directory.",
     )
     model_group.add_argument(
         "--hookpoint",
         type=str,
-        default="mlp.gate",
+        default="nway_crosscoder.layer_{layer_idx}",
         help="Hookpoint module name to extract latents from.",
     )
     model_group.add_argument(
         "--output_dir",
         type=str,
-        default="outputs/",
+        default="/share/nlp/baijun/shuhan/expaining_features/outputs/",
         help="Directory to save outputs such as explanations and evaluations.",
     )
     model_group.add_argument(
         "--num_layers",
         type=int,
-        default=16,
+        default=13,
         help="Number of layers in the model to process.",
     )
     model_group.add_argument(
@@ -109,7 +109,7 @@ def parse_args():
     constructor_group.add_argument(
         "--min_examples",
         type=int,
-        default=100,
+        default=10,
         help="Minimum number of examples required.",
     )
     constructor_group.add_argument(
@@ -124,13 +124,13 @@ def parse_args():
     llm_group.add_argument(
         "--exp_model",
         type=str,
-        default="qwen3",
+        default="deepseek-v4-flash-260425",
         help="Model name for the explainer LLM client.",
     )
     llm_group.add_argument(
         "--base_url",
         type=str,
-        default="http://0.0.0.0:8889/v1/chat/completions",
+        default="https://ark.cn-beijing.volces.com/api/v3",
         help="Base URL for the LLM API.",
     )
     llm_group.add_argument(
@@ -174,6 +174,16 @@ def parse_args():
 
     return parser.parse_args()
 
+import pandas as pd
+
+def get_topk_range_indices(csv_path, top_k=5):
+    df = pd.read_csv(csv_path, index_col=0)
+    df['range'] = df.max(axis=1) - df.min(axis=1)
+    top_k_indices = df['range'].nlargest(top_k).index.tolist()
+    
+    return top_k_indices
+
+
 # --- 主逻辑函数 ---
 async def main():
     args = parse_args()
@@ -181,9 +191,12 @@ async def main():
     # 1. 初始化模型和 Hookpoints
     tokenizer = AutoTokenizer.from_pretrained(args.tokenizer_path)
     
-    hookpoints = [args.hookpoint.format(layer_id=i) for i in range(args.num_layers)]
+    hookpoints = [args.hookpoint.format(layer_idx=i, layer=i) for i in range(args.num_layers)]
 
-    latent_dict = {hp: torch.arange(0, args.num_latents) for hp in hookpoints}
+    #latent_dict = {hp: torch.arange(0, args.num_latents) for hp in hookpoints}
+    selected_latents = torch.tensor(get_topk_range_indices(args.feature_csv_file, top_k=args.top_k), dtype=torch.long)
+
+    latent_dict = {hp: selected_latents for hp in hookpoints}
 
     # 2. 初始化配置对象
     sampler_cfg = SamplerConfig(
