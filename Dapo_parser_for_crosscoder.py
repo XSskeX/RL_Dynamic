@@ -15,13 +15,8 @@ if __name__ == '__main__':
     args = parser.parse_args()
     dataset = datasets.load_dataset(args.local_dataset_path, "default")
     raw_dataset = dataset['train']
-
-    if args.is_test:
-        split = raw_dataset.train_test_split(test_size=0.95, seed=42)
-        raw_dataset = split['train']
         
     data_source = "BytedTsinghua-SIA/DAPO-Math-17k"
-    #instruction_following = "Let's think step by step and output the final answer within \\boxed{}."
     instruction_following = ""
 
     def make_map_fn(split):
@@ -46,11 +41,9 @@ if __name__ == '__main__':
             }
             return data
         return process_fn
-    #train_dataset = train_dataset.map(function=make_map_fn("train"))
-    #test_dataset = test_dataset.map(function=make_map_fn("test"))
+
     train_dataset = raw_dataset.map(function=make_map_fn("train"))
 
     local_save_dir = args.local_dir
     os.makedirs(local_save_dir, exist_ok=True)
-    #train_dataset.to_parquet(os.path.join(local_save_dir, "train.parquet"))
     train_dataset.to_parquet(os.path.join(local_save_dir, "train.parquet"))
