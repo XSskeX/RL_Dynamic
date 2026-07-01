@@ -15,7 +15,7 @@ training:
   tensor_parallel:
     enabled: false
     devices: null
-  expansion_factor: 48
+  expansion_factor: 16
   batch_size: 131072
   epochs: 2
   lr: 2e-5
@@ -27,7 +27,7 @@ training:
   k_annealing_steps: 2000
   auxk_alpha: 0.03125
 
-  num_samples: 300_000_000
+  num_samples: 30_000_000
   num_validation_samples: 5_000_000
   local_shuffling: true
   local_shuffling_shard_size: 1_000_000
