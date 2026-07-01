@@ -77,7 +77,7 @@ def parse_MMLU_Pro():
         return process_fn
     #train_dataset = train_dataset.map(function=make_map_fn("train"))
     #test_dataset = test_dataset.map(function=make_map_fn("test"))
-    test_dataset = raw_dataset.map(function=make_map_fn("validation"))
+    test_dataset = raw_dataset.map(function=make_map_fn("validation"), remove_columns=raw_dataset.column_names)
 
     local_save_dir = args.local_dir
     os.makedirs(local_save_dir, exist_ok=True)
@@ -138,14 +138,14 @@ def parse_IF_bench():
             answer = "just for placeholder"
             data = {
                 "data_source": data_source,
-                "prompt": [{"role": "user", "content": question}],
+                "prompt": question,
                 "ability": "Instruction_Following",
                 "reward_model": {"style": "rule", "ground_truth": answer},
                 "extra_info": {
                     "split": split,
                     "index": idx,
-                    "instruction_id_list": instruction_id_list,
-                    "kwargs": kwargs, 
+                    "instruction_id_list": [],
+                    "kwargs": [], 
                     "question": question_raw,
                 },
             }
@@ -170,5 +170,5 @@ if __name__ == '__main__':
     local_save_dir = args.local_dir
     os.makedirs(local_save_dir, exist_ok=True)
     dataset_list = [mmlu_test_dataset, aime_test_dataset, if_test_dataset]
-    test_dataset = dataset.concatenate_datasets(dataset_list)
+    test_dataset = datasets.concatenate_datasets(dataset_list)
     test_dataset.to_parquet(os.path.join(local_save_dir, "validation.parquet"))

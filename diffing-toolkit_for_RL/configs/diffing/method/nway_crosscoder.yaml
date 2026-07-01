@@ -12,19 +12,22 @@ nway:
 
 # Training parameters - mirrors crosscoder.yaml
 training:
-  expansion_factor: 24
-  batch_size: 2048
+  tensor_parallel:
+    enabled: false
+    devices: null
+  expansion_factor: 48
+  batch_size: 131072
   epochs: 2
-  lr: 1e-4
+  lr: 2e-5
   max_steps: null
-  validate_every_n_steps: 1000
+  validate_every_n_steps: 10000
   mu: 1e-1
   k: 100
   k_max: 1024
   k_annealing_steps: 2000
   auxk_alpha: 0.03125
 
-  num_samples: 150_000_000
+  num_samples: 300_000_000
   num_validation_samples: 5_000_000
   local_shuffling: true
   local_shuffling_shard_size: 1_000_000

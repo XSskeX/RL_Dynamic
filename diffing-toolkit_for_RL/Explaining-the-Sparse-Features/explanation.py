@@ -59,7 +59,7 @@ def parse_args():
     model_group.add_argument(
         "--output_dir",
         type=str,
-        default="/share/nlp/baijun/shuhan/expaining_features/outputs/",
+        default="/share/nlp/baijun/shuhan/expaining_features/outputs",
         help="Directory to save outputs such as explanations and evaluations.",
     )
     model_group.add_argument(

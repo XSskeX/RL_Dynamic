@@ -25,7 +25,8 @@ class OpenRouter(Client):
         super().__init__(model)
 
         self.headers = {"Authorization": f"Bearer {api_key}"}
-
+        print(f"Using OpenRouter model: {model} with base URL: {base_url}")
+        print(f"api_key: {api_key}")
         self.url = base_url
         self.max_tokens = max_tokens
         self.temperature = temperature
