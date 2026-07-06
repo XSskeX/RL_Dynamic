@@ -80,6 +80,127 @@ VLLM_ASCEND_REQUIRED_ENV_VARS = {"VLLM_ALL2ALL_BACKEND": "flashinfer_all2allv", 
 # 2. passing tokenizer is not necessary? no encoding/decoding is happending here
 # 3. simplify init logics
 
+@dataclass
+class SteeringController:
+    handle: torch.utils.hooks.RemovableHandle
+    scale: torch.Tensor
+
+    def enable(self, alpha: float) -> None:
+        self.scale.fill_(alpha)
+
+    def disable(self) -> None:
+        self.scale.zero_()
+
+    def remove(self) -> None:
+        self.handle.remove()
+
+
+def register_steering_hook(
+    model: nn.Module,
+    steering_vector: torch.Tensor,
+    layer_idx: int = 13,
+    alpha: float = 0.0,
+) -> SteeringController:
+    """
+    在指定 decoder layer 的输出 residual stream 上添加 steering vector。
+
+    Args:
+        model:
+            vLLM 中的 LlamaForCausalLM。
+        steering_vector:
+            shape 必须为 [hidden_size]，Llama-3.2-3B 为 [3072]。
+        layer_idx:
+            Python 的 0-based 层编号。13 表示第 14 层。
+        alpha:
+            初始 steering 强度。建议初始化为 0，validation 时再开启。
+    """
+    # vLLM LlamaForCausalLM 通常是 model.model.layers
+    if hasattr(model, "model") and hasattr(model.model, "layers"):
+        layers = model.model.layers
+    elif hasattr(model, "layers"):
+        layers = model.layers
+    else:
+        raise AttributeError(
+            f"无法定位 decoder layers，model type={type(model).__name__}"
+        )
+
+    if not 0 <= layer_idx < len(layers):
+        raise IndexError(
+            f"layer_idx={layer_idx} 越界，模型一共有 {len(layers)} 层"
+        )
+
+    layer = layers[layer_idx]
+
+    # 用该层参数确定 device 和 dtype。
+    try:
+        reference_param = next(
+            p for p in layer.parameters() if p.is_floating_point()
+        )
+    except StopIteration as exc:
+        raise RuntimeError(
+            f"第 {layer_idx} 层没有可用于确定 device/dtype 的浮点参数"
+        ) from exc
+
+    vector = torch.as_tensor(steering_vector).detach().flatten()
+
+    if vector.numel() != 3072:
+        raise ValueError(
+            f"Llama-3.2-3B steering vector 应有 3072 个元素，"
+            f"实际为 {vector.numel()}"
+        )
+
+    vector = vector.to(
+        device=reference_param.device,
+        dtype=reference_param.dtype,
+    )
+
+    # 使用 tensor scale，可以原地切换，不重新注册 hook。
+    scale = torch.tensor(
+        alpha,
+        device=reference_param.device,
+        dtype=reference_param.dtype,
+    )
+
+    def steering_hook(
+        module: nn.Module,
+        inputs: tuple,
+        output,
+    ):
+        # vLLM LlamaDecoderLayer 通常返回：
+        # (hidden_states, residual)
+        if isinstance(output, tuple):
+            hidden_states = output[0]
+
+            if hidden_states.shape[-1] != vector.numel():
+                raise RuntimeError(
+                    f"hidden size={hidden_states.shape[-1]}，"
+                    f"vector size={vector.numel()}"
+                )
+
+            steered = hidden_states + scale * vector
+            return (steered, *output[1:])
+
+        # 兼容直接返回 Tensor 的实现。
+        if torch.is_tensor(output):
+            if output.shape[-1] != vector.numel():
+                raise RuntimeError(
+                    f"hidden size={output.shape[-1]}，"
+                    f"vector size={vector.numel()}"
+                )
+            return output + scale * vector
+
+        raise TypeError(
+            f"不支持 decoder layer 输出类型：{type(output)}"
+        )
+
+    handle = layer.register_forward_hook(steering_hook)
+
+    return SteeringController(
+        handle=handle,
+        scale=scale,
+    )
+
+
 
 if is_version_ge(pkg="vllm", minver="0.7.3"):
     VLLMHijack.hijack()
@@ -217,6 +338,13 @@ class vLLMAsyncRollout(BaseRollout):
 
     def _load_model(self, *args, **kwargs):
         self.inference_engine.load_model(*args, **kwargs)
+        model = self.inference_engine.worker.model_runner.model
+        self.steering_controller = register_steering_hook(
+            model=model,
+            steering_vector=steering_vector,
+            layer_idx=13,  # 14(28*0.5)
+            alpha=0.0,
+        )
         _monkey_patch_compute_logits(self.inference_engine.worker.model_runner.model, len(self.tokenizer))
 
     async def _execute_method(self, method: str | bytes, *args, **kwargs):

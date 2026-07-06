@@ -16,7 +16,7 @@ training:
     enabled: false
     devices: null
   expansion_factor: 16
-  batch_size: 131072
+  batch_size: 8192
   epochs: 2
   lr: 2e-5
   max_steps: null
