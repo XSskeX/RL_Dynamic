@@ -34,7 +34,7 @@ def parse_args():
     exp_group.add_argument(
         "--feature_csv_file",
         type=str,
-        default="/share/nlp/baijun/shuhan/crosscoder_output/activation_analysis/per_model_encoder_contrib_mean_scaled_with_decoder_norm_stats.csv",
+        default="/share/nlp/baijun/shuhan/crosscoder_output/crosscoder_output_for_8/per_model_encoder_contrib_mean_scaled_with_decoder_norm_stats.csv",
     )
     exp_group.add_argument(
         "--top_k",
@@ -77,7 +77,7 @@ def parse_args():
     model_group.add_argument(
         "--example_ctx_len",
         type=int,
-        default=128,
+        default=64,
         help="Context length for examples.",
     )
 
@@ -86,13 +86,13 @@ def parse_args():
     sampler_group.add_argument(
         "--n_examples_train",
         type=int,
-        default=20,
+        default=40,
         help="Number of training examples.",
     )
     sampler_group.add_argument(
         "--n_examples_test",
         type=int,
-        default=20,
+        default=40,
         help="Number of testing examples.",
     )
     sampler_group.add_argument(
@@ -193,6 +193,14 @@ def get_topk_range_indices(csv_path, top_k=5):
     
     return top_k_indices
 
+def get_monotonic_increasing_indices(csv_path, top_k=5):
+    df = pd.read_csv(csv_path, index_col=0)
+    mask = df.apply(lambda row: row.is_monotonic_increasing, axis=1)
+    mono_df = df[mask]
+    mono_df['range'] = mono_df.max(axis=1) - mono_df.min(axis=1)
+    monotonic_increasing_indices = mono_df['range'].nlargest(top_k).index.tolist()
+    return monotonic_increasing_indices
+
 
 # --- 主逻辑函数 ---
 async def main():
@@ -204,7 +212,8 @@ async def main():
     hookpoints = [args.hookpoint.format(layer_idx=args.num_layers, layer=args.num_layers)]
 
     #latent_dict = {hp: torch.arange(0, args.num_latents) for hp in hookpoints}
-    selected_latents = torch.tensor(get_topk_range_indices(args.feature_csv_file, top_k=args.top_k), dtype=torch.long)
+    #selected_latents = torch.tensor(get_topk_range_indices(args.feature_csv_file, top_k=args.top_k), dtype=torch.long)
+    selected_latents = torch.tensor(get_monotonic_increasing_indices(args.feature_csv_file, top_k=args.top_k), dtype=torch.long)
 
     latent_dict = {hp: selected_latents for hp in hookpoints}
 

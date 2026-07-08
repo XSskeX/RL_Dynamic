@@ -29,10 +29,10 @@ When working with Megatron:
 import getpass
 import logging
 import os
-from dataclasses import asdict
+from dataclasses import asdict, dataclass
 from types import MethodType
 from typing import Any, Generator
-
+import torch.nn as nn
 import cloudpickle as pickle
 import ray
 import torch

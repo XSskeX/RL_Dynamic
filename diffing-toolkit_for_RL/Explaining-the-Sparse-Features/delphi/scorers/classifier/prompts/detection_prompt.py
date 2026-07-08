@@ -76,5 +76,5 @@ def prompt(examples: str, explanation: str) -> list[dict]:
         *default,
         {"role": "user", "content": generation_prompt},
     ]
-    print(prompt, flush=True)
+    #print(prompt, flush=True)
     return prompt
