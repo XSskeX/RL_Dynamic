@@ -62,7 +62,7 @@ def parse_MMLU_Pro():
             answer = str(answer_raw).strip()
             data = {
                 "data_source": data_source,
-                "prompt": question,
+                "prompt": question + cot_content,
                 "ability": "math",
                 "reward_model": {"style": "rule", "ground_truth": answer},
                 "extra_info": {
@@ -96,7 +96,8 @@ def parse_AIME_2024():
         def process_fn(example):
             idx = example.pop("id")
             question_raw = example.pop("problem")
-            question = instruction_following + question_raw
+            solution = example.pop("solution")
+            question = instruction_following + question_raw + solution
             answer_raw = str(example.pop("answer")).strip()
             answer = str(answer_raw).strip()
             data = {

@@ -75,7 +75,7 @@ good = df[
     & (df["n_pos"] >= 3)
     & (df["n_neg"] >= 3)
     & (df["valid_rate"] >= 0.8)
-    & (df["balanced_accuracy"] >= 0.60)
+    & (df["balanced_accuracy"] >= 0.75)
     & (~df["all_pred_true"])
     & (~df["all_pred_false"])
 ].sort_values("balanced_accuracy", ascending=False)

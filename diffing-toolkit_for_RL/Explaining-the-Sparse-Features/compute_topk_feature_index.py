@@ -9,7 +9,7 @@ def get_topk_range_indices(csv_path, top_k=5):
 
 # ================= 使用示例 =================
 if __name__ == "__main__":
-    csv_file = "C:/Users/Administrator/Desktop/RL_Data/crosscoder_data/RL_Dynamics_data/activation_analysis/per_model_encoder_contrib_mean_scaled_with_decoder_norm_stats.csv"  
+    csv_file = "C:/Users/Administrator/Desktop/RL_Data/crosscoder_data/RL_Dynamics_data/crosscoder_output_for_8/llama32_3B_Instruct_latent_norm.csv"  
     k = 10                  
     
     result_indices = get_topk_range_indices(csv_file, top_k=k)
