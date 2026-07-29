@@ -1,7 +1,7 @@
 import argparse
 import os
 import re
-
+import ast
 import datasets
 
 from verl.utils.hdfs_io import copy, makedirs
@@ -23,8 +23,11 @@ if __name__ == '__main__':
     def make_map_fn(split):
         def process_fn(example):
             question_raw = example.pop("messages")[0]["content"]
-            instruction_id_list = example.pop("ground_truth")[0]["instruction_id"]
-            kwargs = example.pop("ground_truth")[0]["kwargs"]
+            if isinstance(ground_truth, str):
+                ground_truth = ast.literal_eval(ground_truth)
+
+            instruction_id_list = ground_truth[0]["instruction_id"]
+            kwargs_list = ground_truth[0]["kwargs"]
             question = question_raw
             #answer_raw = str(example.pop("answer")).strip()
             answer = "just for placeholder"
