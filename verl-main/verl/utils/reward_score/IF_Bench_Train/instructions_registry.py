@@ -14,7 +14,7 @@
 
 """Registry of all instructions."""
 
-from . import IF_Bench_instructions
+from . import instructions
 
 _PARAGRAPH = "paragraphs:"
 

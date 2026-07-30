@@ -29,15 +29,15 @@ def file_exists(path: str | Path) -> bool:
 
 def if_bench_evaluation(response, key, kwargs, instruction_id_list, prompt, method):
     #print("-" * 60 + "successfully enter evaluation" + "-" * 60)
-    promptExample = IF_Bench_evaluation_lib.read_prompt_list(key, kwargs, instruction_id_list, prompt)
+    promptExample = IF_Bench_train_lib.read_prompt_list(key, kwargs, instruction_id_list, prompt)
     #print("-" * 60 + "successfully get promptExample" + "-" * 60)
     if method == "strict":
-        output = IF_Bench_evaluation_lib.test_instruction_following_strict(promptExample, response) 
-        #print("-" * 60 + "successfully complete IF_Bench_evaluation_lib.test_instruction_following_strict" + "-" * 60)
+        output = IF_Bench_train_lib.test_instruction_following_strict(promptExample, response) 
+        #print("-" * 60 + "successfully complete IF_Bench_train_lib.test_instruction_following_strict" + "-" * 60)
         follow_all_instructions = output.follow_all_instructions
         return int(follow_all_instructions)
     else:
-        output = IF_Bench_evaluation_lib.test_instruction_following_loose(promptExample, response) 
+        output = IF_Bench_train_lib.test_instruction_following_loose(promptExample, response) 
         follow_all_instructions = output.follow_all_instructions
         return int(follow_all_instructions)
 

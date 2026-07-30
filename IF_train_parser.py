@@ -6,6 +6,36 @@ import datasets
 
 from verl.utils.hdfs_io import copy, makedirs
 
+def keep_valid_example(example):
+    ground_truth = example["ground_truth"]
+
+    if isinstance(ground_truth, str):
+        try:
+            ground_truth = ast.literal_eval(ground_truth)
+        except (ValueError, SyntaxError):
+            return False
+
+    try:
+        kwargs = ground_truth[0]["kwargs"]
+        instruction_id_list = ground_truth[0]["instruction_id"]
+    except (TypeError, KeyError, IndexError):
+        return False
+
+    # kwargs 不是列表，丢弃
+    if not isinstance(kwargs, list):
+        return False
+
+    # 只要任意一个 instruction 的 kwargs 为 None，
+    # 就丢弃整个样本
+    if any(item is None for item in kwargs):
+        return False
+    if any(item is None for item in instruction_id_list):
+        return False
+    
+    if len(kwargs) != len(instruction_id_list):
+        return False   
+
+    return True
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -14,6 +44,10 @@ if __name__ == '__main__':
     args = parser.parse_args()
     dataset = datasets.load_dataset(args.local_dataset_path, "default")
     raw_dataset = dataset['train']
+    raw_dataset = raw_dataset.filter(
+        keep_valid_example,
+        desc="Removing samples with None kwargs",
+    )
     #split = raw_dataset.train_test_split(test_size=0.2, seed=42)
     #train_dataset, test_dataset = split['train'], split['test']
     data_source = "allenai/IFBench_train"
