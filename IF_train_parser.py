@@ -16,13 +16,13 @@ if __name__ == '__main__':
     raw_dataset = dataset['train']
     #split = raw_dataset.train_test_split(test_size=0.2, seed=42)
     #train_dataset, test_dataset = split['train'], split['test']
-    idx = 0
-    data_source = "allenai/IFBench_test"
+    data_source = "allenai/IFBench_train"
     #instruction_following = 'Let\'s think step by step and output the final answer after "####".'
 
     def make_map_fn(split):
-        def process_fn(example):
+        def process_fn(example, idx):
             question_raw = example.pop("messages")[0]["content"]
+            ground_truth = example.pop("ground_truth")
             if isinstance(ground_truth, str):
                 ground_truth = ast.literal_eval(ground_truth)
 
@@ -44,12 +44,11 @@ if __name__ == '__main__':
                     "question": question_raw,
                 },
             }
-            idx += 1
             return data
         return process_fn
     #train_dataset = train_dataset.map(function=make_map_fn("train"))
     #test_dataset = test_dataset.map(function=make_map_fn("test"))
-    test_dataset = raw_dataset.map(function=make_map_fn("train"))
+    test_dataset = raw_dataset.map(function=make_map_fn("train"), with_indices=True)
 
     local_save_dir = args.local_dir
     os.makedirs(local_save_dir, exist_ok=True)

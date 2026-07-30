@@ -67,6 +67,9 @@ def default_compute_score(
         #print(f"-------------------------successfully import IFBench_test----------------------")
         res = IFBench_test.compute_score(solution_str, ground_truth, extra_info)
         #print(f"-------------------------successfully compute score for IFBench:{res}----------------------")
+    elif data_source == "allenai/IFBench_train":
+        from . import IFBench_train
+        res = IFBench_train.compute_score(solution_str, ground_truth, extra_info)
     elif data_source in ["lighteval/MATH", "DigitalLearningGmbH/MATH-lighteval", "HuggingFaceH4/MATH-500"]:
         from . import math_reward
 
