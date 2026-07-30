@@ -24,7 +24,7 @@ from collections.abc import Sequence
 import langdetect
 from absl import logging
 
-from open_instruct.IFEvalG import instructions_util
+from . import instructions_util
 
 _InstructionArgsDtype = dict[str, int | str | Sequence[str]] | None
 

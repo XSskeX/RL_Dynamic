@@ -27,7 +27,7 @@ if __name__ == '__main__':
                 ground_truth = ast.literal_eval(ground_truth)
 
             instruction_id_list = ground_truth[0]["instruction_id"]
-            kwargs_list = ground_truth[0]["kwargs"]
+            kwargs = ground_truth[0]["kwargs"]
             question = question_raw
             #answer_raw = str(example.pop("answer")).strip()
             answer = "just for placeholder"

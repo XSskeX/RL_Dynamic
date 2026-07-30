@@ -20,7 +20,7 @@ import dataclasses
 import json
 from typing import Dict, Optional, Union
 
-from . import IF_Bench_instructions_registry
+from . import instructions_registry
 
 
 @dataclasses.dataclass
@@ -77,7 +77,7 @@ def test_instruction_following_strict(
   is_following_list = []
 
   for index, instruction_id in enumerate(instruction_list):
-    instruction_cls = IF_Bench_instructions_registry.INSTRUCTION_DICT[instruction_id]
+    instruction_cls = instructions_registry.INSTRUCTION_DICT[instruction_id]
     #print("------------successfully complete intructions_registry--------------")
     instruction = instruction_cls(instruction_id)
     inp.kwargs[index] = {key: value for key, value in inp.kwargs[index].items() if value is not None}
@@ -136,7 +136,7 @@ def test_instruction_following_loose(
   is_following_list = []
 
   for index, instruction_id in enumerate(instruction_list):
-    instruction_cls = IF_Bench_instructions_registry.INSTRUCTION_DICT[instruction_id]
+    instruction_cls = instructions_registry.INSTRUCTION_DICT[instruction_id]
     instruction = instruction_cls(instruction_id)
     inp.kwargs[index] = {key: value for key, value in inp.kwargs[index].items() if value is not None}
     instruction.build_description(**inp.kwargs[index])
