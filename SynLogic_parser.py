@@ -24,14 +24,14 @@ if __name__ == '__main__':
     def make_map_fn(split):
         def process_fn(example, idx):
             question_raw = example.pop("prompt")[0]["content"]
-            if question_raw is None:
+            if question_raw is None or question_raw == "":
                 raise ValueError(
                     "Invalid sample survived filtering: "
                     f"original_index={example.get('original_index')}"
                 )
             question = question_raw
             game_data = example.pop("extra_info")["game_data_str"]
-            if game_data is None:
+            if game_data is None or game_data == "":
                 raise ValueError(
                     "Invalid sample survived filtering: "
                     f"original_index={example.get('original_index')}"
