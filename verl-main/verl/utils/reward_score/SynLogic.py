@@ -18,7 +18,7 @@ _SOLUTION_CLIP_CHARS = 300
 from pathlib import Path
 import time
 import random
-
+import json
 
 from pydantic import BaseModel
 import time
@@ -133,7 +133,10 @@ def compute_score(solution_str, ground_truth, extra_info, format_score=0.0, scor
         format_score: the score for the format
         score: the score for the correct answer
     """
-    data_source = extra_info["kwargs"][0]["data_source"]
-    game_data = extra_info["kwargs"][0]["game_data_str"]
+    metadata = json.loads(extra_info["metadata_json"])
+
+    data_source = metadata["data_source"]
+    game_data = metadata["game_data_str"]
+
     result = extract_reward(solution_str=solution_str, game_data=game_data, data_source=data_source)
     return result['rewards']['final_reward']
