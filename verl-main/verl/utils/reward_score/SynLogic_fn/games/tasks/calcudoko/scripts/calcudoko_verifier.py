@@ -131,9 +131,7 @@ class CalcudokoVerifier(Verifier):
             
             return np.array(grid)
             
-        except Exception as e:
-            import traceback
-            traceback.print_exc()
+        except Exception:
             
             # 尝试直接搜索[[...]]格式
             try:
@@ -271,9 +269,7 @@ class CalcudokoVerifier(Verifier):
                     return False
             return True
             
-        except Exception as e:
-            import traceback
-            traceback.print_exc()
+        except Exception:
             return False
 
 def main():

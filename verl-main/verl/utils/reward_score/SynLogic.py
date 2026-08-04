@@ -133,10 +133,13 @@ def compute_score(solution_str, ground_truth, extra_info, format_score=0.0, scor
         format_score: the score for the format
         score: the score for the correct answer
     """
-    metadata = json.loads(extra_info["metadata_json"])
+    try:
+        metadata = json.loads(extra_info["metadata_json"])
 
-    data_source = metadata["data_source"]
-    game_data = metadata["game_data_str"]
+        data_source = metadata["data_source"]
+        game_data = metadata["game_data_str"]
 
-    result = extract_reward(solution_str=solution_str, game_data=game_data, data_source=data_source)
-    return result['rewards']['final_reward']
+        result = extract_reward(solution_str=solution_str, game_data=game_data, data_source=data_source)
+        return result["rewards"]["final_reward"]
+    except Exception:
+        return 0.0
