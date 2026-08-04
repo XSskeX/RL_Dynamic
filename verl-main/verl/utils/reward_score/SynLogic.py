@@ -134,6 +134,6 @@ def compute_score(solution_str, ground_truth, extra_info, format_score=0.0, scor
         score: the score for the correct answer
     """
     data_source = extra_info['question_class']
-    game_data = extra_info['judge_information']["game_data_str"]
+    game_data = extra_info["game_data_str"]
     result = extract_reward(solution_str=solution_str, game_data=game_data, data_source=data_source)
     return result['rewards']['final_reward']
