@@ -43,10 +43,8 @@ if __name__ == '__main__':
                 "extra_info": {
                     "split": split,
                     "index": idx,
-                    "game_data_str": game_data,
-                    "question_class": data_class,
                     "instruction_id_list": [],
-                    "kwargs": [],
+                    "kwargs": [{"data_source": data_class, "game_data_str": game_data}], 
                     "question": "just for placeholder",
                 },
             }

@@ -43,3 +43,25 @@ print("合并后 validation 数量:", len(merged_val))
 print("合并后列:", merged_val.column_names)
 print("合并后 features:")
 print(merged_val.features)
+for column_name in [
+    "extra_info.split",
+    "extra_info.index",
+    "extra_info.game_data_str",
+    "extra_info.question_class",
+]:
+    try:
+        flat.filter(
+            lambda value: True,
+            input_columns=[column_name],
+            num_proc=1,
+            load_from_cache_file=False,
+            desc=f"Testing {column_name}",
+        )
+
+        print(f"[OK] {column_name}")
+
+    except Exception as exc:
+        print(
+            f"[FAILED] {column_name}: "
+            f"{type(exc).__name__}: {exc}"
+        )
