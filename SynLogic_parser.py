@@ -44,8 +44,15 @@ if __name__ == '__main__':
                     "split": split,
                     "index": idx,
                     "instruction_id_list": [],
-                    "kwargs": [{"data_source": data_class, "game_data_str": game_data}], 
+                    "kwargs": [], 
                     "question": "just for placeholder",
+                    "metadata_json": json.dumps(
+                        {
+                            "data_source": data_class,
+                            "game_data_str": game_data,
+                        },
+                        ensure_ascii=False,
+                    ),
                 },
             }
 

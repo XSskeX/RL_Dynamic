@@ -38,6 +38,7 @@ if __name__ == '__main__':
                     "instruction_id_list": [],
                     "kwargs": [], 
                     "question": question_raw,
+                    "metadata_json": "{}",
                 },
             }
             return data

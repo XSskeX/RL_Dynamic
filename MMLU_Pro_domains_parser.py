@@ -77,6 +77,7 @@ if __name__ == '__main__':
                     "instruction_id_list": [],
                     "kwargs": [domain], 
                     "question": question_raw,
+                    "metadata_json": "{}",
                 },
             }
             #print(data["prompt"][0]["content"])
