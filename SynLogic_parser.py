@@ -14,7 +14,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     dataset = datasets.load_dataset(args.local_dataset_path, "easy")
     raw_dataset = dataset['train']
-    test_raw_dataset = dataset['test']
+    test_raw_dataset = dataset['validation']
     #split = raw_dataset.train_test_split(test_size=0.2, seed=42)
     #train_dataset, test_dataset = split['train'], split['test']
     
@@ -38,8 +38,10 @@ if __name__ == '__main__':
                     "split": split,
                     "index": idx,
                     "instruction_id_list": [],
-                    "kwargs": [{"extra_info": extra_info}, {"data_source": data_class}], 
+                    "kwargs": [], 
                     "question": question_raw,
+                    "judge_information": extra_info,
+                    "question_class": data_class,
                 },
             }
             return data

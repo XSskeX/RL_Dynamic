@@ -14,7 +14,7 @@ export CPU_AFFINITY_CONF=1
 
 trainer_n_gpus_per_node=4
 trainer_nnodes=1
-trainer_project_name='RL_Dynamics_lambda_rollout-8_IF_Bench'
+trainer_project_name='RL_Dynamics_lambda_rollout-8_SynLogic'
 trainer_experiment_name="Llama3.2-3B-Instruct_SynLogic_grpo_4gpu"
 export WANDB_API_KEY="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"
 export WANDB_ENTITY="qinshuhanbuaa-beihang-university"
@@ -70,7 +70,7 @@ python3 -m verl.trainer.main_ppo \
     trainer.project_name=${trainer_project_name} \
     trainer.experiment_name=${trainer_experiment_name} \
     trainer.logger=['console','wandb'] \
-    trainer.default_local_dir="/share/nlp/baijun/shuhan/IF_Bench_ckpt" \
+    trainer.default_local_dir="/share/nlp/baijun/shuhan/SynLogic_ckpt" \
     trainer.n_gpus_per_node=$trainer_n_gpus_per_node \
     trainer.nnodes=$trainer_nnodes \
     trainer.save_freq=30 \
