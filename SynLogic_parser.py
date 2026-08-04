@@ -6,33 +6,6 @@ import datasets
 
 from verl.utils.hdfs_io import copy, makedirs
 
-def parse_ground_truth(raw_ground_truth: Any) -> list[dict[str, Any]] | None:
-    """Parse ground_truth into a non-empty list of dictionaries."""
-
-    ground_truth = raw_ground_truth
-
-    if isinstance(ground_truth, str):
-        ground_truth = ground_truth.strip()
-
-        if not ground_truth:
-            return None
-
-        # 优先按照 JSON 解析；失败后兼容 Python 字面量格式。
-        try:
-            ground_truth = json.loads(ground_truth)
-        except json.JSONDecodeError:
-            try:
-                ground_truth = ast.literal_eval(ground_truth)
-            except (ValueError, SyntaxError):
-                return None
-
-    if not isinstance(ground_truth, list) or not ground_truth:
-        return None
-
-    if not all(isinstance(item, dict) for item in ground_truth):
-        return None
-
-    return ground_truth
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -50,14 +23,9 @@ if __name__ == '__main__':
 
     def make_map_fn(split):
         def process_fn(example, idx):
-            question_raw = parse_ground_truth(example.pop("prompt")[0])["content"]
-            if question_raw is None:
-                raise ValueError(
-                    "Invalid sample survived filtering: "
-                    f"original_index={example.get('original_index')}"
-                )
+            question_raw = example.pop("prompt")
             question = question_raw
-            game_data = parse_ground_truth(example.pop("extra_info"))["game_data_str"]
+            game_data = example.pop("extra_info")["game_data_str"]
             if game_data is None:
                 raise ValueError(
                     "Invalid sample survived filtering: "
@@ -68,7 +36,7 @@ if __name__ == '__main__':
             answer = "just for placeholder"
             data = {
                 "data_source": data_source,
-                "prompt": [{"role": "user", "content": question}],
+                "prompt": question,
                 "ability": "logical_reasoning",
                 "reward_model": {"style": "rule", "ground_truth": answer},
                 "extra_info": {
