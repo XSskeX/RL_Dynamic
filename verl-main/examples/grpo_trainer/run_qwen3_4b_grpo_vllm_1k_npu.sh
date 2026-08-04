@@ -15,7 +15,7 @@ export CPU_AFFINITY_CONF=1
 trainer_n_gpus_per_node=4
 trainer_nnodes=1
 trainer_project_name='RL_Dynamics_lambda_rollout-8_IF_Bench'
-trainer_experiment_name="Llama3.2-3B-Instruct_IF_Bench_grpo_4gpu"
+trainer_experiment_name="Llama3.2-3B-Instruct_SynLogic_grpo_4gpu"
 export WANDB_API_KEY="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"
 export WANDB_ENTITY="qinshuhanbuaa-beihang-university"
 export WANDB_PROJECT="RL_Dynamic_lambda"
@@ -32,8 +32,8 @@ use_dynamic_bsz=True
 
 python3 -m verl.trainer.main_ppo \
     algorithm.adv_estimator=grpo \
-    data.train_files="/share/nlp/baijun/shuhan/IF_Bench_train/train.parquet" \
-    data.val_files="['/share/nlp/baijun/shuhan/MMLU_Pro/test.parquet','/share/nlp/baijun/shuhan/AIME2024/test.parquet','/share/nlp/baijun/shuhan/AIME2025/test.parquet','/share/nlp/baijun/shuhan/AIME2026/test.parquet','/share/nlp/baijun/shuhan/IF_Bench/test.parquet']" \
+    data.train_files="/share/nlp/baijun/shuhan/SynLogic/train.parquet" \
+    data.val_files="['/share/nlp/baijun/shuhan/SynLogic/test.parquet','/share/nlp/baijun/shuhan/MMLU_Pro/test.parquet','/share/nlp/baijun/shuhan/AIME2024/test.parquet','/share/nlp/baijun/shuhan/AIME2025/test.parquet','/share/nlp/baijun/shuhan/AIME2026/test.parquet','/share/nlp/baijun/shuhan/IF_Bench/test.parquet']" \
     data.train_batch_size=512 \
     data.max_prompt_length=1024 \
     data.max_response_length=8192 \
