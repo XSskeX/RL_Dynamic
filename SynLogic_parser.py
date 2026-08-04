@@ -23,43 +23,34 @@ if __name__ == '__main__':
 
     def make_map_fn(split):
         def process_fn(example, idx):
-            question_raw = example.pop("prompt")[0]["content"]
-            if question_raw is None or question_raw == "":
-                raise ValueError(
-                    "Invalid sample survived filtering: "
-                    f"original_index={example.get('original_index')}"
-                )
-            question = question_raw
-            game_data = example.pop("extra_info")["game_data_str"]
-            if game_data is None or game_data == "":
-                raise ValueError(
-                    "Invalid sample survived filtering: "
-                    f"original_index={example.get('original_index')}"
-                )
-            data_class = example.pop("data_source")
-            #answer_raw = str(example.pop("answer")).strip()
-            answer = "just for placeholder"
-            data = {
-                "data_source": data_source,
+            question_raw = example["prompt"][0]["content"]
+            game_data = example["extra_info"]["game_data_str"]
+            data_class = example["data_source"]
+
+            return {
+                "data_source": "MiniMaxAI/SynLogic",
                 "prompt": [
                     {
                         "role": "user",
-                        "content": question,
+                        "content": question_raw,
                     }
                 ],
                 "ability": "logical_reasoning",
-                "reward_model": {"style": "rule", "ground_truth": answer},
+                "reward_model": {
+                    "style": "rule",
+                    "ground_truth": "just for placeholder",
+                },
                 "extra_info": {
                     "split": split,
                     "index": idx,
-                    "instruction_id_list": [],
-                    "kwargs": [], 
-                    "question": "",
                     "game_data_str": game_data,
                     "question_class": data_class,
+                    "instruction_id_list": [],
+                    "kwargs": [],
+                    "question": "just for placeholder",
                 },
             }
-            return data
+
         return process_fn
     #train_dataset = train_dataset.map(function=make_map_fn("train"))
     #test_dataset = test_dataset.map(function=make_map_fn("test"))
