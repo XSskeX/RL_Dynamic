@@ -3,7 +3,7 @@ import os
 import re
 import ast
 import datasets
-
+import json
 from verl.utils.hdfs_io import copy, makedirs
 
 
@@ -26,7 +26,8 @@ if __name__ == '__main__':
             question_raw = example["prompt"][0]["content"]
             game_data = example["extra_info"]["game_data_str"]
             data_class = example["data_source"]
-
+            if split == "test":
+                data_class = data_class.removeprefix("val/")  
             return {
                 "data_source": "MiniMaxAI/SynLogic",
                 "prompt": [
