@@ -23,7 +23,12 @@ if __name__ == '__main__':
 
     def make_map_fn(split):
         def process_fn(example, idx):
-            question_raw = example.pop("prompt")
+            question_raw = example.pop("prompt")[0]["content"]
+            if question_raw is None:
+                raise ValueError(
+                    "Invalid sample survived filtering: "
+                    f"original_index={example.get('original_index')}"
+                )
             question = question_raw
             game_data = example.pop("extra_info")["game_data_str"]
             if game_data is None:
@@ -36,7 +41,12 @@ if __name__ == '__main__':
             answer = "just for placeholder"
             data = {
                 "data_source": data_source,
-                "prompt": question,
+                "prompt": [
+                    {
+                        "role": "user",
+                        "content": question,
+                    }
+                ],
                 "ability": "logical_reasoning",
                 "reward_model": {"style": "rule", "ground_truth": answer},
                 "extra_info": {
