@@ -54,7 +54,7 @@ if __name__ == '__main__':
                     "index": idx,
                     "instruction_id_list": [],
                     "kwargs": [], 
-                    "question": question_raw,
+                    "question": "",
                     "game_data_str": game_data,
                     "question_class": data_class,
                 },

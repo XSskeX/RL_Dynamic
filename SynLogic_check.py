@@ -1,73 +1,45 @@
-from datasets import load_dataset
+import datasets
 from transformers import AutoTokenizer
 
 
-test_path = "/share/nlp/baijun/shuhan/SynLogic/test.parquet"
-model_path = "meta-llama/Llama-3.2-3B-Instruct"
+TRAIN_FILES = [
+    "/share/nlp/baijun/shuhan/SynLogic/train.parquet"
+]
 
-dataset = load_dataset(
-    "parquet",
-    data_files=test_path,
-    split="train",
-)
+VAL_FILES = [
+'/share/nlp/baijun/shuhan/SynLogic/test.parquet','/share/nlp/baijun/shuhan/MMLU_Pro/test.parquet','/share/nlp/baijun/shuhan/AIME2024/test.parquet','/share/nlp/baijun/shuhan/AIME2025/test.parquet','/share/nlp/baijun/shuhan/AIME2026/test.parquet','/share/nlp/baijun/shuhan/IF_Bench/test.parquet'
+]
+
+MODEL_PATH = "meta-llama/Llama-3.2-3B-Instruct"
+MAX_PROMPT_LENGTH = 1024
+
+
+def load_files(files):
+    result = []
+
+    for path in files:
+        ds = datasets.load_dataset(
+            "parquet",
+            data_files=path,
+            split="train",
+        )
+
+        print(f"{path}: {len(ds)} rows")
+        result.append(ds)
+
+    return result
+
 
 tokenizer = AutoTokenizer.from_pretrained(
-    model_path,
+    MODEL_PATH,
     trust_remote_code=True,
 )
 
-# 只读取 prompt，避免其他列干扰检查
-prompt_dataset = dataset.select_columns(["prompt"])
+val_datasets = load_files(VAL_FILES)
 
-lengths = []
-failed = []
+merged_val = datasets.concatenate_datasets(val_datasets)
 
-for idx in range(len(prompt_dataset)):
-    try:
-        prompt = prompt_dataset[idx]["prompt"]
-
-        token_ids = tokenizer.apply_chat_template(
-            prompt,
-            tokenize=True,
-            add_generation_prompt=True,
-        )
-
-        lengths.append((idx, len(token_ids)))
-
-    except Exception as exc:
-        failed.append(
-            {
-                "index": idx,
-                "error_type": type(exc).__name__,
-                "error": str(exc),
-            }
-        )
-
-num_valid = sum(length <= 1024 for _, length in lengths)
-num_overlong = sum(length > 1024 for _, length in lengths)
-
-print("总样本数:", len(prompt_dataset))
-print("成功计算长度:", len(lengths))
-print("读取或分词失败:", len(failed))
-print("<= 1024:", num_valid)
-print("> 1024:", num_overlong)
-
-if lengths:
-    sorted_lengths = sorted(length for _, length in lengths)
-
-    print("最短:", sorted_lengths[0])
-    print("最长:", sorted_lengths[-1])
-    print("平均:", sum(sorted_lengths) / len(sorted_lengths))
-
-    print("\n最长的 20 条:")
-    for idx, length in sorted(
-        lengths,
-        key=lambda item: item[1],
-        reverse=True,
-    )[:20]:
-        print(f"index={idx}, tokens={length}")
-
-if failed:
-    print("\n前 20 个读取失败样本:")
-    for item in failed[:20]:
-        print(item)
+print("合并后 validation 数量:", len(merged_val))
+print("合并后列:", merged_val.column_names)
+print("合并后 features:")
+print(merged_val.features)
