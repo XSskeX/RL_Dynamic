@@ -44,7 +44,6 @@ class ArrowMazeVerifier(Verifier):
         """
         test_answer_str = self.extract_answer(test_solution_str)
         if not test_answer_str:
-            print("答案为空，验证失败")
             return False
         
         try:
@@ -56,39 +55,30 @@ class ArrowMazeVerifier(Verifier):
             
             # 检查答案是否符合要求
             if not self._verify_grid_size(test_answer, question_grid):
-                print("答案网格大小与题目不匹配")
                 return False
                 
             if not self._verify_number_positions(test_answer, question_grid):
-                print("答案中数字位置或值与题目不匹配")
                 return False
                 
             if not self._verify_all_blanks_filled(test_answer, question_grid):
-                print("答案中有空格未被填满")
                 return False
                 
             if not self._verify_arrow_symbols(test_answer):
-                print("答案中包含非法箭头符号")
                 return False
                 
             if not self._verify_prefilled_arrows(test_answer, question_grid):
-                print("答案中预填箭头与题目不一致")
                 return False
                 
             if not self._verify_arrow_rays(test_answer):
-                print("答案中存在未被射线覆盖的箭头")
                 return False
                 
             if not self._verify_number_rays(test_answer):
-                print("答案中数字的射线箭头串总数不符合要求")
                 return False
             
             # 所有验证都通过
-            print("验证通过！")
             return True
             
         except Exception as e:
-            print(f"验证过程中出错: {e}")
             return False
     
     def _verify_grid_size(self, test_answer: List[List[str]], question_grid: List[List[str]]) -> bool:
@@ -284,7 +274,6 @@ class ArrowMazeVerifier(Verifier):
                         if isinstance(grid, list) and all(isinstance(row, list) for row in grid):
                             return json.dumps(grid)
                     except Exception as e:
-                        print(f"解析代码块失败: {e}")
                         continue
             
             # 如果没有找到有效的代码块，尝试直接寻找列表

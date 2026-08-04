@@ -40,15 +40,12 @@ class SurvoVerifier(Verifier):
                         test_matrix = json.loads(cleaned_answer)
                         test_matrix = np.array(test_matrix)
                     except:
-                        print(f"无法解析矩阵答案: {test_answer}")
                         return False
                 else:
-                    print(f"答案格式不正确: {test_answer}")
                     return False
             
             # 验证矩阵维度
             if test_matrix.shape != original_matrix.shape:
-                print(f"矩阵维度不匹配: 期望 {original_matrix.shape}, 实际 {test_matrix.shape}")
                 return False
             
             # 验证矩阵中的元素是否正确填充
@@ -56,7 +53,6 @@ class SurvoVerifier(Verifier):
             for i in range(n):
                 for j in range(n):
                     if original_matrix[i, j] != 0 and original_matrix[i, j] != test_matrix[i, j]:
-                        print(f"原始矩阵中的元素被篡改: 位置 ({i}, {j}), 原值 {original_matrix[i, j]}, 新值 {test_matrix[i, j]}")
                         return False
             
             # 2. 收集填充的数字并验证它们是否与候选数字一致
@@ -71,7 +67,6 @@ class SurvoVerifier(Verifier):
             sorted_candidates = sorted(candidate_numbers)
             
             if sorted_filled != sorted_candidates:
-                print(f"填充的数字与候选数字不匹配: 填充 {sorted_filled}, 候选 {sorted_candidates}")
                 return False
             
             # 3. 验证每行和每列的和是否正确
@@ -80,7 +75,6 @@ class SurvoVerifier(Verifier):
                 row_sum = sum(test_matrix[i, 0:n-1])
                 expected_sum = test_matrix[i, n-1]
                 if row_sum != expected_sum:
-                    print(f"第 {i+1} 行的和不正确: 实际和 {row_sum}, 期望和 {expected_sum}")
                     return False
             
             # 检查每列的和
@@ -88,15 +82,11 @@ class SurvoVerifier(Verifier):
                 col_sum = sum(test_matrix[0:n-1, j])
                 expected_sum = test_matrix[n-1, j]
                 if col_sum != expected_sum:
-                    print(f"第 {j+1} 列的和不正确: 实际和 {col_sum}, 期望和 {expected_sum}")
                     return False
-            
-            # 所有检查都通过
-            print("验证结果: 正确")
+
             return True
             
         except Exception as e:
-            print(f"验证时出错: {e}")
             return False 
         
     def extract_answer(self, test_solution: str):

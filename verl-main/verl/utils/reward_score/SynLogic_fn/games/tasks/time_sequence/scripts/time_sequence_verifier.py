@@ -26,25 +26,18 @@ class TimeSequenceVerifier(Verifier):
             try:
                 test_list = json.loads(test_answer.replace("，", ","))
             except:
-                print(f"无法解析答案: {test_answer}")
                 return False
             
             try:
                 if test_list[0]!=true_answers['answer_maxLen']:
-                    print(f"最长会议时间不正确。model:{test_answer} *** true:[{true_answers['answer_maxLen']}, {true_answers['answer_nums']}]")
                     return False
                 if test_list[1]!=true_answers['answer_nums']:
-                    print(f"可选会议数量不正确。model:{test_answer} *** true:[{true_answers['answer_maxLen']}, {true_answers['answer_nums']}]")
                     return False
             except:
-                print(f"答案判断出错了！")
                 return False
             
-            # 所有检查都通过
-            print("验证结果: 正确")
             return True
         except Exception as e:
-            print(f"验证时出错: {e}")
             return False 
         
     def extract_answer(self, test_solution: str):
@@ -61,8 +54,6 @@ class TimeSequenceVerifier(Verifier):
         matrix_pattern = r'\[.*?\]'
         matrix_matches = re.findall(matrix_pattern, test_solution, re.DOTALL)
         if matrix_matches:
-            # 使用最后一个匹配的列表
-            print(matrix_matches)
             return matrix_matches[-1].strip()
         
         # 如果失败，返回空字符串

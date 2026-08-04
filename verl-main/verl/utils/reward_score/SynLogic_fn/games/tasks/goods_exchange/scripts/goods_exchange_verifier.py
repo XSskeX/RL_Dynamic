@@ -19,8 +19,6 @@ class GoodsExchangeVerifier(Verifier):
             # 获取元数据中的正确答案
             correct_answer = data.metadata["owns_after"]
             
-            print(f"验证: 模型答案='{test_answer}', 正确答案='{correct_answer}'")
-            
             # 解析模型答案
             model_ownership = self._parse_answer(test_answer)
             # 解析正确答案
@@ -29,17 +27,10 @@ class GoodsExchangeVerifier(Verifier):
             # 比较两个答案是否完全一致
             is_correct = self._compare_answers(model_ownership, correct_ownership)
             
-            if is_correct:
-                print("验证结果: 正确")
-            else:
-                print("验证结果: 错误")
-                # 打印详细的不匹配信息
-                self._print_difference(model_ownership, correct_ownership)
                 
             return is_correct
             
         except Exception as e:
-            print(f"验证时出错: {e}")
             return False
     
     def _parse_answer(self, answer_str):
@@ -67,8 +58,6 @@ class GoodsExchangeVerifier(Verifier):
                         result[person.strip()] = item.strip()
                 return result
         except Exception as e:
-            # 如果 eval 失败，记录错误并尝试解析旧格式
-            print(f"Eval解析失败: {e}，尝试手动解析")
             
             # 移除最外层的括号（如果有）
             if answer_str.startswith('('):

@@ -58,7 +58,6 @@ class CalcudokoVerifier(Verifier):
             bracket_match = re.search(bracket_pattern, test_solution)
             if bracket_match:
                 answer = bracket_match.group(1)
-                print(f"从双括号中提取的答案: {answer}")
             
             # 清理字符串，只保留必要字符
             answer = ''.join(c for c in answer if c.isdigit() or c in '[],' or c.isspace())
@@ -79,7 +78,6 @@ class CalcudokoVerifier(Verifier):
                 numbers = [int(n) for n in row.split() if n.strip()]
                 if len(numbers) != grid_size:
                     # 尝试修复长度不正确的行
-                    print(f"警告: 行长度不正确 {len(numbers)} != {grid_size}, 尝试修复...")
                     # 如果长度小于grid_size，尝试查找更多数字
                     if len(numbers) < grid_size:
                         # 在原始答案中查找类似于 "第x行：1 2 3 4 5" 的行描述
@@ -98,16 +96,13 @@ class CalcudokoVerifier(Verifier):
                             if matches:
                                 found_rows.extend(matches)
                         
-                        print(f"找到的可能行: {found_rows}")
                         
                         if len(found_rows) == grid_size:
                             # 如果找到的行数正好等于grid_size，使用这些行
-                            print("使用找到的行描述作为网格数据")
                             grid = []
                             for found_row in found_rows:
                                 numbers = [int(n) for n in found_row.split() if n.strip()]
                                 if len(numbers) != grid_size:
-                                    print(f"警告: 找到的行长度仍不正确: {len(numbers)} != {grid_size}")
                                     # 如果长度不正确，填充或截断
                                     if len(numbers) < grid_size:
                                         numbers.extend([1] * (grid_size - len(numbers)))
@@ -126,7 +121,6 @@ class CalcudokoVerifier(Verifier):
             
             # 检查行数
             if len(grid) != grid_size:
-                print(f"警告: 列数不正确: {len(grid)} != {grid_size}, 尝试修复...")
                 # 如果行数小于grid_size，添加默认行
                 if len(grid) < grid_size:
                     for _ in range(grid_size - len(grid)):
@@ -138,7 +132,6 @@ class CalcudokoVerifier(Verifier):
             return np.array(grid)
             
         except Exception as e:
-            print(f"解析答案时出错: {str(e)}")
             import traceback
             traceback.print_exc()
             
@@ -166,13 +159,11 @@ class CalcudokoVerifier(Verifier):
                         else:
                             grid = grid[:grid_size]
                     
-                    print(f"已解析出最后的网格:\n{np.array(grid)}")
                     return np.array(grid)
             except:
                 pass
             
             # 最终失败，返回默认网格
-            print("无法解析答案，使用默认网格")
             return np.array([[i % grid_size + 1 for i in range(grid_size)] for _ in range(grid_size)])
     
     def verify(self, data: Data, test_answer: str) -> bool:
@@ -188,41 +179,29 @@ class CalcudokoVerifier(Verifier):
             grid_size = data.metadata.get("grid_size", 4)  # 默认为4
             regions = data.metadata.get("regions", [])
             
-            print(f"验证: 网格大小 = {grid_size}x{grid_size}, 区域数量 = {len(regions)}")
-            print(f"验证: 模型答案='{test_answer[:100]}...'")
             
             # 从答案中提取网格
             try:
                 grid = self.parse_grid_from_answer(test_answer, data)
-                print(f"提取的网格:\n{grid}")
             except Exception as e:
-                print(f"验证结果: 错误 - 无法提取网格: {str(e)}")
                 return False
             
-            # 验证数独规则
-            print("验证数独规则...")
             # 检查每一行
             for i, row in enumerate(grid):
                 if len(set(row)) != grid_size:
-                    print(f"验证结果: 错误 - 第{i+1}行包含重复数字: {row}")
                     return False
                 if not all(1 <= n <= grid_size for n in row):
-                    print(f"验证结果: 错误 - 第{i+1}行包含超出范围的数字: {row}")
                     return False
                     
             # 检查每一列
             for i, col in enumerate(grid.T):
                 if len(set(col)) != grid_size:
-                    print(f"验证结果: 错误 - 第{i+1}列包含重复数字: {col}")
                     return False
                 if not all(1 <= n <= grid_size for n in col):
-                    print(f"验证结果: 错误 - 第{i+1}列包含超出范围的数字: {col}")
                     return False
             
             # 验证区域规则
-            print("验证区域规则...")
             for i, region in enumerate(regions):
-                print(f"检查区域 {i+1}: {region}")
                 # 获取区域中的单元格
                 cells = region["cells"]
                 numbers = []
@@ -240,23 +219,18 @@ class CalcudokoVerifier(Verifier):
                         r, c = r-1, c-1
                         # 检查坐标是否有效
                         if r < 0 or r >= grid_size or c < 0 or c >= grid_size:
-                            print(f"无效坐标: {r+1},{c+1}")
                             return False
                         numbers.append(grid[r][c])
                     except Exception as e:
-                        print(f"提取数字时出错: {str(e)}")
                         return False
                 
-                print(f"区域 {i+1} 中的数字: {numbers}")
                 
                 # 检查数字是否有效（1到grid_size）
                 if not all(1 <= n <= grid_size for n in numbers):
-                    print(f"区域中有无效数字: {numbers}")
                     return False
                 
                 # 检查区域内数字是否唯一
                 if len(set(numbers)) != len(numbers):
-                    print(f"区域中有重复数字: {numbers}")
                     return False
                 
                 # 检查数字是否满足运算规则
@@ -267,47 +241,37 @@ class CalcudokoVerifier(Verifier):
                     if operator == '+':
                         result = sum(numbers)
                         valid = (result == target)
-                        print(f"加法验证: {numbers} = {result}, 目标 = {target}, 结果: {'通过' if valid else '失败'}")
                         if not valid:
                             return False
                     elif operator == '-':
                         if len(numbers) != 2:
-                            print(f"减法操作数数量无效: {len(numbers)}")
                             return False
                         result1 = numbers[0] - numbers[1]
                         result2 = numbers[1] - numbers[0]
                         valid = (result1 == target or result2 == target)
-                        print(f"减法验证: {numbers[0]}-{numbers[1]}={result1} 或 {numbers[1]}-{numbers[0]}={result2}, 目标 = {target}, 结果: {'通过' if valid else '失败'}")
+            
                         if not valid:
                             return False
                     elif operator == '*':
                         result = np.prod(numbers)
                         valid = (result == target)
-                        print(f"乘法验证: {numbers} = {result}, 目标 = {target}, 结果: {'通过' if valid else '失败'}")
                         if not valid:
                             return False
                     else:  # division
                         if len(numbers) != 2:
-                            print(f"除法操作数数量无效: {len(numbers)}")
                             return False
                         if numbers[0] == 0 or numbers[1] == 0:
-                            print(f"除数为零: {numbers}")
                             return False
                         result1 = numbers[0] / numbers[1]
                         result2 = numbers[1] / numbers[0]
                         valid = (abs(result1 - target) < 0.001 or abs(result2 - target) < 0.001)
-                        print(f"除法验证: {numbers[0]}÷{numbers[1]}={result1} 或 {numbers[1]}÷{numbers[0]}={result2}, 目标 = {target}, 结果: {'通过' if valid else '失败'}")
                         if not valid:
                             return False
                 except Exception as e:
-                    print(f"检查运算时出错: {str(e)}")
                     return False
-            
-            print("验证结果: 正确")
             return True
             
         except Exception as e:
-            print(f"验证时出错: {e}")
             import traceback
             traceback.print_exc()
             return False
@@ -375,13 +339,11 @@ def main():
                         regions = parse_regions_from_text(data['question'])
                     
                     if not regions:
-                        print(f"错误 - 无法找到regions信息")
                         continue
                     
                     # 获取答案
                     answer = data.get('answer', '')
                     if not answer:
-                        print(f"错误 - 无法找到答案")
                         continue
                     
                     # 构造Data对象
@@ -399,16 +361,11 @@ def main():
                         valid_samples.append(data)
                     else:
                         invalid_answers += 1
-                        print(f"验证失败 - 答案不符合规则")
-                        print(f"模型答案: {answer}")
-                        print(f"区域规则: {regions}\n")
                     
                 except Exception as e:
-                    print(f"处理答案时出错: {str(e)}")
                     invalid_answers += 1
                     
     except Exception as e:
-        print(f"读取文件时出错: {str(e)}")
         return
     
     # 保存有效样本
@@ -417,19 +374,11 @@ def main():
         if output_dir and not os.path.exists(output_dir):
             os.makedirs(output_dir)
             
-        print(f"\n保存有效样本到: {args.output_file}")
         with open(args.output_file, 'w', encoding='utf-8') as f:
             for sample in valid_samples:
                 json.dump(sample, f, ensure_ascii=False)
                 f.write('\n')
-        print(f"成功保存 {len(valid_samples)} 个有效样本")
     
-    # 输出统计信息
-    print("\n结果统计:")
-    print(f"总题目数: {total_puzzles}")
-    print(f"有效答案数: {valid_answers}")
-    print(f"无效答案数: {invalid_answers}")
-    print(f"通过率: {(valid_answers/total_puzzles*100):.2f}%")
 
 if __name__ == "__main__":
     main() 

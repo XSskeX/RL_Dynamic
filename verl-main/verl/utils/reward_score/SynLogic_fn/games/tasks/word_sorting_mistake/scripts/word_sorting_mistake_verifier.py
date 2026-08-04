@@ -22,7 +22,6 @@ class WordSortingMistakeVerifier(Verifier):
             else:
                 return parsed_answer.lower() == ground_truth.lower()
         except Exception as e:
-            print(f"解析答案错误:{e}")
             return False
     
     def extract_answer(self, answer_str):

@@ -73,7 +73,6 @@ class NorinoriVerifier(Verifier):
             
             return True
         except Exception as e:
-            print(f"验证过程中出错: {e}")
             return False
         
     def _parse_answer(self, test_solution: str):
@@ -103,7 +102,6 @@ class NorinoriVerifier(Verifier):
             
             return dominoes
         except Exception as e:
-            print(f"解析答案时出错: {e}")
             return None
     
     def _check_domino_shapes(self, dominoes):

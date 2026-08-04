@@ -29,7 +29,6 @@ class FutoshikiVerifier(Verifier):
         # 从test_solution中提取答案
         answer = self.extract_answer(test_solution)
         if answer is None:
-            print("无法提取答案")
             return False
             
         # 获取网格大小
@@ -37,12 +36,10 @@ class FutoshikiVerifier(Verifier):
         
         # 检查答案格式
         if not self.check_answer_format(answer, grid_size):
-            print(f"答案格式不正确: 期望 {grid_size}x{grid_size} 矩阵，实际为 {answer.shape}")
             return False
             
         # 检查每行和每列是否包含1到N的所有数字（数独规则）
         if not self.check_rows_and_columns(answer, grid_size):
-            print("答案不满足数独规则（每行每列包含1到N的所有数字）")
             return False
             
         # 检查预填充数字是否保留
@@ -80,13 +77,11 @@ class FutoshikiVerifier(Verifier):
                 prefilled_values.append(None)
         
         if not self.check_prefilled_numbers(answer, prefilled_coords, prefilled_values):
-            print("答案未保留预填充数字")
             return False
             
         # 检查不等式约束
         constraints = data.metadata["constraints"]
         if not self.check_inequality_constraints(answer, constraints):
-            print("答案不满足不等式约束")
             return False
             
         return True
@@ -138,11 +133,9 @@ class FutoshikiVerifier(Verifier):
                 
                 return np.array(grid)
             
-            print(f"无法找到有效的答案格式，原始回答: {test_solution[:100]}...")
             return None
             
         except Exception as e:
-            print(f"解析答案时出错: {e}，原始回答: {test_solution[:100]}...")
             return None
     
     def check_answer_format(self, answer: np.ndarray, grid_size: int) -> bool:
@@ -162,13 +155,11 @@ class FutoshikiVerifier(Verifier):
         # 检查每一行
         for i, row in enumerate(answer):
             if not self.check_sequence(row, grid_size):
-                print(f"第 {i+1} 行不满足数独规则: {row}")
                 return False
                 
         # 检查每一列
         for i, col in enumerate(answer.T):
             if not self.check_sequence(col, grid_size):
-                print(f"第 {i+1} 列不满足数独规则: {col}")
                 return False
                 
         return True
@@ -186,7 +177,6 @@ class FutoshikiVerifier(Verifier):
         """Check if the prefilled numbers are preserved in the answer."""
         for (row, col), value in zip(prefilled_coords, prefilled_values):
             if value is not None and answer[row, col] != value:
-                print(f"预填充位置 ({row+1},{col+1}) 的值被改变: 期望 {value}, 实际为 {answer[row, col]}")
                 return False
         return True
     
@@ -200,11 +190,9 @@ class FutoshikiVerifier(Verifier):
             
             if sign == '>':
                 if num1 <= num2:
-                    print(f"不等式约束不满足: ({row1+1},{col1+1}) > ({row2+1},{col2+1}), 实际值: {num1} <= {num2}")
                     return False
             elif sign == '<':
                 if num1 >= num2:
-                    print(f"不等式约束不满足: ({row1+1},{col1+1}) < ({row2+1},{col2+1}), 实际值: {num1} >= {num2}")
                     return False
                     
         return True 

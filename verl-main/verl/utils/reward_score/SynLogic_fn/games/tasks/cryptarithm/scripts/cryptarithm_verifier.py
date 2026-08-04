@@ -22,8 +22,6 @@ class CryptarithmVerifier(Verifier):
             # 获取元数据中的正确答案
             correct_answer = data.answer
             
-            print(f"验证: 模型答案='{test_answer}', 正确答案='{correct_answer}'")
-            
             # 清理答案字符串
             test_answer = test_answer.strip()
             
@@ -33,11 +31,6 @@ class CryptarithmVerifier(Verifier):
             
             # 检查答案是否完全匹配
             is_correct = (test_answer == correct_answer)
-            
-            if is_correct:
-                print("验证结果: 正确")
-            else:
-                print("验证结果: 错误")
                 
             return is_correct
             

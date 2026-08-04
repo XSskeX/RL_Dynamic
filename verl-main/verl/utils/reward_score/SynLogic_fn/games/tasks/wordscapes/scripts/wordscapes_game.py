@@ -63,7 +63,6 @@ class WordscapesGame(Game):
                     game_data.append(data)
                     break
                 except Exception as e:
-                    print(f"Error generating puzzle {i+1}: {e}")
                     continue
         
         return game_data
@@ -263,7 +262,6 @@ def main():
         game._generate_puzzle = custom_generate_puzzle
     
     # Generate puzzles
-    print(f"Generating {args.num_questions} Wordscapes puzzles...")
     game_data = game.generate(args.num_questions, args.max_attempts)
     
     # Build structured output path similar to Game of 24
@@ -302,7 +300,6 @@ def main():
             }
             f.write(json.dumps(json_data, ensure_ascii=False) + "\n")
     
-    print(f"Generated {len(game_data)} puzzles and saved to {output_file}")
 
 if __name__ == "__main__":
     main() 

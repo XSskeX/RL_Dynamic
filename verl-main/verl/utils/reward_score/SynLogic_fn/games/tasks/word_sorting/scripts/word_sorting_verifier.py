@@ -21,7 +21,6 @@ class WordSortingVerifier(Verifier):
             return parsed_answer == ground_truth
 
         except Exception as e:
-            print(f"解析答案错误:{e}")
             return False
     
     def extract_answer(self, answer_str):

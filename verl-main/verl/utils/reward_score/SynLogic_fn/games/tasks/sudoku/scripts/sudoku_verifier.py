@@ -19,7 +19,6 @@ class SudokuVerifier(Verifier):
             test_answer = self.extract_answer(test_solution)
             # 将字符串转换为Python元组（二维数组）
             if not test_answer or test_answer == "":
-                print("验证失败：答案为空")
                 return False
             
             # 尝试将答案字符串转换为二维数组
@@ -28,44 +27,35 @@ class SudokuVerifier(Verifier):
                 sudoku_solution = ast.literal_eval(test_answer)
                 
                 # 检查解答是否为9x9的二维数组
-                if (not isinstance(sudoku_solution, tuple) and not isinstance(sudoku_solution, list)) or len(sudoku_solution) != 9:
-                    print(f"验证失败：解答格式不正确，应为9x9数组，实际为: {type(sudoku_solution)}, 长度: {len(sudoku_solution)}")
+                if (not isinstance(sudoku_solution, tuple) and not isinstance(sudoku_solution, list)) or len(sudoku_solution) != 9:     
                     return False
                 
                 for row in sudoku_solution:
                     if (not isinstance(row, tuple) and not isinstance(row, list)) or len(row) != 9:
-                        print(f"验证失败：解答格式不正确，行应为长度9的数组，实际为: {type(row)}, 长度: {len(row)}")
                         return False
                     
                     for num in row:
                         if not isinstance(num, int) or num < 1 or num > 9:
-                            print(f"验证失败：解答包含非法数字 {num}，应为1-9的整数")
                             return False
             except (SyntaxError, ValueError) as e:
-                print(f"验证失败：无法解析答案 '{test_answer}', 错误: {e}")
                 return False
             
             # 从元数据中获取原始数独题目
             original_sudoku = data.metadata.get("original_sudoku", [])
             if not original_sudoku:
-                print("验证失败：元数据中缺少原始数独题目")
                 return False
             
             # 1. 验证解答是否符合数独规则
             if not self._is_valid_sudoku(sudoku_solution):
-                print("验证失败：解答不符合数独规则")
                 return False
             
             # 2. 验证解答是否与原始数独题目一致（已填数字部分）
             if not self._is_consistent_with_original(original_sudoku, sudoku_solution):
-                print("验证失败：解答与原始数独不一致")
                 return False
             
-            print("验证成功：解答正确")
             return True
             
         except Exception as e:
-            print(f"验证时出错: {e}")
             return False
     
     def _is_valid_sudoku(self, sudoku):
@@ -112,7 +102,6 @@ class SudokuVerifier(Verifier):
                 # 如果原始数独中的位置不是空的（不是0或'X'），则检查解答是否与之一致
                 if original_value not in [0, 'X', 'x']:
                     if solution_sudoku[i][j] != int(original_value):
-                        print(f"位置 ({i},{j}) 不一致: 原始值 {original_value}, 解答值 {solution_sudoku[i][j]}")
                         return False
         
         return True 

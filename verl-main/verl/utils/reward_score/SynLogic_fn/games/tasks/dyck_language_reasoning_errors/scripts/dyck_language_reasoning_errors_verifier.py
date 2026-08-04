@@ -22,11 +22,9 @@ class DyckLanguageReasoningErrorsVerifier(Verifier):
             # 格式化为正确的答案字符串格式
             expected_answer = self._format_answer(correct_indices)
             
-            print(f"验证: 模型答案='{test_answer}', 正确答案='{expected_answer}'")
             
             # 检查不明确的答案
             if "不确定" in test_answer or "不知道" in test_answer or "unclear" in test_answer.lower():
-                print("验证结果: 错误")
                 return False
             
             # 清理模型答案，允许一定的格式变化
@@ -43,15 +41,10 @@ class DyckLanguageReasoningErrorsVerifier(Verifier):
                 # 检查两个集合是否相同
                 is_correct = test_error_indices == expected_error_indices
             
-            if is_correct:
-                print("验证结果: 正确")
-            else:
-                print("验证结果: 错误")
                 
             return is_correct
             
         except Exception as e:
-            print(f"验证时出错: {e}")
             return False
     
     def _standardize_answer(self, answer: str) -> str:

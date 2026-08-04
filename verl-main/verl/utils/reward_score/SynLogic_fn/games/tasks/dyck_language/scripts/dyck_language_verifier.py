@@ -19,18 +19,12 @@ class DyckLanguageVerifier(Verifier):
             # 获取元数据中的完整序列
             full_sequence = data.metadata["full_sequence"]
             
-            print(f"验证: 模型答案='{test_answer}', 完整序列='{full_sequence}'")
-            
             # 从模型回答中提取答案
             extracted_answer = self.extract_answer(test_answer)
             
             # 检查答案是否完全匹配
             is_correct = (extracted_answer == full_sequence)
             
-            if is_correct:
-                print("验证结果: 正确")
-            else:
-                print("验证结果: 错误")
                 
             return is_correct
             

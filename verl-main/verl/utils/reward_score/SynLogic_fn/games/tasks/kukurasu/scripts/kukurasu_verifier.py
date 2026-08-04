@@ -15,7 +15,6 @@ class KukurasuVerifier(Verifier):
             # Extract metadata from the data
             row_sums = data.metadata["row_sums"]
             col_sums = data.metadata["col_sums"]
-            print(row_sums, col_sums)
             n = data.metadata["n"]
             m = data.metadata["m"]
             
@@ -62,8 +61,6 @@ class KukurasuVerifier(Verifier):
             return True
             
         except Exception as e:
-            # If any error occurs during verification, return False
-            print(f"Verification error: {e}")
             return False
         
         

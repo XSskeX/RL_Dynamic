@@ -25,8 +25,6 @@ class MinesweeperVerifier(Verifier):
             return False
             
         except Exception as e:
-            # 如果验证过程中发生任何错误，返回False
-            print(f"Verification error: {e}")
             return False
     
     def extract_answer(self, response: str) -> List[Tuple[int, int]]:

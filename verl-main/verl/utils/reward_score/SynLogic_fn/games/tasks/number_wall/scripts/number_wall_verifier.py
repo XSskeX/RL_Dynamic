@@ -14,7 +14,6 @@ class NumberWallVerifier(Verifier):
             # 提取答案网格
             solution_grid = self.extract_answer(test_solution)
             if not solution_grid:
-                print("Failed to extract solution grid")
                 return False
                 
             # 提取元数据
@@ -23,45 +22,36 @@ class NumberWallVerifier(Verifier):
             
             # 检查网格尺寸
             if len(solution_grid) != n:
-                print(f"Solution grid has incorrect number of rows: {len(solution_grid)} != {n}")
                 return False
                 
             for row in solution_grid:
                 if len(row) != n:
-                    print(f"Solution grid has incorrect number of columns: {len(row)} != {n}")
                     return False
                     
                 # 检查每个单元格只包含数字、"X"或"A"
                 for cell in row:
                     if not (isinstance(cell, int) or cell in ["X", "A"]):
-                        print(f"Invalid cell content: {cell}")
                         return False
             
             # 检查原始数字是否保留
             if not self._check_original_numbers(original_grid, solution_grid):
-                print("Original numbers not preserved")
                 return False
                 
             # 检查墙壁布局是否有效（没有2×2或更大的连续墙块）
             if not self._check_wall_layout(solution_grid):
-                print("Invalid wall layout (2x2 or larger continuous wall blocks found)")
                 return False
                 
             # 检查岛屿划分是否有效
             if not self._check_islands(solution_grid):
-                print("Invalid island division")
                 return False
                 
             # 检查是否有斜线边
             if not self._check_diagonal_borders(solution_grid):
-                print("Invalid solution: islands have diagonal borders")
                 return False
                 
             return True
             
         except Exception as e:
-            # 如果验证过程中发生任何错误，返回False
-            print(f"Verification error: {e}")
             return False
     
     def _check_original_numbers(self, original_grid, solution_grid):
@@ -70,7 +60,6 @@ class NumberWallVerifier(Verifier):
             for j in range(len(original_grid[i])):
                 if isinstance(original_grid[i][j], int):
                     if original_grid[i][j] != solution_grid[i][j]:
-                        print(f"Original number at ({i},{j}) changed: {original_grid[i][j]} -> {solution_grid[i][j]}")
                         return False
         return True
     
@@ -81,7 +70,6 @@ class NumberWallVerifier(Verifier):
             for j in range(n - 1):
                 if (grid[i][j] == "A" and grid[i][j+1] == "A" and
                     grid[i+1][j] == "A" and grid[i+1][j+1] == "A"):
-                    print(f"Found 2x2 wall block at ({i},{j})")
                     return False
         return True
     
@@ -105,8 +93,6 @@ class NumberWallVerifier(Verifier):
                         
                         if isinstance(grid[r][c], int):
                             if island_number is not None:
-                                # 岛屿有多个数字
-                                print(f"Island contains multiple numbers: {island_number} and {grid[r][c]}")
                                 return False
                             island_number = grid[r][c]
                         
@@ -119,13 +105,9 @@ class NumberWallVerifier(Verifier):
                                 visited.add((nr, nc))
                     
                     if island_number is None:
-                        # 岛屿没有数字
-                        print(f"Island at ({i},{j}) has no number")
                         return False
                     
                     if len(island_cells) != island_number:
-                        # 岛屿大小与数字不匹配
-                        print(f"Island size ({len(island_cells)}) doesn't match number ({island_number})")
                         return False
         
         return True
@@ -167,7 +149,6 @@ class NumberWallVerifier(Verifier):
                     grid[i][j+1] == "A" and grid[i+1][j] == "A"):
                     # 对角格子属于不同岛屿，存在斜线边
                     if island_map.get((i, j)) != island_map.get((i+1, j+1)):
-                        print(f"Found diagonal border at ({i},{j}) and ({i+1},{j+1})")
                         return False
                 
                 # 检查另一对对角格子
@@ -175,7 +156,6 @@ class NumberWallVerifier(Verifier):
                     grid[i][j] == "A" and grid[i+1][j+1] == "A"):
                     # 对角格子属于不同岛屿，存在斜线边
                     if island_map.get((i, j+1)) != island_map.get((i+1, j)):
-                        print(f"Found diagonal border at ({i},{j+1}) and ({i+1},{j})")
                         return False
         
         return True

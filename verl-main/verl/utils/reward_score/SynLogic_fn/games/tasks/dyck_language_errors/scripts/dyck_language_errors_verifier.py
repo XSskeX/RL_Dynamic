@@ -23,7 +23,6 @@ class DyckLanguageErrorsVerifier(Verifier):
             else:
                 correct_answer = str(data.metadata["first_error_pos"])
             
-            print(f"验证: 模型答案='{test_answer}', 正确答案='{correct_answer}'")
             
             # 清理和标准化答案
             test_answer = test_answer.strip()
@@ -43,10 +42,6 @@ class DyckLanguageErrorsVerifier(Verifier):
                     # 如果模型回答不是有效数字，验证失败
                     is_correct = False
             
-            if is_correct:
-                print("验证结果: 正确")
-            else:
-                print("验证结果: 错误")
                 
             return is_correct
             
