@@ -73,6 +73,9 @@ def default_compute_score(
     elif data_source == "MiniMaxAI/SynLogic":
         from . import SynLogic
         res = SynLogic.compute_score(solution_str, ground_truth, extra_info)
+    elif data_source == "K-and-K/knights-and-knaves":
+        from . import mem-kk-logic
+        res = mem-kk-logic.compute_score(solution_str, ground_truth)
     elif data_source in ["lighteval/MATH", "DigitalLearningGmbH/MATH-lighteval", "HuggingFaceH4/MATH-500"]:
         from . import math_reward
 
