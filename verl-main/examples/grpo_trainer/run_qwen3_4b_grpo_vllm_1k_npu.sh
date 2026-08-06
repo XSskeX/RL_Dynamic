@@ -14,8 +14,8 @@ export CPU_AFFINITY_CONF=1
 
 trainer_n_gpus_per_node=4
 trainer_nnodes=1
-trainer_project_name='RL_Dynamics_lambda_rollout-8_SynLogic'
-trainer_experiment_name="Llama3.2-3B-Instruct_SynLogic_grpo_4gpu"
+trainer_project_name='RL_Dynamics_lambda_rollout-8_GooseReason_stem'
+trainer_experiment_name="Llama3.2-3B-Instruct_GooseReason_stem_grpo_4gpu"
 export WANDB_API_KEY="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"
 export WANDB_ENTITY="qinshuhanbuaa-beihang-university"
 export WANDB_PROJECT="RL_Dynamic_lambda"
@@ -32,10 +32,10 @@ use_dynamic_bsz=True
 
 python3 -m verl.trainer.main_ppo \
     algorithm.adv_estimator=grpo \
-    data.train_files="/share/nlp/baijun/shuhan/SynLogic/train.parquet" \
-    data.val_files="['/share/nlp/baijun/shuhan/SynLogic/test.parquet','/share/nlp/baijun/shuhan/MMLU_Pro/test.parquet','/share/nlp/baijun/shuhan/AIME2024/test.parquet','/share/nlp/baijun/shuhan/AIME2025/test.parquet','/share/nlp/baijun/shuhan/AIME2026/test.parquet','/share/nlp/baijun/shuhan/IF_Bench/test.parquet']" \
+    data.train_files="/share/nlp/baijun/shuhan/GooseReason_stem/train.parquet" \
+    data.val_files="['/share/nlp/baijun/shuhan/GooseReason_stem/test.parquet','/share/nlp/baijun/shuhan/MMLU_Pro/test.parquet','/share/nlp/baijun/shuhan/AIME2024/test.parquet','/share/nlp/baijun/shuhan/AIME2025/test.parquet','/share/nlp/baijun/shuhan/AIME2026/test.parquet','/share/nlp/baijun/shuhan/IF_Bench/test.parquet']" \
     data.train_batch_size=512 \
-    data.max_prompt_length=1024 \
+    data.max_prompt_length=2048 \
     data.max_response_length=8192 \
     data.filter_overlong_prompts=True \
     data.truncation='error' \
@@ -43,7 +43,7 @@ python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.actor.optim.lr=5e-7 \
     actor_rollout_ref.model.use_remove_padding=True \
     actor_rollout_ref.actor.entropy_coeff=0.001 \
-    actor_rollout_ref.actor.ppo_mini_batch_size=1024 \
+    actor_rollout_ref.actor.ppo_mini_batch_size=256 \
     actor_rollout_ref.actor.use_kl_loss=True \
     actor_rollout_ref.actor.kl_loss_coef=0.001 \
     actor_rollout_ref.actor.kl_loss_type=low_var_kl \
@@ -70,7 +70,7 @@ python3 -m verl.trainer.main_ppo \
     trainer.project_name=${trainer_project_name} \
     trainer.experiment_name=${trainer_experiment_name} \
     trainer.logger=['console','wandb'] \
-    trainer.default_local_dir="/share/nlp/baijun/shuhan/SynLogic_ckpt" \
+    trainer.default_local_dir="/share/nlp/baijun/shuhan/GooseReason_stem_ckpt" \
     trainer.n_gpus_per_node=$trainer_n_gpus_per_node \
     trainer.nnodes=$trainer_nnodes \
     trainer.save_freq=30 \
