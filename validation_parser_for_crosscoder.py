@@ -125,10 +125,9 @@ def parse_AIME_2025():
 
     def make_map_fn(split):
         def process_fn(example):
-            idx = example.pop("id")
+            idx = example.pop("problem_idx")
             question_raw = example.pop("problem")
-            solution = example.pop("solution")
-            question = instruction_following + question_raw + solution
+            question = instruction_following + question_raw
             answer_raw = str(example.pop("answer")).strip()
             answer = str(answer_raw).strip()
             data = {
@@ -150,19 +149,18 @@ def parse_AIME_2025():
     test_dataset = raw_dataset.map(function=make_map_fn("validation"), remove_columns=raw_dataset.column_names)
     return test_dataset
 
-def parse_AIME_2024():
-    dataset = datasets.load_dataset("HuggingFaceH4/aime_2024", "default")
+def parse_AIME_2026():
+    dataset = datasets.load_dataset("MathArena/aime_2026", "default")
     raw_dataset = dataset['train']
     
-    data_source = "HuggingFaceH4/aime_2024"
+    data_source = "MathArena/aime_2026"
     instruction_following = "Solve the following math problem step by step. The last line of your response should be of the form Answer: $Answer (without quotes) where $Answer is the answer to the problem.\n\n"
 
     def make_map_fn(split):
         def process_fn(example):
-            idx = example.pop("id")
+            idx = example.pop("problem_idx")
             question_raw = example.pop("problem")
-            solution = example.pop("solution")
-            question = instruction_following + question_raw + solution
+            question = instruction_following + question_raw
             answer_raw = str(example.pop("answer")).strip()
             answer = str(answer_raw).strip()
             data = {
@@ -225,10 +223,12 @@ if __name__ == '__main__':
     parser.add_argument("--local_dir", default="/share/nlp/baijun/shuhan/DAPO17k_for_Diffing")
     args = parser.parse_args()
     mmlu_test_dataset = parse_MMLU_Pro()
-    aime_test_dataset = parse_AIME_2024()
+    aime2024_test_dataset = parse_AIME_2024()
+    aime2025_test_dataset = parse_AIME_2025()
+    aime2026_test_dataset = parse_AIME_2026()
     if_test_dataset = parse_IF_bench()
     local_save_dir = args.local_dir
     os.makedirs(local_save_dir, exist_ok=True)
-    dataset_list = [mmlu_test_dataset, aime_test_dataset, if_test_dataset]
+    dataset_list = [mmlu_test_dataset, aime2024_test_dataset, aime2025_test_dataset, aime2026_test_dataset, if_test_dataset]
     test_dataset = datasets.concatenate_datasets(dataset_list)
     test_dataset.to_parquet(os.path.join(local_save_dir, "validation.parquet"))
