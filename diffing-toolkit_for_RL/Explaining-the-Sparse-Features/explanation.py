@@ -18,6 +18,7 @@ from pathlib import Path
 from transformers import AutoTokenizer
 from functools import partial
 
+
 # --- 配置参数解析 ---
 def parse_args():
     parser = argparse.ArgumentParser(description="Run the explanation pipeline with customizable settings.")
@@ -32,9 +33,9 @@ def parse_args():
         help="Mode to run: 'explanation' to generate explanations, 'evaluation' to evaluate them.",
     )
     exp_group.add_argument(
-        "--feature_csv_file",
+        "--feature_file",
         type=str,
-        default="/share/nlp/baijun/shuhan/crosscoder_output/crosscoder_output_for_8/per_model_encoder_contrib_mean_scaled_with_decoder_norm_stats.csv",
+        default="/share/nlp/baijun/shuhan/RL_Dynamic/diffing-toolkit_for_RL/Explaining-the-Sparse-Features/matches.json",
     )
     exp_group.add_argument(
         "--top_k",
@@ -202,6 +203,22 @@ def get_monotonic_increasing_indices(csv_path, top_k=5):
     return monotonic_increasing_indices
 
 
+
+def get_feature_ids_from_json(matches_path="matches.json"):
+    with Path(matches_path).open("r", encoding="utf-8") as file:
+        matches = json.load(file)
+
+    feature_ids = []
+    for value in matches.values():
+        if not isinstance(value, list):
+            continue
+        for item in value:
+            if isinstance(item, dict) and "feature_id" in item:
+                feature_ids.append(item["feature_id"])
+
+    return feature_ids
+
+
 # --- 主逻辑函数 ---
 async def main():
     args = parse_args()
@@ -212,8 +229,8 @@ async def main():
     hookpoints = [args.hookpoint.format(layer_idx=args.num_layers, layer=args.num_layers)]
 
     #latent_dict = {hp: torch.arange(0, args.num_latents) for hp in hookpoints}
-    #selected_latents = torch.tensor(get_topk_range_indices(args.feature_csv_file, top_k=args.top_k), dtype=torch.long)
-    selected_latents = torch.tensor(get_monotonic_increasing_indices(args.feature_csv_file, top_k=args.top_k), dtype=torch.long)
+    #selected_latents = torch.tensor(get_topk_range_indices(args.feature_file, top_k=args.top_k), dtype=torch.long)
+    selected_latents = torch.tensor(get_feature_ids_from_json(args.feature_file, top_k=args.top_k), dtype=torch.long)
 
     latent_dict = {hp: selected_latents for hp in hookpoints}
 

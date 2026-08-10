@@ -79,9 +79,6 @@ def parse_MMLU_Pro():
     #test_dataset = test_dataset.map(function=make_map_fn("test"))
     test_dataset = raw_dataset.map(function=make_map_fn("validation"), remove_columns=raw_dataset.column_names)
 
-    local_save_dir = args.local_dir
-    os.makedirs(local_save_dir, exist_ok=True)
-    #train_dataset.to_parquet(os.path.join(local_save_dir, "train.parquet"))
     return test_dataset
 
 
@@ -117,9 +114,74 @@ def parse_AIME_2024():
         return process_fn
 
     test_dataset = raw_dataset.map(function=make_map_fn("validation"), remove_columns=raw_dataset.column_names)
+    return test_dataset
 
-    local_save_dir = args.local_dir
-    os.makedirs(local_save_dir, exist_ok=True)
+def parse_AIME_2025():
+    dataset = datasets.load_dataset("MathArena/aime_2025", "default")
+    raw_dataset = dataset['train']
+    
+    data_source = "MathArena/aime_2025"
+    instruction_following = "Solve the following math problem step by step. The last line of your response should be of the form Answer: $Answer (without quotes) where $Answer is the answer to the problem.\n\n"
+
+    def make_map_fn(split):
+        def process_fn(example):
+            idx = example.pop("id")
+            question_raw = example.pop("problem")
+            solution = example.pop("solution")
+            question = instruction_following + question_raw + solution
+            answer_raw = str(example.pop("answer")).strip()
+            answer = str(answer_raw).strip()
+            data = {
+                "data_source": data_source,
+                "prompt": question,
+                "ability": "math",
+                "reward_model": {"style": "rule", "ground_truth": answer},
+                "extra_info": {
+                    "split": split,
+                    "index": idx,
+                    "instruction_id_list": [],
+                    "kwargs": [], 
+                    "question": question_raw,
+                },
+            }
+            return data
+        return process_fn
+
+    test_dataset = raw_dataset.map(function=make_map_fn("validation"), remove_columns=raw_dataset.column_names)
+    return test_dataset
+
+def parse_AIME_2024():
+    dataset = datasets.load_dataset("HuggingFaceH4/aime_2024", "default")
+    raw_dataset = dataset['train']
+    
+    data_source = "HuggingFaceH4/aime_2024"
+    instruction_following = "Solve the following math problem step by step. The last line of your response should be of the form Answer: $Answer (without quotes) where $Answer is the answer to the problem.\n\n"
+
+    def make_map_fn(split):
+        def process_fn(example):
+            idx = example.pop("id")
+            question_raw = example.pop("problem")
+            solution = example.pop("solution")
+            question = instruction_following + question_raw + solution
+            answer_raw = str(example.pop("answer")).strip()
+            answer = str(answer_raw).strip()
+            data = {
+                "data_source": data_source,
+                "prompt": question,
+                "ability": "math",
+                "reward_model": {"style": "rule", "ground_truth": answer},
+                "extra_info": {
+                    "split": split,
+                    "index": idx,
+                    "instruction_id_list": [],
+                    "kwargs": [], 
+                    "question": question_raw,
+                },
+            }
+            return data
+        return process_fn
+
+    test_dataset = raw_dataset.map(function=make_map_fn("validation"), remove_columns=raw_dataset.column_names)
     return test_dataset
 
 
@@ -154,9 +216,6 @@ def parse_IF_bench():
         return process_fn
 
     test_dataset = raw_dataset.map(function=make_map_fn("validation"), remove_columns=raw_dataset.column_names)
-
-    local_save_dir = args.local_dir
-    os.makedirs(local_save_dir, exist_ok=True)
 
     return test_dataset
 

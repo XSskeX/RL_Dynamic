@@ -1,0 +1,1837 @@
+{
+  "metadata": {
+    "activation_vector": "/home/stu15/projects/steering-exp/jobs/20260805-002823-4d392a/output/detail-strength_layer13/vector.pt",
+    "activation_vector_metadata": {
+      "experiment": "detail-strength_layer13",
+      "aggregator": "mean",
+      "num_training_samples": 2,
+      "normalized": false,
+      "source_type": "contrastive",
+      "model": "meta-llama/Llama-3.2-3B-Instruct",
+      "hidden_size": 3072,
+      "layer_type": "decoder_block",
+      "layers": [
+        13
+      ],
+      "vector_norms": {
+        "13": 6.201481819152832
+      }
+    },
+    "decoder_path": "/home/stu15/projects/steering-assets/crosscoder/global_step_0_decoder.pt",
+    "layer": 13,
+    "layer_type": "decoder_block",
+    "weight_key": "decoder_weight",
+    "feature_axis": 0,
+    "warning": "Cosine similarity identifies candidate directions, not proven semantic equivalence. Confirm model, layer, activation location, and feature meaning before drawing conclusions."
+  },
+  "num_features": 49152,
+  "activation_dim": 3072,
+  "invalid_or_zero_directions": 0,
+  "top_positive": [
+    {
+      "feature_id": 13913,
+      "cosine_similarity": 0.09075365960597992,
+      "absolute_similarity": 0.09075365960597992,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 3888,
+      "cosine_similarity": 0.07304318249225616,
+      "absolute_similarity": 0.07304318249225616,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 19234,
+      "cosine_similarity": 0.07260323315858841,
+      "absolute_similarity": 0.07260323315858841,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 4441,
+      "cosine_similarity": 0.0715738981962204,
+      "absolute_similarity": 0.0715738981962204,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 38350,
+      "cosine_similarity": 0.06979896128177643,
+      "absolute_similarity": 0.06979896128177643,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 36962,
+      "cosine_similarity": 0.06645900011062622,
+      "absolute_similarity": 0.06645900011062622,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 24654,
+      "cosine_similarity": 0.0651492178440094,
+      "absolute_similarity": 0.0651492178440094,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 19087,
+      "cosine_similarity": 0.06331723928451538,
+      "absolute_similarity": 0.06331723928451538,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 33686,
+      "cosine_similarity": 0.06316544115543365,
+      "absolute_similarity": 0.06316544115543365,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 14608,
+      "cosine_similarity": 0.06261128187179565,
+      "absolute_similarity": 0.06261128187179565,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 36989,
+      "cosine_similarity": 0.06250012665987015,
+      "absolute_similarity": 0.06250012665987015,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 3682,
+      "cosine_similarity": 0.06229527294635773,
+      "absolute_similarity": 0.06229527294635773,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 8140,
+      "cosine_similarity": 0.062066175043582916,
+      "absolute_similarity": 0.062066175043582916,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 7691,
+      "cosine_similarity": 0.061920616775751114,
+      "absolute_similarity": 0.061920616775751114,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 19676,
+      "cosine_similarity": 0.061090756207704544,
+      "absolute_similarity": 0.061090756207704544,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 25262,
+      "cosine_similarity": 0.06104546785354614,
+      "absolute_similarity": 0.06104546785354614,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 40833,
+      "cosine_similarity": 0.06071645766496658,
+      "absolute_similarity": 0.06071645766496658,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 36056,
+      "cosine_similarity": 0.060653798282146454,
+      "absolute_similarity": 0.060653798282146454,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 27990,
+      "cosine_similarity": 0.06057829037308693,
+      "absolute_similarity": 0.06057829037308693,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 34909,
+      "cosine_similarity": 0.059778843075037,
+      "absolute_similarity": 0.059778843075037,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 14059,
+      "cosine_similarity": 0.059531137347221375,
+      "absolute_similarity": 0.059531137347221375,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 19537,
+      "cosine_similarity": 0.059337470680475235,
+      "absolute_similarity": 0.059337470680475235,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 41012,
+      "cosine_similarity": 0.05930691957473755,
+      "absolute_similarity": 0.05930691957473755,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 26707,
+      "cosine_similarity": 0.05906284227967262,
+      "absolute_similarity": 0.05906284227967262,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 14748,
+      "cosine_similarity": 0.05900419503450394,
+      "absolute_similarity": 0.05900419503450394,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 34613,
+      "cosine_similarity": 0.05851994454860687,
+      "absolute_similarity": 0.05851994454860687,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 17188,
+      "cosine_similarity": 0.05849173292517662,
+      "absolute_similarity": 0.05849173292517662,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 16818,
+      "cosine_similarity": 0.0579400509595871,
+      "absolute_similarity": 0.0579400509595871,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 25770,
+      "cosine_similarity": 0.05792200192809105,
+      "absolute_similarity": 0.05792200192809105,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 34625,
+      "cosine_similarity": 0.05787520855665207,
+      "absolute_similarity": 0.05787520855665207,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 22442,
+      "cosine_similarity": 0.057819828391075134,
+      "absolute_similarity": 0.057819828391075134,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 2302,
+      "cosine_similarity": 0.057715341448783875,
+      "absolute_similarity": 0.057715341448783875,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 18890,
+      "cosine_similarity": 0.057645056396722794,
+      "absolute_similarity": 0.057645056396722794,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 25209,
+      "cosine_similarity": 0.05726135894656181,
+      "absolute_similarity": 0.05726135894656181,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 47123,
+      "cosine_similarity": 0.05718015506863594,
+      "absolute_similarity": 0.05718015506863594,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 19704,
+      "cosine_similarity": 0.05712499842047691,
+      "absolute_similarity": 0.05712499842047691,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 12166,
+      "cosine_similarity": 0.05703757703304291,
+      "absolute_similarity": 0.05703757703304291,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 15431,
+      "cosine_similarity": 0.05698234960436821,
+      "absolute_similarity": 0.05698234960436821,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 13168,
+      "cosine_similarity": 0.05689544603228569,
+      "absolute_similarity": 0.05689544603228569,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 18175,
+      "cosine_similarity": 0.05659111961722374,
+      "absolute_similarity": 0.05659111961722374,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 20962,
+      "cosine_similarity": 0.05649295449256897,
+      "absolute_similarity": 0.05649295449256897,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 32184,
+      "cosine_similarity": 0.0564594566822052,
+      "absolute_similarity": 0.0564594566822052,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 37206,
+      "cosine_similarity": 0.05600414052605629,
+      "absolute_similarity": 0.05600414052605629,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 44201,
+      "cosine_similarity": 0.055991582572460175,
+      "absolute_similarity": 0.055991582572460175,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 47220,
+      "cosine_similarity": 0.05590471997857094,
+      "absolute_similarity": 0.05590471997857094,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 15080,
+      "cosine_similarity": 0.05586111545562744,
+      "absolute_similarity": 0.05586111545562744,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 35020,
+      "cosine_similarity": 0.055755555629730225,
+      "absolute_similarity": 0.055755555629730225,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 19120,
+      "cosine_similarity": 0.05554451048374176,
+      "absolute_similarity": 0.05554451048374176,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 10676,
+      "cosine_similarity": 0.05533965677022934,
+      "absolute_similarity": 0.05533965677022934,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 32212,
+      "cosine_similarity": 0.05519166588783264,
+      "absolute_similarity": 0.05519166588783264,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 26289,
+      "cosine_similarity": 0.055088113993406296,
+      "absolute_similarity": 0.055088113993406296,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 11116,
+      "cosine_similarity": 0.05500839650630951,
+      "absolute_similarity": 0.05500839650630951,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 6884,
+      "cosine_similarity": 0.05498313531279564,
+      "absolute_similarity": 0.05498313531279564,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 39198,
+      "cosine_similarity": 0.05464331805706024,
+      "absolute_similarity": 0.05464331805706024,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 16437,
+      "cosine_similarity": 0.05459684506058693,
+      "absolute_similarity": 0.05459684506058693,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 8906,
+      "cosine_similarity": 0.05454861745238304,
+      "absolute_similarity": 0.05454861745238304,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 39846,
+      "cosine_similarity": 0.054403156042099,
+      "absolute_similarity": 0.054403156042099,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 25434,
+      "cosine_similarity": 0.054397109895944595,
+      "absolute_similarity": 0.054397109895944595,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 24519,
+      "cosine_similarity": 0.05434960126876831,
+      "absolute_similarity": 0.05434960126876831,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 1670,
+      "cosine_similarity": 0.05423133075237274,
+      "absolute_similarity": 0.05423133075237274,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 1674,
+      "cosine_similarity": 0.054216474294662476,
+      "absolute_similarity": 0.054216474294662476,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 32624,
+      "cosine_similarity": 0.05420380085706711,
+      "absolute_similarity": 0.05420380085706711,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 21810,
+      "cosine_similarity": 0.05401363968849182,
+      "absolute_similarity": 0.05401363968849182,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 19055,
+      "cosine_similarity": 0.054000068455934525,
+      "absolute_similarity": 0.054000068455934525,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 19709,
+      "cosine_similarity": 0.053880028426647186,
+      "absolute_similarity": 0.053880028426647186,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 10717,
+      "cosine_similarity": 0.053678497672080994,
+      "absolute_similarity": 0.053678497672080994,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 20422,
+      "cosine_similarity": 0.05351109057664871,
+      "absolute_similarity": 0.05351109057664871,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 8035,
+      "cosine_similarity": 0.053357355296611786,
+      "absolute_similarity": 0.053357355296611786,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 36136,
+      "cosine_similarity": 0.053348176181316376,
+      "absolute_similarity": 0.053348176181316376,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 35872,
+      "cosine_similarity": 0.053173426538705826,
+      "absolute_similarity": 0.053173426538705826,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 26250,
+      "cosine_similarity": 0.05314650014042854,
+      "absolute_similarity": 0.05314650014042854,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 24667,
+      "cosine_similarity": 0.05308372899889946,
+      "absolute_similarity": 0.05308372899889946,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 25412,
+      "cosine_similarity": 0.053077708929777145,
+      "absolute_similarity": 0.053077708929777145,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 39440,
+      "cosine_similarity": 0.053066231310367584,
+      "absolute_similarity": 0.053066231310367584,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 15526,
+      "cosine_similarity": 0.05300935357809067,
+      "absolute_similarity": 0.05300935357809067,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 22226,
+      "cosine_similarity": 0.05292364954948425,
+      "absolute_similarity": 0.05292364954948425,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 15832,
+      "cosine_similarity": 0.052871156483888626,
+      "absolute_similarity": 0.052871156483888626,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 47419,
+      "cosine_similarity": 0.05283370986580849,
+      "absolute_similarity": 0.05283370986580849,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 48806,
+      "cosine_similarity": 0.0528118871152401,
+      "absolute_similarity": 0.0528118871152401,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 4305,
+      "cosine_similarity": 0.05279400944709778,
+      "absolute_similarity": 0.05279400944709778,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 3296,
+      "cosine_similarity": 0.052755508571863174,
+      "absolute_similarity": 0.052755508571863174,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 6442,
+      "cosine_similarity": 0.05268263444304466,
+      "absolute_similarity": 0.05268263444304466,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 45730,
+      "cosine_similarity": 0.05261898785829544,
+      "absolute_similarity": 0.05261898785829544,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 32230,
+      "cosine_similarity": 0.05253644287586212,
+      "absolute_similarity": 0.05253644287586212,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 48596,
+      "cosine_similarity": 0.05232373997569084,
+      "absolute_similarity": 0.05232373997569084,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 12807,
+      "cosine_similarity": 0.05228545144200325,
+      "absolute_similarity": 0.05228545144200325,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 17788,
+      "cosine_similarity": 0.052245985716581345,
+      "absolute_similarity": 0.052245985716581345,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 19547,
+      "cosine_similarity": 0.0522158183157444,
+      "absolute_similarity": 0.0522158183157444,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 28596,
+      "cosine_similarity": 0.05213826149702072,
+      "absolute_similarity": 0.05213826149702072,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 20919,
+      "cosine_similarity": 0.05206013470888138,
+      "absolute_similarity": 0.05206013470888138,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 46743,
+      "cosine_similarity": 0.05204084515571594,
+      "absolute_similarity": 0.05204084515571594,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 48301,
+      "cosine_similarity": 0.052025265991687775,
+      "absolute_similarity": 0.052025265991687775,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 13122,
+      "cosine_similarity": 0.05185221508145332,
+      "absolute_similarity": 0.05185221508145332,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 1011,
+      "cosine_similarity": 0.05171075835824013,
+      "absolute_similarity": 0.05171075835824013,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 17713,
+      "cosine_similarity": 0.05165401101112366,
+      "absolute_similarity": 0.05165401101112366,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 10725,
+      "cosine_similarity": 0.051626648753881454,
+      "absolute_similarity": 0.051626648753881454,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 5932,
+      "cosine_similarity": 0.05160541832447052,
+      "absolute_similarity": 0.05160541832447052,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 17734,
+      "cosine_similarity": 0.05158306658267975,
+      "absolute_similarity": 0.05158306658267975,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 25958,
+      "cosine_similarity": 0.05148717388510704,
+      "absolute_similarity": 0.05148717388510704,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 29023,
+      "cosine_similarity": 0.051425859332084656,
+      "absolute_similarity": 0.051425859332084656,
+      "suggested_sign": 1
+    }
+  ],
+  "top_negative": [
+    {
+      "feature_id": 578,
+      "cosine_similarity": -0.07479551434516907,
+      "absolute_similarity": 0.07479551434516907,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 35297,
+      "cosine_similarity": -0.07212381064891815,
+      "absolute_similarity": 0.07212381064891815,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 37831,
+      "cosine_similarity": -0.07149837166070938,
+      "absolute_similarity": 0.07149837166070938,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 830,
+      "cosine_similarity": -0.07022128254175186,
+      "absolute_similarity": 0.07022128254175186,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 44535,
+      "cosine_similarity": -0.06884555518627167,
+      "absolute_similarity": 0.06884555518627167,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 9667,
+      "cosine_similarity": -0.06644624471664429,
+      "absolute_similarity": 0.06644624471664429,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 22896,
+      "cosine_similarity": -0.0657634362578392,
+      "absolute_similarity": 0.0657634362578392,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 5144,
+      "cosine_similarity": -0.06527885049581528,
+      "absolute_similarity": 0.06527885049581528,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 20392,
+      "cosine_similarity": -0.06447987258434296,
+      "absolute_similarity": 0.06447987258434296,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 29641,
+      "cosine_similarity": -0.06438140571117401,
+      "absolute_similarity": 0.06438140571117401,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 26819,
+      "cosine_similarity": -0.06423676013946533,
+      "absolute_similarity": 0.06423676013946533,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 20451,
+      "cosine_similarity": -0.06338178366422653,
+      "absolute_similarity": 0.06338178366422653,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 30153,
+      "cosine_similarity": -0.0632384642958641,
+      "absolute_similarity": 0.0632384642958641,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 24610,
+      "cosine_similarity": -0.06275922060012817,
+      "absolute_similarity": 0.06275922060012817,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 16146,
+      "cosine_similarity": -0.06273819506168365,
+      "absolute_similarity": 0.06273819506168365,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 25462,
+      "cosine_similarity": -0.06239386275410652,
+      "absolute_similarity": 0.06239386275410652,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 2365,
+      "cosine_similarity": -0.062368243932724,
+      "absolute_similarity": 0.062368243932724,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 8813,
+      "cosine_similarity": -0.06180732697248459,
+      "absolute_similarity": 0.06180732697248459,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 21738,
+      "cosine_similarity": -0.061520639806985855,
+      "absolute_similarity": 0.061520639806985855,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 8856,
+      "cosine_similarity": -0.061380889266729355,
+      "absolute_similarity": 0.061380889266729355,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 38983,
+      "cosine_similarity": -0.06063180789351463,
+      "absolute_similarity": 0.06063180789351463,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 36818,
+      "cosine_similarity": -0.06030118837952614,
+      "absolute_similarity": 0.06030118837952614,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 31087,
+      "cosine_similarity": -0.060106802731752396,
+      "absolute_similarity": 0.060106802731752396,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 44474,
+      "cosine_similarity": -0.06004650145769119,
+      "absolute_similarity": 0.06004650145769119,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 45825,
+      "cosine_similarity": -0.05994878709316254,
+      "absolute_similarity": 0.05994878709316254,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 32909,
+      "cosine_similarity": -0.05867873504757881,
+      "absolute_similarity": 0.05867873504757881,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 18566,
+      "cosine_similarity": -0.058458127081394196,
+      "absolute_similarity": 0.058458127081394196,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 38422,
+      "cosine_similarity": -0.05775020271539688,
+      "absolute_similarity": 0.05775020271539688,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 41954,
+      "cosine_similarity": -0.05774876847863197,
+      "absolute_similarity": 0.05774876847863197,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 39605,
+      "cosine_similarity": -0.057709090411663055,
+      "absolute_similarity": 0.057709090411663055,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 38560,
+      "cosine_similarity": -0.05768906697630882,
+      "absolute_similarity": 0.05768906697630882,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 31155,
+      "cosine_similarity": -0.05722983926534653,
+      "absolute_similarity": 0.05722983926534653,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 26264,
+      "cosine_similarity": -0.05653180554509163,
+      "absolute_similarity": 0.05653180554509163,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 20737,
+      "cosine_similarity": -0.05649590492248535,
+      "absolute_similarity": 0.05649590492248535,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 28740,
+      "cosine_similarity": -0.05642303451895714,
+      "absolute_similarity": 0.05642303451895714,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 45493,
+      "cosine_similarity": -0.05638204514980316,
+      "absolute_similarity": 0.05638204514980316,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 16249,
+      "cosine_similarity": -0.056263748556375504,
+      "absolute_similarity": 0.056263748556375504,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 5643,
+      "cosine_similarity": -0.05617264285683632,
+      "absolute_similarity": 0.05617264285683632,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 11838,
+      "cosine_similarity": -0.05612679570913315,
+      "absolute_similarity": 0.05612679570913315,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 45547,
+      "cosine_similarity": -0.05608537048101425,
+      "absolute_similarity": 0.05608537048101425,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 15387,
+      "cosine_similarity": -0.05604124441742897,
+      "absolute_similarity": 0.05604124441742897,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 26754,
+      "cosine_similarity": -0.055849701166152954,
+      "absolute_similarity": 0.055849701166152954,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 15538,
+      "cosine_similarity": -0.05584123358130455,
+      "absolute_similarity": 0.05584123358130455,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 30705,
+      "cosine_similarity": -0.055822014808654785,
+      "absolute_similarity": 0.055822014808654785,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 45563,
+      "cosine_similarity": -0.05558909475803375,
+      "absolute_similarity": 0.05558909475803375,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 3423,
+      "cosine_similarity": -0.055450618267059326,
+      "absolute_similarity": 0.055450618267059326,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 2281,
+      "cosine_similarity": -0.055428843945264816,
+      "absolute_similarity": 0.055428843945264816,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 22940,
+      "cosine_similarity": -0.05504485219717026,
+      "absolute_similarity": 0.05504485219717026,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 39255,
+      "cosine_similarity": -0.05501098558306694,
+      "absolute_similarity": 0.05501098558306694,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 19226,
+      "cosine_similarity": -0.0549267940223217,
+      "absolute_similarity": 0.0549267940223217,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 46631,
+      "cosine_similarity": -0.05479280278086662,
+      "absolute_similarity": 0.05479280278086662,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 44779,
+      "cosine_similarity": -0.05475963279604912,
+      "absolute_similarity": 0.05475963279604912,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 41028,
+      "cosine_similarity": -0.05470665171742439,
+      "absolute_similarity": 0.05470665171742439,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 13799,
+      "cosine_similarity": -0.05469885841012001,
+      "absolute_similarity": 0.05469885841012001,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 4124,
+      "cosine_similarity": -0.05469609424471855,
+      "absolute_similarity": 0.05469609424471855,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 4865,
+      "cosine_similarity": -0.054636191576719284,
+      "absolute_similarity": 0.054636191576719284,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 6873,
+      "cosine_similarity": -0.05451037734746933,
+      "absolute_similarity": 0.05451037734746933,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 33430,
+      "cosine_similarity": -0.05429442226886749,
+      "absolute_similarity": 0.05429442226886749,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 8992,
+      "cosine_similarity": -0.05412313714623451,
+      "absolute_similarity": 0.05412313714623451,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 799,
+      "cosine_similarity": -0.054044175893068314,
+      "absolute_similarity": 0.054044175893068314,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 5394,
+      "cosine_similarity": -0.05378345027565956,
+      "absolute_similarity": 0.05378345027565956,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 46473,
+      "cosine_similarity": -0.05375291034579277,
+      "absolute_similarity": 0.05375291034579277,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 26753,
+      "cosine_similarity": -0.05373130366206169,
+      "absolute_similarity": 0.05373130366206169,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 33969,
+      "cosine_similarity": -0.05373004451394081,
+      "absolute_similarity": 0.05373004451394081,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 7506,
+      "cosine_similarity": -0.05362379178404808,
+      "absolute_similarity": 0.05362379178404808,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 38586,
+      "cosine_similarity": -0.05356238782405853,
+      "absolute_similarity": 0.05356238782405853,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 36899,
+      "cosine_similarity": -0.05331125110387802,
+      "absolute_similarity": 0.05331125110387802,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 34815,
+      "cosine_similarity": -0.05320621654391289,
+      "absolute_similarity": 0.05320621654391289,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 16102,
+      "cosine_similarity": -0.05315859243273735,
+      "absolute_similarity": 0.05315859243273735,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 33974,
+      "cosine_similarity": -0.05313989520072937,
+      "absolute_similarity": 0.05313989520072937,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 4870,
+      "cosine_similarity": -0.05312490090727806,
+      "absolute_similarity": 0.05312490090727806,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 732,
+      "cosine_similarity": -0.05299383029341698,
+      "absolute_similarity": 0.05299383029341698,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 21931,
+      "cosine_similarity": -0.05295686423778534,
+      "absolute_similarity": 0.05295686423778534,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 18952,
+      "cosine_similarity": -0.05292942002415657,
+      "absolute_similarity": 0.05292942002415657,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 7733,
+      "cosine_similarity": -0.052786678075790405,
+      "absolute_similarity": 0.052786678075790405,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 14208,
+      "cosine_similarity": -0.05277737230062485,
+      "absolute_similarity": 0.05277737230062485,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 32695,
+      "cosine_similarity": -0.052659470587968826,
+      "absolute_similarity": 0.052659470587968826,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 43546,
+      "cosine_similarity": -0.05245909467339516,
+      "absolute_similarity": 0.05245909467339516,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 5406,
+      "cosine_similarity": -0.05239678919315338,
+      "absolute_similarity": 0.05239678919315338,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 3302,
+      "cosine_similarity": -0.052228644490242004,
+      "absolute_similarity": 0.052228644490242004,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 46592,
+      "cosine_similarity": -0.052123259752988815,
+      "absolute_similarity": 0.052123259752988815,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 40370,
+      "cosine_similarity": -0.05199683830142021,
+      "absolute_similarity": 0.05199683830142021,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 9361,
+      "cosine_similarity": -0.05190771073102951,
+      "absolute_similarity": 0.05190771073102951,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 41123,
+      "cosine_similarity": -0.05189486965537071,
+      "absolute_similarity": 0.05189486965537071,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 15544,
+      "cosine_similarity": -0.051892317831516266,
+      "absolute_similarity": 0.051892317831516266,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 34004,
+      "cosine_similarity": -0.05187986046075821,
+      "absolute_similarity": 0.05187986046075821,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 48807,
+      "cosine_similarity": -0.05176899954676628,
+      "absolute_similarity": 0.05176899954676628,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 25896,
+      "cosine_similarity": -0.05170520395040512,
+      "absolute_similarity": 0.05170520395040512,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 23223,
+      "cosine_similarity": -0.05162668973207474,
+      "absolute_similarity": 0.05162668973207474,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 9978,
+      "cosine_similarity": -0.051587820053100586,
+      "absolute_similarity": 0.051587820053100586,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 33985,
+      "cosine_similarity": -0.05157950893044472,
+      "absolute_similarity": 0.05157950893044472,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 41999,
+      "cosine_similarity": -0.05155782774090767,
+      "absolute_similarity": 0.05155782774090767,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 46652,
+      "cosine_similarity": -0.051555413752794266,
+      "absolute_similarity": 0.051555413752794266,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 18146,
+      "cosine_similarity": -0.05150080844759941,
+      "absolute_similarity": 0.05150080844759941,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 155,
+      "cosine_similarity": -0.05148055776953697,
+      "absolute_similarity": 0.05148055776953697,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 20068,
+      "cosine_similarity": -0.05146230757236481,
+      "absolute_similarity": 0.05146230757236481,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 44790,
+      "cosine_similarity": -0.05142827332019806,
+      "absolute_similarity": 0.05142827332019806,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 15317,
+      "cosine_similarity": -0.05141742154955864,
+      "absolute_similarity": 0.05141742154955864,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 5899,
+      "cosine_similarity": -0.051372379064559937,
+      "absolute_similarity": 0.051372379064559937,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 40714,
+      "cosine_similarity": -0.05135125666856766,
+      "absolute_similarity": 0.05135125666856766,
+      "suggested_sign": -1
+    }
+  ],
+  "top_absolute": [
+    {
+      "feature_id": 13913,
+      "cosine_similarity": 0.09075365960597992,
+      "absolute_similarity": 0.09075365960597992,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 578,
+      "cosine_similarity": -0.07479551434516907,
+      "absolute_similarity": 0.07479551434516907,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 3888,
+      "cosine_similarity": 0.07304318249225616,
+      "absolute_similarity": 0.07304318249225616,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 19234,
+      "cosine_similarity": 0.07260323315858841,
+      "absolute_similarity": 0.07260323315858841,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 35297,
+      "cosine_similarity": -0.07212381064891815,
+      "absolute_similarity": 0.07212381064891815,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 4441,
+      "cosine_similarity": 0.0715738981962204,
+      "absolute_similarity": 0.0715738981962204,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 37831,
+      "cosine_similarity": -0.07149837166070938,
+      "absolute_similarity": 0.07149837166070938,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 830,
+      "cosine_similarity": -0.07022128254175186,
+      "absolute_similarity": 0.07022128254175186,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 38350,
+      "cosine_similarity": 0.06979896128177643,
+      "absolute_similarity": 0.06979896128177643,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 44535,
+      "cosine_similarity": -0.06884555518627167,
+      "absolute_similarity": 0.06884555518627167,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 36962,
+      "cosine_similarity": 0.06645900011062622,
+      "absolute_similarity": 0.06645900011062622,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 9667,
+      "cosine_similarity": -0.06644624471664429,
+      "absolute_similarity": 0.06644624471664429,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 22896,
+      "cosine_similarity": -0.0657634362578392,
+      "absolute_similarity": 0.0657634362578392,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 5144,
+      "cosine_similarity": -0.06527885049581528,
+      "absolute_similarity": 0.06527885049581528,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 24654,
+      "cosine_similarity": 0.0651492178440094,
+      "absolute_similarity": 0.0651492178440094,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 20392,
+      "cosine_similarity": -0.06447987258434296,
+      "absolute_similarity": 0.06447987258434296,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 29641,
+      "cosine_similarity": -0.06438140571117401,
+      "absolute_similarity": 0.06438140571117401,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 26819,
+      "cosine_similarity": -0.06423676013946533,
+      "absolute_similarity": 0.06423676013946533,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 20451,
+      "cosine_similarity": -0.06338178366422653,
+      "absolute_similarity": 0.06338178366422653,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 19087,
+      "cosine_similarity": 0.06331723928451538,
+      "absolute_similarity": 0.06331723928451538,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 30153,
+      "cosine_similarity": -0.0632384642958641,
+      "absolute_similarity": 0.0632384642958641,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 33686,
+      "cosine_similarity": 0.06316544115543365,
+      "absolute_similarity": 0.06316544115543365,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 24610,
+      "cosine_similarity": -0.06275922060012817,
+      "absolute_similarity": 0.06275922060012817,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 16146,
+      "cosine_similarity": -0.06273819506168365,
+      "absolute_similarity": 0.06273819506168365,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 14608,
+      "cosine_similarity": 0.06261128187179565,
+      "absolute_similarity": 0.06261128187179565,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 36989,
+      "cosine_similarity": 0.06250012665987015,
+      "absolute_similarity": 0.06250012665987015,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 25462,
+      "cosine_similarity": -0.06239386275410652,
+      "absolute_similarity": 0.06239386275410652,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 2365,
+      "cosine_similarity": -0.062368243932724,
+      "absolute_similarity": 0.062368243932724,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 3682,
+      "cosine_similarity": 0.06229527294635773,
+      "absolute_similarity": 0.06229527294635773,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 8140,
+      "cosine_similarity": 0.062066175043582916,
+      "absolute_similarity": 0.062066175043582916,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 7691,
+      "cosine_similarity": 0.061920616775751114,
+      "absolute_similarity": 0.061920616775751114,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 8813,
+      "cosine_similarity": -0.06180732697248459,
+      "absolute_similarity": 0.06180732697248459,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 21738,
+      "cosine_similarity": -0.061520639806985855,
+      "absolute_similarity": 0.061520639806985855,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 8856,
+      "cosine_similarity": -0.061380889266729355,
+      "absolute_similarity": 0.061380889266729355,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 19676,
+      "cosine_similarity": 0.061090756207704544,
+      "absolute_similarity": 0.061090756207704544,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 25262,
+      "cosine_similarity": 0.06104546785354614,
+      "absolute_similarity": 0.06104546785354614,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 40833,
+      "cosine_similarity": 0.06071645766496658,
+      "absolute_similarity": 0.06071645766496658,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 36056,
+      "cosine_similarity": 0.060653798282146454,
+      "absolute_similarity": 0.060653798282146454,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 38983,
+      "cosine_similarity": -0.06063180789351463,
+      "absolute_similarity": 0.06063180789351463,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 27990,
+      "cosine_similarity": 0.06057829037308693,
+      "absolute_similarity": 0.06057829037308693,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 36818,
+      "cosine_similarity": -0.06030118837952614,
+      "absolute_similarity": 0.06030118837952614,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 31087,
+      "cosine_similarity": -0.060106802731752396,
+      "absolute_similarity": 0.060106802731752396,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 44474,
+      "cosine_similarity": -0.06004650145769119,
+      "absolute_similarity": 0.06004650145769119,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 45825,
+      "cosine_similarity": -0.05994878709316254,
+      "absolute_similarity": 0.05994878709316254,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 34909,
+      "cosine_similarity": 0.059778843075037,
+      "absolute_similarity": 0.059778843075037,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 14059,
+      "cosine_similarity": 0.059531137347221375,
+      "absolute_similarity": 0.059531137347221375,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 19537,
+      "cosine_similarity": 0.059337470680475235,
+      "absolute_similarity": 0.059337470680475235,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 41012,
+      "cosine_similarity": 0.05930691957473755,
+      "absolute_similarity": 0.05930691957473755,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 26707,
+      "cosine_similarity": 0.05906284227967262,
+      "absolute_similarity": 0.05906284227967262,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 14748,
+      "cosine_similarity": 0.05900419503450394,
+      "absolute_similarity": 0.05900419503450394,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 32909,
+      "cosine_similarity": -0.05867873504757881,
+      "absolute_similarity": 0.05867873504757881,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 34613,
+      "cosine_similarity": 0.05851994454860687,
+      "absolute_similarity": 0.05851994454860687,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 17188,
+      "cosine_similarity": 0.05849173292517662,
+      "absolute_similarity": 0.05849173292517662,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 18566,
+      "cosine_similarity": -0.058458127081394196,
+      "absolute_similarity": 0.058458127081394196,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 16818,
+      "cosine_similarity": 0.0579400509595871,
+      "absolute_similarity": 0.0579400509595871,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 25770,
+      "cosine_similarity": 0.05792200192809105,
+      "absolute_similarity": 0.05792200192809105,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 34625,
+      "cosine_similarity": 0.05787520855665207,
+      "absolute_similarity": 0.05787520855665207,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 22442,
+      "cosine_similarity": 0.057819828391075134,
+      "absolute_similarity": 0.057819828391075134,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 38422,
+      "cosine_similarity": -0.05775020271539688,
+      "absolute_similarity": 0.05775020271539688,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 41954,
+      "cosine_similarity": -0.05774876847863197,
+      "absolute_similarity": 0.05774876847863197,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 2302,
+      "cosine_similarity": 0.057715341448783875,
+      "absolute_similarity": 0.057715341448783875,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 39605,
+      "cosine_similarity": -0.057709090411663055,
+      "absolute_similarity": 0.057709090411663055,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 38560,
+      "cosine_similarity": -0.05768906697630882,
+      "absolute_similarity": 0.05768906697630882,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 18890,
+      "cosine_similarity": 0.057645056396722794,
+      "absolute_similarity": 0.057645056396722794,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 25209,
+      "cosine_similarity": 0.05726135894656181,
+      "absolute_similarity": 0.05726135894656181,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 31155,
+      "cosine_similarity": -0.05722983926534653,
+      "absolute_similarity": 0.05722983926534653,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 47123,
+      "cosine_similarity": 0.05718015506863594,
+      "absolute_similarity": 0.05718015506863594,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 19704,
+      "cosine_similarity": 0.05712499842047691,
+      "absolute_similarity": 0.05712499842047691,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 12166,
+      "cosine_similarity": 0.05703757703304291,
+      "absolute_similarity": 0.05703757703304291,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 15431,
+      "cosine_similarity": 0.05698234960436821,
+      "absolute_similarity": 0.05698234960436821,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 13168,
+      "cosine_similarity": 0.05689544603228569,
+      "absolute_similarity": 0.05689544603228569,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 18175,
+      "cosine_similarity": 0.05659111961722374,
+      "absolute_similarity": 0.05659111961722374,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 26264,
+      "cosine_similarity": -0.05653180554509163,
+      "absolute_similarity": 0.05653180554509163,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 20737,
+      "cosine_similarity": -0.05649590492248535,
+      "absolute_similarity": 0.05649590492248535,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 20962,
+      "cosine_similarity": 0.05649295449256897,
+      "absolute_similarity": 0.05649295449256897,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 32184,
+      "cosine_similarity": 0.0564594566822052,
+      "absolute_similarity": 0.0564594566822052,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 28740,
+      "cosine_similarity": -0.05642303451895714,
+      "absolute_similarity": 0.05642303451895714,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 45493,
+      "cosine_similarity": -0.05638204514980316,
+      "absolute_similarity": 0.05638204514980316,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 16249,
+      "cosine_similarity": -0.056263748556375504,
+      "absolute_similarity": 0.056263748556375504,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 5643,
+      "cosine_similarity": -0.05617264285683632,
+      "absolute_similarity": 0.05617264285683632,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 11838,
+      "cosine_similarity": -0.05612679570913315,
+      "absolute_similarity": 0.05612679570913315,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 45547,
+      "cosine_similarity": -0.05608537048101425,
+      "absolute_similarity": 0.05608537048101425,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 15387,
+      "cosine_similarity": -0.05604124441742897,
+      "absolute_similarity": 0.05604124441742897,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 37206,
+      "cosine_similarity": 0.05600414052605629,
+      "absolute_similarity": 0.05600414052605629,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 44201,
+      "cosine_similarity": 0.055991582572460175,
+      "absolute_similarity": 0.055991582572460175,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 47220,
+      "cosine_similarity": 0.05590471997857094,
+      "absolute_similarity": 0.05590471997857094,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 15080,
+      "cosine_similarity": 0.05586111545562744,
+      "absolute_similarity": 0.05586111545562744,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 26754,
+      "cosine_similarity": -0.055849701166152954,
+      "absolute_similarity": 0.055849701166152954,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 15538,
+      "cosine_similarity": -0.05584123358130455,
+      "absolute_similarity": 0.05584123358130455,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 30705,
+      "cosine_similarity": -0.055822014808654785,
+      "absolute_similarity": 0.055822014808654785,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 35020,
+      "cosine_similarity": 0.055755555629730225,
+      "absolute_similarity": 0.055755555629730225,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 45563,
+      "cosine_similarity": -0.05558909475803375,
+      "absolute_similarity": 0.05558909475803375,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 19120,
+      "cosine_similarity": 0.05554451048374176,
+      "absolute_similarity": 0.05554451048374176,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 3423,
+      "cosine_similarity": -0.055450618267059326,
+      "absolute_similarity": 0.055450618267059326,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 2281,
+      "cosine_similarity": -0.055428843945264816,
+      "absolute_similarity": 0.055428843945264816,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 10676,
+      "cosine_similarity": 0.05533965677022934,
+      "absolute_similarity": 0.05533965677022934,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 32212,
+      "cosine_similarity": 0.05519166588783264,
+      "absolute_similarity": 0.05519166588783264,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 26289,
+      "cosine_similarity": 0.055088113993406296,
+      "absolute_similarity": 0.055088113993406296,
+      "suggested_sign": 1
+    },
+    {
+      "feature_id": 22940,
+      "cosine_similarity": -0.05504485219717026,
+      "absolute_similarity": 0.05504485219717026,
+      "suggested_sign": -1
+    },
+    {
+      "feature_id": 39255,
+      "cosine_similarity": -0.05501098558306694,
+      "absolute_similarity": 0.05501098558306694,
+      "suggested_sign": -1
+    }
+  ],
+  "exported_vectors": []
+}
