@@ -228,8 +228,11 @@ if __name__ == '__main__':
     aime2025_test_dataset = parse_AIME_2025()
     aime2026_test_dataset = parse_AIME_2026()
     if_test_dataset = parse_IF_bench()
+    dapo_train_dataset = parse_Dapo_17k()
+    if_train_dataset = parse_IF_bench_train()
+    kk_train_dataset = parse_kk()
     local_save_dir = args.local_dir
     os.makedirs(local_save_dir, exist_ok=True)
-    dataset_list = [mmlu_test_dataset, aime2024_test_dataset, aime2025_test_dataset, aime2026_test_dataset, if_test_dataset]
+    dataset_list = [mmlu_test_dataset, aime2024_test_dataset, aime2025_test_dataset, aime2026_test_dataset, if_test_dataset, dapo_train_dataset, if_train_dataset, kk_train_dataset]
     test_dataset = datasets.concatenate_datasets(dataset_list)
     test_dataset.to_parquet(os.path.join(local_save_dir, "validation.parquet"))
