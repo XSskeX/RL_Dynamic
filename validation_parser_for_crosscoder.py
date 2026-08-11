@@ -57,7 +57,17 @@ def parse_MMLU_Pro():
             question = format_example(question_raw, options)
             
             data = {
+                "data_source": data_source,
                 "prompt": question + cot_content,
+                "ability": "",
+                "reward_model": {"style": "rule", "ground_truth": ""},
+                "extra_info": {
+                    "split": "",
+                    "index": "",
+                    "instruction_id_list": [],
+                    "kwargs": [], 
+                    "question": "",
+                },                
             }
             return data
         return process_fn
@@ -80,7 +90,17 @@ def parse_AIME_2024():
             solution = example.pop("solution")
             question = instruction_following + question_raw + solution
             data = {
+                "data_source": data_source,
                 "prompt": question,
+                "ability": "",
+                "reward_model": {"style": "rule", "ground_truth": ""},
+                "extra_info": {
+                    "split": "",
+                    "index": "",
+                    "instruction_id_list": [],
+                    "kwargs": [], 
+                    "question": "",
+                },
             }
             return data
         return process_fn
@@ -101,7 +121,17 @@ def parse_AIME_2025():
             question_raw = example.pop("problem")
             question = instruction_following + question_raw
             data = {
+                "data_source": data_source,
                 "prompt": question,
+                "ability": "",
+                "reward_model": {"style": "rule", "ground_truth": ""},
+                "extra_info": {
+                    "split": "",
+                    "index": "",
+                    "instruction_id_list": [],
+                    "kwargs": [], 
+                    "question": "",
+                },
             }
             return data
         return process_fn
@@ -121,7 +151,17 @@ def parse_AIME_2026():
             question_raw = example.pop("problem")
             question = instruction_following + question_raw
             data = {
+                "data_source": data_source,
                 "prompt": question,
+                "ability": "",
+                "reward_model": {"style": "rule", "ground_truth": ""},
+                "extra_info": {
+                    "split": "",
+                    "index": "",
+                    "instruction_id_list": [],
+                    "kwargs": [], 
+                    "question": "",
+                },                
             }
             return data
         return process_fn
@@ -141,7 +181,17 @@ def parse_IF_bench():
             question_raw = example.pop("prompt")
             question = question_raw
             data = {
+                "data_source": data_source,
                 "prompt": question,
+                "ability": "",
+                "reward_model": {"style": "rule", "ground_truth": ""},
+                "extra_info": {
+                    "split": "",
+                    "index": "",
+                    "instruction_id_list": [],
+                    "kwargs": [], 
+                    "question": "",
+                },
             }
             return data
         return process_fn
@@ -161,7 +211,17 @@ def parse_Dapo_17k():
             question_raw = example.pop("prompt")[0]['content']
             question = question_raw + " " + instruction_following
             data = {
+                "data_source": data_source,
                 "prompt": question,
+                "ability": "",
+                "reward_model": {"style": "rule", "ground_truth": ""},
+                "extra_info": {
+                    "split": "",
+                    "index": "",
+                    "instruction_id_list": [],
+                    "kwargs": [], 
+                    "question": "",
+                },
             }
             return data
         return process_fn
@@ -178,7 +238,17 @@ def parse_IF_bench_train():
         def process_fn(example):
             question = example["messages"][0]["content"].strip()
             data = {
+                "data_source": data_source,
                 "prompt": question,
+                "ability": "",
+                "reward_model": {"style": "rule", "ground_truth": ""},
+                "extra_info": {
+                    "split": "",
+                    "index": "",
+                    "instruction_id_list": [],
+                    "kwargs": [], 
+                    "question": "",
+                },
             }
             return data
         return process_fn
@@ -212,7 +282,17 @@ def parse_kk():
                 + "### Answer: Let's think step by step"
             )
             data = {
+                "data_source": "K-and-K/knights-and-knaves",
                 "prompt": question,
+                "ability": "",
+                "reward_model": {"style": "rule", "ground_truth": ""},
+                "extra_info": {
+                    "split": "",
+                    "index": "",
+                    "instruction_id_list": [],
+                    "kwargs": [], 
+                    "question": "",
+                },
             }
             return data
         return process_fn
