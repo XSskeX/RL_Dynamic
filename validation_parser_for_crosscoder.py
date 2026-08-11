@@ -226,7 +226,7 @@ def parse_Dapo_17k():
             return data
         return process_fn
 
-    train_dataset = sampled_dataset.map(function=make_map_fn("train"))
+    train_dataset = sampled_dataset.map(function=make_map_fn("train"), remove_columns=raw_dataset.column_names)
     return train_dataset
 
 def parse_IF_bench_train():
@@ -253,7 +253,7 @@ def parse_IF_bench_train():
             return data
         return process_fn
 
-    train_dataset = sampled_dataset.map(function=make_map_fn("train"))
+    train_dataset = sampled_dataset.map(function=make_map_fn("train"), remove_columns=raw_dataset.column_names)
     return train_dataset
 
 def parse_kk():
@@ -296,7 +296,7 @@ def parse_kk():
             }
             return data
         return process_fn
-    train_dataset = sampled_dataset.map(function=make_map_fn("train"))
+    train_dataset = sampled_dataset.map(function=make_map_fn("train"), remove_columns=raw_dataset.column_names)
     return train_dataset
 
 if __name__ == '__main__':
