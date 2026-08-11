@@ -51,32 +51,17 @@ def parse_MMLU_Pro():
 
     def make_map_fn(split):
         def process_fn(example):
-            idx = example.pop("question_id")
-
             question_raw = example.pop("question")
             options = example.pop("options")
             cot_content = example.pop("cot_content")
             question = format_example(question_raw, options)
             
-            answer_raw = str(example.pop("answer")).strip()
-            answer = str(answer_raw).strip()
             data = {
-                "data_source": data_source,
                 "prompt": question + cot_content,
-                "ability": "math",
-                "reward_model": {"style": "rule", "ground_truth": answer},
-                "extra_info": {
-                    "split": split,
-                    "index": idx,
-                    "instruction_id_list": [],
-                    "kwargs": [], 
-                    "question": question_raw,
-                },
             }
             return data
         return process_fn
-    #train_dataset = train_dataset.map(function=make_map_fn("train"))
-    #test_dataset = test_dataset.map(function=make_map_fn("test"))
+
     test_dataset = raw_dataset.map(function=make_map_fn("validation"), remove_columns=raw_dataset.column_names)
 
     return test_dataset
@@ -91,24 +76,11 @@ def parse_AIME_2024():
 
     def make_map_fn(split):
         def process_fn(example):
-            idx = example.pop("id")
             question_raw = example.pop("problem")
             solution = example.pop("solution")
             question = instruction_following + question_raw + solution
-            answer_raw = str(example.pop("answer")).strip()
-            answer = str(answer_raw).strip()
             data = {
-                "data_source": data_source,
                 "prompt": question,
-                "ability": "math",
-                "reward_model": {"style": "rule", "ground_truth": answer},
-                "extra_info": {
-                    "split": split,
-                    "index": idx,
-                    "instruction_id_list": [],
-                    "kwargs": [], 
-                    "question": question_raw,
-                },
             }
             return data
         return process_fn
@@ -128,20 +100,8 @@ def parse_AIME_2025():
             idx = example.pop("problem_idx")
             question_raw = example.pop("problem")
             question = instruction_following + question_raw
-            answer_raw = str(example.pop("answer")).strip()
-            answer = str(answer_raw).strip()
             data = {
-                "data_source": data_source,
                 "prompt": question,
-                "ability": "math",
-                "reward_model": {"style": "rule", "ground_truth": answer},
-                "extra_info": {
-                    "split": split,
-                    "index": idx,
-                    "instruction_id_list": [],
-                    "kwargs": [], 
-                    "question": question_raw,
-                },
             }
             return data
         return process_fn
@@ -158,23 +118,10 @@ def parse_AIME_2026():
 
     def make_map_fn(split):
         def process_fn(example):
-            idx = example.pop("problem_idx")
             question_raw = example.pop("problem")
             question = instruction_following + question_raw
-            answer_raw = str(example.pop("answer")).strip()
-            answer = str(answer_raw).strip()
             data = {
-                "data_source": data_source,
                 "prompt": question,
-                "ability": "math",
-                "reward_model": {"style": "rule", "ground_truth": answer},
-                "extra_info": {
-                    "split": split,
-                    "index": idx,
-                    "instruction_id_list": [],
-                    "kwargs": [], 
-                    "question": question_raw,
-                },
             }
             return data
         return process_fn
@@ -191,24 +138,10 @@ def parse_IF_bench():
 
     def make_map_fn(split):
         def process_fn(example):
-            idx = int(example.pop("key"))
             question_raw = example.pop("prompt")
-            instruction_id_list = example.pop("instruction_id_list")
-            kwargs = example.pop("kwargs")
             question = question_raw
-            answer = "just for placeholder"
             data = {
-                "data_source": data_source,
                 "prompt": question,
-                "ability": "Instruction_Following",
-                "reward_model": {"style": "rule", "ground_truth": answer},
-                "extra_info": {
-                    "split": split,
-                    "index": idx,
-                    "instruction_id_list": [],
-                    "kwargs": [], 
-                    "question": question_raw,
-                },
             }
             return data
         return process_fn
@@ -217,6 +150,74 @@ def parse_IF_bench():
 
     return test_dataset
 
+def parse_Dapo_17k():
+    dataset = datasets.load_dataset("BytedTsinghua-SIA/DAPO-Math-17k", "default")
+    raw_dataset = dataset['train']
+    data_source = "BytedTsinghua-SIA/DAPO-Math-17k"
+    instruction_following = ""
+    sampled_dataset = raw_dataset.shuffle(seed=42).select(range(1000))
+    def make_map_fn(split):
+        def process_fn(example):
+            question_raw = example.pop("prompt")[0]['content']
+            question = question_raw + " " + instruction_following
+            data = {
+                "prompt": question,
+            }
+            return data
+        return process_fn
+
+    train_dataset = sampled_dataset.map(function=make_map_fn("train"))
+    return train_dataset
+
+def parse_IF_bench_train():
+    dataset = datasets.load_dataset("allenai/IF_multi_constraints_upto5_no_lang", "default")
+    raw_dataset = dataset['train']
+    sampled_dataset = raw_dataset.shuffle(seed=42).select(range(1000))
+    data_source = "allenai/IF_multi_constraints_upto5_no_lang"
+    def make_map_fn(split):
+        def process_fn(example):
+            question = example["messages"][0]["content"].strip()
+            data = {
+                "prompt": question,
+            }
+            return data
+        return process_fn
+
+    train_dataset = sampled_dataset.map(function=make_map_fn("train"))
+    return train_dataset
+
+def parse_kk():
+    system_instruction='''Your task is to solve a logical reasoning problem. You are given set of statements from which you must logically deduce the identity of a set of characters.
+
+    You must infer the identity of each character. First, explain your reasoning. At the end of your answer, you must clearly state the identity of each character by following the format:
+
+    CONCLUSION:
+    (1) ...
+    (2) ...
+    (3) ...
+    '''
+    dataset = load_dataset(
+        "K-and-K/knights-and-knaves",
+        "train",
+        split="3ppl",
+    )
+    sampled_dataset = dataset.shuffle(seed=42).select(range(1000))
+    def make_map_fn(split):
+        def process_fn(example):
+            question_raw = example["quiz"]
+            solution_text = example["solution_text"]
+            question = (
+                system_instruction
+                + f"\n\n### Question: {question_raw}\n"
+                + "### Answer: Let's think step by step"
+            )
+            data = {
+                "prompt": question,
+            }
+            return data
+        return process_fn
+    train_dataset = sampled_dataset.map(function=make_map_fn("train"))
+    return train_dataset
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

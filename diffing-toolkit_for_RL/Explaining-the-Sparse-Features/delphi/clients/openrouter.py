@@ -1,5 +1,6 @@
 import json
 from asyncio import sleep
+from urllib.parse import urlparse
 
 import httpx
 
@@ -24,10 +25,17 @@ class OpenRouter(Client):
     ):
         super().__init__(model)
 
-        self.headers = {"Authorization": f"Bearer {api_key}"}
+        if not api_key:
+            raise ValueError("OpenRouter API key is empty.")
+
+        self.headers = {
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json",
+        }
         print(f"Using OpenRouter model: {model} with base URL: {base_url}")
-        print(f"api_key: {api_key}")
-        self.url = base_url
+        self.url = base_url.rstrip("/")
+        if not self.url.endswith("/chat/completions"):
+            self.url += "/chat/completions"
         self.max_tokens = max_tokens
         self.temperature = temperature
         timeout_config = httpx.Timeout(5.0)
@@ -42,7 +50,7 @@ class OpenRouter(Client):
     async def generate(  # type: ignore
         self,
         prompt: ChatFormatRequest,
-        max_retries: int = 1,
+        max_retries: int = 3,
         **kwargs,  # type: ignore
     ) -> Response:  # type: ignore
         kwargs.pop("schema", None)
@@ -63,6 +71,7 @@ class OpenRouter(Client):
                 response = await self.client.post(
                     url=self.url, json=data, headers=self.headers, timeout=100
                 )
+                response.raise_for_status()
                 result = self.postprocess(response)
 
                 return result
@@ -71,6 +80,15 @@ class OpenRouter(Client):
                 logger.warning(
                     f"Attempt {attempt + 1}: Invalid JSON response, retrying..."
                 )
+
+            except httpx.HTTPStatusError as e:
+                body = e.response.text[:1000]
+                logger.warning(
+                    f"Attempt {attempt + 1}: HTTP {e.response.status_code} "
+                    f"from {urlparse(self.url).netloc}: {body}"
+                )
+                if e.response.status_code in {400, 401, 402, 403, 404}:
+                    break
 
             except Exception as e:
                 logger.warning(f"Attempt {attempt + 1}: {repr(e)}, retrying...")

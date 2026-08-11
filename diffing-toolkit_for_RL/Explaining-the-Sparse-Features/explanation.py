@@ -230,7 +230,7 @@ async def main():
 
     #latent_dict = {hp: torch.arange(0, args.num_latents) for hp in hookpoints}
     #selected_latents = torch.tensor(get_topk_range_indices(args.feature_file, top_k=args.top_k), dtype=torch.long)
-    selected_latents = torch.tensor(get_feature_ids_from_json(args.feature_file, top_k=args.top_k), dtype=torch.long)
+    selected_latents = torch.tensor(get_feature_ids_from_json(args.feature_file), dtype=torch.long)
 
     latent_dict = {hp: selected_latents for hp in hookpoints}
 
