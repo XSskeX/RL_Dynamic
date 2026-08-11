@@ -29,20 +29,20 @@ if __name__ == '__main__':
             data = {
                 "data_source": data_source,
                 "prompt": question,
-                "ability": "math",
-                "reward_model": {"style": "rule", "ground_truth": answer},
+                "ability": "",
+                "reward_model": {"style": "rule", "ground_truth": ""},
                 "extra_info": {
-                    "split": split,
-                    "index": idx,
+                    "split": "",
+                    "index": "",
                     "instruction_id_list": [],
                     "kwargs": [], 
-                    "question": question_raw,
+                    "question": "",
                 },
             }
             return data
         return process_fn
 
-    train_dataset = raw_dataset.map(function=make_map_fn("train"))
+    train_dataset = raw_dataset.map(function=make_map_fn("train"), remove_columns=raw_dataset.column_names)
 
     local_save_dir = args.local_dir
     os.makedirs(local_save_dir, exist_ok=True)
