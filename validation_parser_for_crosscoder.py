@@ -196,7 +196,7 @@ def parse_kk():
     (2) ...
     (3) ...
     '''
-    dataset = load_dataset(
+    dataset = datasets.load_dataset(
         "K-and-K/knights-and-knaves",
         "train",
         split="3ppl",

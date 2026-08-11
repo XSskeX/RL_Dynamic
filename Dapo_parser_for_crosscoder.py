@@ -27,17 +27,7 @@ if __name__ == '__main__':
             answer_raw = example.pop("reward_model")['ground_truth']
             answer = str(answer_raw).strip()
             data = {
-                "data_source": data_source,
                 "prompt": question,
-                "ability": "math",
-                "reward_model": {"style": "rule", "ground_truth": answer},
-                "extra_info": {
-                    "split": split,
-                    "index": idx,
-                    "instruction_id_list": [],
-                    "kwargs": [], 
-                    "question": question_raw,
-                },
             }
             return data
         return process_fn
