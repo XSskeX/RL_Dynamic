@@ -1,0 +1,62 @@
+# @package organism
+name: if_rl
+description: Organism trained on instruction following RL dataset
+type: RL
+description_long: |
+ The base model was already trained to reason on instruction following problems. The finetuning was done using RL on the same kind of instruction following problems.
+dataset:
+  id: /share/nlp/baijun/shuhan/IF_bench_for_Diffing
+  splits:
+  - train
+  - validation
+  is_chat: false
+  text_column: prompt
+finetuned_models:
+  llama32_3B_Instruct:
+    default:
+      model_id: /share/nlp/share/shuhan/IF_Bench_ckpt/global_step_30/actor_hf_export
+  global_step_30:
+    default:
+      model_id: /share/nlp/share/shuhan/IF_Bench_ckpt/global_step_60/actor_hf_export
+  global_step_60:
+    default:
+      model_id: /share/nlp/share/shuhan/IF_Bench_ckpt/global_step_90/actor_hf_export
+  global_step_90:
+    default:
+      model_id: /share/nlp/share/shuhan/IF_Bench_ckpt/global_step_120/actor_hf_export
+  global_step_120:
+    default: 
+      model_id: /share/nlp/share/shuhan/IF_Bench_ckpt/global_step_150/actor_hf_export
+  global_step_150:
+    default:
+      model_id: /share/nlp/share/shuhan/IF_Bench_ckpt/global_step_180/actor_hf_export
+  global_step_180:
+    default:
+      model_id: /share/nlp/share/shuhan/IF_Bench_ckpt/global_step_210/actor_hf_export
+  global_step_210:
+    default:
+      model_id: /share/nlp/share/shuhan/IF_Bench_ckpt/global_step_240/actor_hf_export
+  global_step_240:
+    default:
+      model_id: /share/nlp/share/shuhan/IF_Bench_ckpt/global_step_270/actor_hf_export
+  global_step_270:
+    default:
+      model_id: /share/nlp/share/shuhan/IF_Bench_ckpt/global_step_300/actor_hf_export
+  global_step_300:
+    default:  
+      model_id: /share/nlp/share/shuhan/IF_Bench_ckpt/global_step_330/actor_hf_export
+  global_step_330:
+    default:
+      model_id: /share/nlp/share/shuhan/IF_Bench_ckpt/global_step_360/actor_hf_export
+  global_step_360:
+    default:
+      model_id: /share/nlp/share/shuhan/IF_Bench_ckpt/global_step_390/actor_hf_export
+  global_step_390:
+    default:
+      model_id: /share/nlp/share/shuhan/IF_Bench_ckpt/global_step_420/actor_hf_export
+  global_step_420:
+    default:
+      model_id: /share/nlp/share/shuhan/IF_Bench_ckpt/global_step_450/actor_hf_export
+  global_step_0_to_450:
+    default:
+      model_id: /share/nlp/share/shuhan/IF_Bench_ckpt/global_step_450/actor_hf_export
