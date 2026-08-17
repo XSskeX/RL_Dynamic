@@ -1,0 +1,38 @@
+# @package organism
+name: logical_rl
+description: Organism trained on logical RL dataset
+type: RL
+description_long: |
+ The base model was already trained to reason on logical problems. The finetuning was done using RL on the same kind of logical problems.
+dataset:
+  id: /share/nlp/baijun/shuhan/KK_for_Diffing
+  splits:
+  - train
+  - validation
+  is_chat: false
+  text_column: prompt
+finetuned_models:
+  llama32_3B_Instruct:
+    default:
+      model_id: /share/nlp/share/shuhan/KK_ckpt/global_step_30/actor_hf_export
+  global_step_30:
+    default:
+      model_id: /share/nlp/share/shuhan/KK_ckpt/global_step_60/actor_hf_export
+  global_step_60:
+    default:
+      model_id: /share/nlp/share/shuhan/KK_ckpt/global_step_90/actor_hf_export
+  global_step_90:
+    default:
+      model_id: /share/nlp/share/shuhan/KK_ckpt/global_step_120/actor_hf_export
+  global_step_120:
+    default: 
+      model_id: /share/nlp/share/shuhan/KK_ckpt/global_step_150/actor_hf_export
+  global_step_150:
+    default:
+      model_id: /share/nlp/share/shuhan/KK_ckpt/global_step_180/actor_hf_export
+  global_step_180:
+    default:
+      model_id: /share/nlp/share/shuhan/KK_ckpt/global_step_210/actor_hf_export
+  global_step_210:
+    default:
+      model_id: /share/nlp/share/shuhan/KK_ckpt/global_step_240/actor_hf_export

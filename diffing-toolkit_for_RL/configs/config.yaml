@@ -1,5 +1,5 @@
 defaults:
-  - organism: Math_RL
+  - organism: Logical_RL
   - model: llama32_3B_Instruct
   - diffing/method: crosscoder
   - infrastructure: mats_cluster
