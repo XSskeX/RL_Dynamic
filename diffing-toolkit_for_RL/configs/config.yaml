@@ -35,7 +35,7 @@ preprocessing:
   max_tokens_per_dataset_train: 500_000_000
   max_tokens_per_dataset_validation: 5_000_000
   batch_size: 32
-  context_len: 1024
+  context_len: 4096
   dtype: bfloat16 # dtype of how activations are stored (independent of model dtype)
   store_tokens: true
   overwrite: false

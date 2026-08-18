@@ -5,7 +5,7 @@ type: RL
 description_long: |
  The base model was already trained to reason on math problems. The finetuning was done using RL on the same kind of math problems.
 dataset:
-  id: /share/nlp/baijun/shuhan/DAPO17k_for_Diffing
+  id: /share/nlp/baijun/shuhan/OpenThoughts_for_Diffing
   splits:
   - train
   - validation
