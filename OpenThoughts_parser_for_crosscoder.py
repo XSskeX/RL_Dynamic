@@ -14,8 +14,8 @@ if __name__ == '__main__':
     parser.add_argument("--is_test", default=False)
     args = parser.parse_args()
     dataset = datasets.load_dataset(args.local_dataset_path, "default")
-    raw_dataset = dataset['train']
-    train_raw_dataset, test_raw_dataset = raw_dataset.train_test_split(test_size=0.95, seed=42)
+    raw_dataset = dataset['train'].train_test_split(test_size=0.95, seed=42)
+    train_raw_dataset, test_raw_dataset = raw_dataset["train"], raw_dataset["test"]
         
     data_source = "open-r1/OpenThoughts-114k-math"
     #instruction_following = ""
